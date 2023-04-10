@@ -36,7 +36,7 @@ def register():
             return jsonify({'message': 'User already exists'}), 400
     # 如果用户不存在，则将信息加入到用户列表中
     user_db.append({'username': username, 'password': password})
-    return jsonify({'message': 'User registered successfully'}), 200
+    return jsonify({'code':200,'message': 'User registered successfully'})
 
 
 if __name__ == '__main__':
