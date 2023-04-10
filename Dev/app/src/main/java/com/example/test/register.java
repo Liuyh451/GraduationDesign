@@ -22,11 +22,12 @@ public class register extends AppCompatActivity {
             super.handleMessage(msg);
             boolean result = (Boolean) msg.obj;
             // 通过 msg.arg1, msg.arg2, msg.obj 等获取子线程数据，然后在主线程中处理
-            Toast.makeText(getApplicationContext(), "注册成功，已为您自动登录", Toast.LENGTH_SHORT).show();
-
+            Toast.makeText(register.this, result ? "注册成功，已为您自动登录" : "用户名已存在请重新注册", Toast.LENGTH_SHORT).show();
             // 注册完成后自动登录主界面，登录到主界面
-            Intent intent = new Intent(register.this, MainActivity2.class);
-            startActivity(intent);
+            if(result){
+                Intent intent = new Intent(register.this, MainActivity2.class);
+                startActivity(intent);
+            }
         }
     };
     @Override
@@ -62,7 +63,7 @@ public class register extends AppCompatActivity {
                     Log.d("TAG", username);
                     Log.d("TAG", password);
                     String registerUrl = "http://10.0.2.2:5000/register";
-                    boolean loginResult = NetUnit.sendLoginRequest(registerUrl, username, password);
+                    boolean loginResult = NetUnit.sendRegisterRequest(registerUrl, username, password);
                     Log.d("TAG", registerUrl);
                     Message msg = new Message();
                     msg.obj = loginResult;

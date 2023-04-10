@@ -63,15 +63,11 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     new Thread(new Runnable() {
                         public void run() {
-                            Log.d("TAG", username);
-                            Log.d("TAG", password);
                             String loginUrl = "http://10.0.2.2:5000/login";
-                            boolean loginResult = NetUnit.sendRegisterRequest(loginUrl, username, password);
-                            Log.d("TAG", loginUrl);
+                            boolean loginResult = NetUnit.sendLoginRequest(loginUrl, username, password);
                             Message msg = new Message();
                             msg.obj = loginResult;
                             mHandler.sendMessage(msg);
-
                             // 在此处执行网络操作
                         }
                     }).start();

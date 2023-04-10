@@ -2,6 +2,10 @@ package com.example.test;
 
 import android.util.Log;
 
+import com.google.gson.Gson;
+
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -41,8 +45,6 @@ public class NetUnit {
 
             // 发送请求并读取结果
             int responseCode = connection.getResponseCode();
-            String numString = Integer.toString(responseCode);
-            Log.d("TAG", numString);
 
             StringBuilder response = new StringBuilder();
             String line;
@@ -54,12 +56,12 @@ public class NetUnit {
                     response.append(line);
                 }
             }
-            String str = response.toString();
-            Log.d("TAG", "res" + str);
+            //将json字符串转为JsonObj，方便读取返回值
+            JSONObject person = new JSONObject(response.toString());
+            String respCode = person.getString("code");
+            Log.d("TAG", "rescode---" +respCode );
             // 判断响应结果
-            if (responseCode == 200) {
-                Log.d("TAG", "111111");
-
+            if (respCode.equals("200")) {
                 return true;
             } else {
                 return false;
@@ -103,8 +105,7 @@ public class NetUnit {
 
             // 发送请求并读取结果
             int responseCode = connection.getResponseCode();
-            String numString = Integer.toString(responseCode);
-            Log.d("TAG", numString);
+
 
             StringBuilder response = new StringBuilder();
             String line;
@@ -116,8 +117,12 @@ public class NetUnit {
                     response.append(line);
                 }
             }
+            //将json字符串转为JsonObj，方便读取返回值
+            JSONObject person = new JSONObject(response.toString());
+            String respCode = person.getString("code");
+            Log.d("TAG", "rescode---" +respCode );
             // 判断响应结果
-            if (responseCode == 200) {
+            if (respCode.equals("200")) {
                 return true;
             } else {
                 return false;
