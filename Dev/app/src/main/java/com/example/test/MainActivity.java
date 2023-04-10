@@ -1,6 +1,5 @@
 package com.example.test;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -15,13 +14,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-
 public class MainActivity extends AppCompatActivity {
     private EditText usernameEditText, passwordEditText;
 
@@ -34,16 +26,20 @@ public class MainActivity extends AppCompatActivity {
             super.handleMessage(msg);
             boolean result = (Boolean) msg.obj;
 
-                Toast.makeText(MainActivity.this, result ? "登录成功" : "用户名或密码错误", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, result ? "登录成功" : "用户名或密码错误", Toast.LENGTH_SHORT).show();
             // 通过 msg.arg1, msg.arg2, msg.obj 等获取子线程数据，然后在主线程中处理
             // 如果用户名和密码均输入正确，登录到主界面
-            Intent intent = new Intent(MainActivity.this, MainActivity2.class);
-            startActivity(intent);
+            if(result){
+                Intent intent = new Intent(MainActivity.this, MainActivity2.class);
+                startActivity(intent);
+            }
+
         }
     };
 
     // 登录按钮控件
     private Button loginButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,28 +63,27 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     new Thread(new Runnable() {
                         public void run() {
-                            Log.d("TAG",username);
-                            Log.d("TAG",password);
+                            Log.d("TAG", username);
+                            Log.d("TAG", password);
                             String loginUrl = "http://10.0.2.2:5000/login";
-                            boolean loginResult = login_post.sendLoginRequest(loginUrl, username, password);
-                            Log.d("TAG",loginUrl);
+                            boolean loginResult = NetUnit.sendRegisterRequest(loginUrl, username, password);
+                            Log.d("TAG", loginUrl);
                             Message msg = new Message();
-                            msg.obj=loginResult;
+                            msg.obj = loginResult;
                             mHandler.sendMessage(msg);
 
                             // 在此处执行网络操作
                         }
                     }).start();
-
-
                 }
             }
         });
-
     }
-
-
-
+    //点击注册按钮后跳转到注册页面
+    public void openNextActivity(View view) {
+        Intent intent = new Intent(this, register.class);
+        startActivity(intent);
+    }
 
 
 }

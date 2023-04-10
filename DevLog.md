@@ -8,6 +8,9 @@
 
 - [ ] 找UI组件库，GitHub开源的
 - [ ] 学习Android的网络请求，注意跨域问题
+- [x] 测试注册模块
+- [ ] 需要获取json中的code，用响应code不行
+- [x] 需要解决ui消失的问题 ~~曲线解决~~
 
 #### 1.1.1 遇到的问题以及解决方案
 
@@ -148,6 +151,16 @@ new Thread(new Runnable() {
                     }).start();
 ```
 
+##### 1.1.1.5 W/System.err: java.net.ConnectException: Failed to connect to /127.0.0.1:5000
+
+原因：在[Android](http://lib.csdn.net/base/android)开发中通过localhost或127.0.0.1访问本地服务器时，会报[Java](http://lib.csdn.net/base/javase)[.NET](http://lib.csdn.net/base/dotnet).ConnectException: localhost/127.0.0.1:8083 -Connection refused异常。因为Android模拟器本身把自己当做了localhost或127.0.0.1，而此时我们又通过localhost或127.0.0.1访问本地服务器，所以会抛出异常了。
+
+解决方案：
+
+```
+在模拟器上可以用10.0.2.2代替127.0.0.1和localhost；
+```
+
 #### 1.1.2 待思考和解决的问题
 
 ```java
@@ -172,7 +185,11 @@ int responseCode = connection.getResponseCode();//responseCode:200,201....
 
 ### 1.2 推荐模块
 
+初步想法是做一个listview，在用户数据少的时候直接进行随机推荐，利用fragment机制进行跳转
+
 ### 1.3 用户的评分，收藏等拓展模块
+
+### 1.4 用户个人中心模块
 
 ## 2.Flask后端
 
@@ -183,6 +200,7 @@ int responseCode = connection.getResponseCode();//responseCode:200,201....
 ###### Todo
 
 - [ ] 学习flask验证，并测试API
+- [ ] 冷启动问题，直接随机推荐任意的，待用户喜欢的数据达到一定数量的时候，再进行推荐
 
 ### 2.2电子书推荐模块
 
