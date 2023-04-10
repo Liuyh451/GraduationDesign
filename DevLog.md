@@ -9,7 +9,7 @@
 - [ ] 找UI组件库，GitHub开源的
 - [ ] 学习Android的网络请求，注意跨域问题
 - [x] 测试注册模块
-- [ ] 需要获取json中的code，用响应code不行
+- [x] 需要获取json中的code，用响应code不行
 - [x] 需要解决ui消失的问题 ~~曲线解决~~
 
 #### 1.1.1 遇到的问题以及解决方案
@@ -161,6 +161,16 @@ new Thread(new Runnable() {
 在模拟器上可以用10.0.2.2代替127.0.0.1和localhost；
 ```
 
+##### 1.1.1.6 无法获取json字符串中的数据
+
+解决方案：将json字符串转为JsonObj
+
+```java
+//将json字符串转为JsonObj，方便读取返回值
+            JSONObject person = new JSONObject(response.toString());
+            String respCode = person.getString("code");
+```
+
 #### 1.1.2 待思考和解决的问题
 
 ```java
@@ -212,14 +222,211 @@ int responseCode = connection.getResponseCode();//responseCode:200,201....
 - [ ] 查找数据集，并进行数据清洗
 - [ ] 学习如何从mysql中获取数据，并交由sklearn进行处理
 - [ ] 思考是否能只增加更新后那一个数据，而不必全部重新进行训练。
+- [ ] https://www.bilibili.com/video/BV1wA41197hb?p=8&vd_source=6368fab9a1f9e5ff082e1e1f68e1de89基于协同过滤
+- [ ] https://blog.csdn.net/weixin_62075168/article/details/128431395 基于tensorflow
+- [ ] https://blog.csdn.net/Jason_Nevermind/article/details/123982764
+- [ ] https://blog.csdn.net/weixin_62075168/article/details/128431395
 
 初步设计思路如下：
 
-#### 2.2.1 仅以作者为标签进行深度学习，做出推荐列表
+#### 2.2.1 基于Apache Mahout的推荐算法
 
-这个是一个初步的demo，目前的时间不够，可能完成。
+```java
+import org.apache.mahout.cf.taste.impl.model.file.FileDataModel;
+import org.apache.mahout.cf.taste.impl.neighborhood.ThresholdUserNeighborhood;
+import org.apache.mahout.cf.taste.impl.recommender.GenericUserBasedRecommender;
+import org.apache.mahout.cf.taste.impl.similarity.PearsonCorrelationSimilarity;
+import org.apache.mahout.cf.taste.model.DataModel;
+import org.apache.mahout.cf.taste.neighborhood.UserNeighborhood;
+import org.apache.mahout.cf.taste.recommender.RecommendedItem;
+import org.apache.mahout.cf.taste.recommender.UserBasedRecommender;
+import org.apache.mahout.cf.taste.similarity.UserSimilarity;
 
-#### 2.2.2 仅以题材为标签进行深度学习，做出推荐列表
+import java.io.File;
+import java.util.List;
+
+public class BookRecommender {
+    public static void main(String[] args) throws Exception {
+        // 加载用户评分数据
+        DataModel model = new FileDataModel(new File("/path/to/your/data.csv"));
+
+        // 计算相似度
+        UserSimilarity similarity = new PearsonCorrelationSimilarity(model);
+
+        // 构建邻居
+        UserNeighborhood neighborhood =
+                new ThresholdUserNeighborhood(0.1, similarity, model);
+
+        // 构建推荐引擎
+        UserBasedRecommender recommender =
+                new GenericUserBasedRecommender(model, neighborhood, similarity);
+
+        // 获得用户ID，以及需要生成前n个推荐的书籍数量为10
+        long userID = 1;
+        int n = 10;
+
+        // 生成推荐列表
+        List<RecommendedItem> recommendations =
+                recommender.recommend(userID, n);
+
+        // 打印推荐列表
+        for (RecommendedItem recommendation : recommendations) {
+            System.out.println(recommendation);
+        }
+    }
+}
+
+```
+
+#### 2.2.2 基于tensorflow的推荐算法
+
+首先，您需要使用用户对书籍的评分数据对TensorFlow模型进行训练，以便模型可以学习用户的偏好和行为模式。然后，您可以使用模型对新的用户-书籍组合进行推荐。
+
+以下是一个例子，展示如何在TensorFlow中构建和使用推荐模型。这个例子使用了基于矩阵分解的协同过滤算法。
+
+首先，您需要加载数据和对数据进行预处理。假设您的数据如下：
+
+| **User ID** | Book ID | **Rating** |
+| :---------: | :-----: | :--------: |
+|      1      |    1    |     4      |
+|      1      |    2    |     3      |
+|      2      |    1    |     1      |
+|     ...     |   ...   |    ...     |
+
+<div align="center">用户-书籍评分数据表（表名为ratings）
+    </div>
+
+| Book ID | **Title**             | **Author**          | ...  |
+| ------- | --------------------- | ------------------- | ---- |
+| 1       | The Great Gatsby      | F. Scott Fitzgerald | ...  |
+| 2       | To Kill a Mockingbird | Harper Lee          | ...  |
+| 3       | 1984                  | George Orwell       | ...  |
+| ...     | ...                   | ...                 |      |
+
+<div align="center">书籍元数据表（表名为books）
+    </div>
+
+使用pandas库加载数据：
+
+```python
+import pandas as pd
+
+# 加载评分数据
+ratings = pd.read_csv('ratings.csv')
+
+# 将评分数据转化为矩阵
+ratings_matrix = ratings.pivot(
+    index='user_id',
+    columns='book_id',
+    values='rating'
+).fillna(0)
+
+# 加载书籍元数据
+books = pd.read_csv('books.csv')
+```
+
+然后，您需要建立TensorFlow模型。基于矩阵分解的协同过滤算法可以将用户和书籍都映射到低维向量上，然后计算这些向量之间的余弦相似度。下面是一个简单的TensorFlow模型示例：
+
+```python
+import tensorflow as tf
+import numpy as np
+
+# 定义模型
+n_user = ratings_matrix.shape[0]
+n_book = ratings_matrix.shape[1]
+n_embedding = 20
+
+user_input = tf.placeholder(tf.int32, [None])
+book_input = tf.placeholder(tf.int32, [None])
+rating_input = tf.placeholder(tf.float32, [None])
+
+user_embedding = tf.get_variable('user_embedding', shape=(n_user, n_embedding))
+book_embedding = tf.get_variable('book_embedding', shape=(n_book, n_embedding))
+
+user_bias = tf.get_variable('user_bias', shape=(n_user,))
+book_bias = tf.get_variable('book_bias', shape=(n_book,))
+
+user_embed = tf.nn.embedding_lookup(user_embedding, user_input)
+book_embed = tf.nn.embedding_lookup(book_embedding, book_input)
+
+user_bias_embed = tf.nn.embedding_lookup(user_bias, user_input)
+book_bias_embed = tf.nn.embedding_lookup(book_bias, book_input)
+
+prediction = tf.reduce_sum(user_embed * book_embed, axis=1) + user_bias_embed + book_bias_embed
+
+# 定义损失函数
+loss = tf.reduce_mean(tf.square(rating_input - prediction))
+
+# 定义优化器
+train_op = tf.train.AdamOptimizer().minimize(loss)
+
+```
+
+通过训练模型学习用户和书籍的偏好向量，模型可以预测一个用户对于某本书的评分。然后，您可以使用模型对新的用户-书籍组合进行推荐。
+
+```python
+# 训练模型
+n_iter = 1000
+batch_size = 512
+
+with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer())
+    for i in range(n_iter):
+        # 从评分数据中随机取出一个batch的数据进行训练
+        idx = np.random.choice(len(ratings), batch_size)
+        batch_users = ratings.loc[idx, 'user_id'].values
+        batch_books = ratings.loc[idx, 'book_id'].values
+        batch_ratings = ratings.loc[idx, 'rating'].values
+
+        feed_dict = {
+            user_input: batch_users,
+            book_input: batch_books,
+            rating_input: batch_ratings
+        }
+        _, l = sess.run([train_op, loss], feed_dict=feed_dict)
+        if i % 100 == 0:
+            print(f'Iteration {i} Loss {l}')
+
+    # 预测某个用户对于所有书籍的评分
+    user_id = 1
+    user_ratings = ratings_matrix.loc[user_id]
+    book_ids = list(user_ratings.index)
+    feed_dict = {
+        user_input: [user_id] * len(book_ids),
+        book_input: book_ids,
+    }
+    predicted_ratings = sess.run(prediction, feed_dict=feed_dict)
+    
+    # 选出最高的前10个评分，推荐给用户
+    top_n = 10
+    recommendation_idx = np.argsort(predicted_ratings)[-top_n:][::-1]
+    recommendations = books.loc[book_ids[recommendation_idx], 'Title']
+    print(f'Recommended books for user {user_id}:')
+    for r in recommendations:
+        print(r)
+
+```
+
+通过调整模型结构和参数，可以得到更加精确和个性化的推荐结果。
 
 #### 2.2.3 综合作者，题材，用户给出的评分等综合推荐
 
+## 3 不要更新Gradle
+
+网络被墙，会失败，会导致无法运行程序
+
+gradle-wrapper.properties文件下：
+
+```json
+distributionUrl=https\://services.gradle.org/distributions/gradle-7.0.2-bin.zip
+```
+
+目前版本号
+
+位于build.gradle(Module:app)
+
+```json
+dependencies {
+    classpath 'com.android.tools.build:gradle:7.0.3'
+}
+```
