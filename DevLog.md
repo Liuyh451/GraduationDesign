@@ -221,11 +221,11 @@ int responseCode = connection.getResponseCode();//responseCode:200,201....
 - [ ] 学习python和mysql的交互
 - [ ] 查找数据集，并进行数据清洗
 - [ ] 学习如何从mysql中获取数据，并交由sklearn进行处理
-- [ ] 思考是否能只增加更新后那一个数据，而不必全部重新进行训练。
-- [ ] https://www.bilibili.com/video/BV1wA41197hb?p=8&vd_source=6368fab9a1f9e5ff082e1e1f68e1de89基于协同过滤
-- [ ] https://blog.csdn.net/weixin_62075168/article/details/128431395 基于tensorflow
-- [ ] https://blog.csdn.net/Jason_Nevermind/article/details/123982764
-- [ ] https://blog.csdn.net/weixin_62075168/article/details/128431395
+- [x] 思考是否能只增加更新后那一个数据，而不必全部重新进行训练。
+- [ ] [基于用户的协同过滤推荐算法](https://www.bilibili.com/video/BV1wA41197hb)
+- [ ] [Apache Mahout初体验](https://blog.csdn.net/Jason_Nevermind/article/details/123982764 )
+- [x]  [基于tensorflow的个性化电影推荐系统实战](https://blog.csdn.net/weixin_62075168/article/details/128431395)
+- [ ] 考虑保存模型和加载模型，若无法加载模型，就推荐100个每次展示10个，曲线救国
 
 初步设计思路如下：
 
@@ -278,13 +278,9 @@ public class BookRecommender {
 
 ```
 
-#### 2.2.2 基于tensorflow的推荐算法
+#### 2.2.2 基于tensorflow的推荐算法（目前使用）
 
-首先，您需要使用用户对书籍的评分数据对TensorFlow模型进行训练，以便模型可以学习用户的偏好和行为模式。然后，您可以使用模型对新的用户-书籍组合进行推荐。
-
-以下是一个例子，展示如何在TensorFlow中构建和使用推荐模型。这个例子使用了基于矩阵分解的协同过滤算法。
-
-首先，您需要加载数据和对数据进行预处理。假设您的数据如下：
+数据如下：
 
 | **User ID** | Book ID | **Rating** |
 | :---------: | :-----: | :--------: |
@@ -305,109 +301,110 @@ public class BookRecommender {
 
 <div align="center">书籍元数据表（表名为books）
     </div>
+使用 TensorFlow 实现用户-物品协同过滤推荐算法的过程，使用了基于矩阵分解的协同过滤算法。步骤如下（伪代码）：
 
-使用pandas库加载数据：
+1. 准备数据：从 CSV 文件中读取用户-物品评分矩阵，评分范围为 1 到 5，0 表示用户没有评分（未读）。
 
-```python
-import pandas as pd
+   ```python
+   import pandas as pd
+   
+   ratings_df = pd.read_csv('ratings.csv').drop_duplicates(['user_id', 'item_id'])
+   ratings_matrix = ratings_df.pivot(index='user_id', columns='item_id', values='rating').fillna(0)
+   ```
 
-# 加载评分数据
-ratings = pd.read_csv('ratings.csv')
+2. 删除重复的记录，并将评分数据转换为矩阵。
 
-# 将评分数据转化为矩阵
-ratings_matrix = ratings.pivot(
-    index='user_id',
-    columns='book_id',
-    values='rating'
-).fillna(0)
+   ```python
+   is_duplicated = ratings.duplicated(subset=['user_id', 'book_id'])
+   ratings = ratings[~is_duplicated]
+   ratings = np.array(ratings_matrix)
+   ```
 
-# 加载书籍元数据
-books = pd.read_csv('books.csv')
-```
+3. 定义模型：使用神经网络实现协同过滤，该模型由用户和物品的嵌入向量乘积组成。
 
-然后，您需要建立TensorFlow模型。基于矩阵分解的协同过滤算法可以将用户和书籍都映射到低维向量上，然后计算这些向量之间的余弦相似度。下面是一个简单的TensorFlow模型示例：
+   ```python
+   import tensorflow as tf
+   
+   class CFModel(tf.keras.Model):
+       def __init__(self, num_users, num_items, embedding_size):
+           super(CFModel, self).__init__()
+           self.user_embedding = tf.keras.layers.Embedding(...)
+           self.item_embedding = tf.keras.layers.Embedding(...)
+           self.predict_layer = tf.keras.layers.Dense(...)
+   
+       def call(self, inputs):
+           user_vector = self.user_embedding(inputs[:, 0])
+           item_vector = self.item_embedding(inputs[:, 1])
+           dot_product = tf.reduce_sum(tf.multiply(user_vector, item_vector), axis=1)
+           output = self.predict_layer(dot_product)
+           return output
+   
+   ```
 
-```python
-import tensorflow as tf
-import numpy as np
+4. 训练模型：使用训练数据进行梯度下降训练，并将损失做为训练过程的指标。
 
-# 定义模型
-n_user = ratings_matrix.shape[0]
-n_book = ratings_matrix.shape[1]
-n_embedding = 20
+   ```python
+   model = CFModel(num_users, num_items, embedding_size)
+   optimizer = tf.keras.optimizers.Adam(...)
+   mse_loss = tf.keras.losses.MeanSquaredError()
+   
+   for epoch in range(num_epochs):
+     for batch in batches:
+       with tf.GradientTape() as tape:
+           user_item_pairs = tf.gather(ratings_matrix, batch)
+           predictions = model(user_item_pairs)
+           loss = mse_loss(true_ratings, predictions)
+       gradients = tape.gradient(loss, model.trainable_variables)
+       optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+   
+   ```
+   
+5. 评估模型：使用测试数据计算均方误差（MSE），用于评估模型的性能。
 
-user_input = tf.placeholder(tf.int32, [None])
-book_input = tf.placeholder(tf.int32, [None])
-rating_input = tf.placeholder(tf.float32, [None])
+   ```python
+   test_df = pd.read_csv('test.csv')
+   test_matrix = test_df.pivot(index='user_id', columns='item_id', values='rating').fillna(0)
+   user_item_pairs = tf.gather(test_matrix, batch)
+   predictions = model(user_item_pairs)
+   mse = mse_loss(true_ratings, predictions)
+   ```
 
-user_embedding = tf.get_variable('user_embedding', shape=(n_user, n_embedding))
-book_embedding = tf.get_variable('book_embedding', shape=(n_book, n_embedding))
+6. 使用模型进行推荐：为指定的用户推荐指定数量的未读过物品。
 
-user_bias = tf.get_variable('user_bias', shape=(n_user,))
-book_bias = tf.get_variable('book_bias', shape=(n_book,))
+   ```python
+   user_id = ...
+   unseen_items = ...
+   scores = {}
+   for item_id in unseen_items:
+       prediction = model(tf.constant([[user_id, item_id]]))
+       scores[item_id] = prediction.numpy()[0]
+   recommended_items = sorted(scores, key=scores.get, reverse=True)[:num_recommendations]
+   ```
 
-user_embed = tf.nn.embedding_lookup(user_embedding, user_input)
-book_embed = tf.nn.embedding_lookup(book_embedding, book_input)
+7. 更新评分矩阵：更新给定用户和给定物品之间的评分。
 
-user_bias_embed = tf.nn.embedding_lookup(user_bias, user_input)
-book_bias_embed = tf.nn.embedding_lookup(book_bias, book_input)
+   ```python
+   update_ratings=ratings
+   def update_ratings_matrix(ratings, user_id, book_id, new_rating):
+       updated_ratings = ratings.copy()
+       updated_ratings[user_id, book_id] = new_rating
+       return updated_ratings
+   ```
 
-prediction = tf.reduce_sum(user_embed * book_embed, axis=1) + user_bias_embed + book_bias_embed
+8. 更新推荐：使用更新的评分矩阵，为指定的用户更新推荐物品。
 
-# 定义损失函数
-loss = tf.reduce_mean(tf.square(rating_input - prediction))
+   ```python
+   for user_id in updated_users:
+       unseen_items = ...
+       scores = {}
+       for item_id in unseen_items:
+           prediction = model(tf.constant([[user_id, item_id]]))
+           scores[item_id] = prediction.numpy()[0]
+       updated_recommendations[user_id] = sorted(scores, key=scores.get, reverse=True)[:num_recommendations]
+   
+   ```
 
-# 定义优化器
-train_op = tf.train.AdamOptimizer().minimize(loss)
-
-```
-
-通过训练模型学习用户和书籍的偏好向量，模型可以预测一个用户对于某本书的评分。然后，您可以使用模型对新的用户-书籍组合进行推荐。
-
-```python
-# 训练模型
-n_iter = 1000
-batch_size = 512
-
-with tf.Session() as sess:
-    sess.run(tf.global_variables_initializer())
-    for i in range(n_iter):
-        # 从评分数据中随机取出一个batch的数据进行训练
-        idx = np.random.choice(len(ratings), batch_size)
-        batch_users = ratings.loc[idx, 'user_id'].values
-        batch_books = ratings.loc[idx, 'book_id'].values
-        batch_ratings = ratings.loc[idx, 'rating'].values
-
-        feed_dict = {
-            user_input: batch_users,
-            book_input: batch_books,
-            rating_input: batch_ratings
-        }
-        _, l = sess.run([train_op, loss], feed_dict=feed_dict)
-        if i % 100 == 0:
-            print(f'Iteration {i} Loss {l}')
-
-    # 预测某个用户对于所有书籍的评分
-    user_id = 1
-    user_ratings = ratings_matrix.loc[user_id]
-    book_ids = list(user_ratings.index)
-    feed_dict = {
-        user_input: [user_id] * len(book_ids),
-        book_input: book_ids,
-    }
-    predicted_ratings = sess.run(prediction, feed_dict=feed_dict)
-    
-    # 选出最高的前10个评分，推荐给用户
-    top_n = 10
-    recommendation_idx = np.argsort(predicted_ratings)[-top_n:][::-1]
-    recommendations = books.loc[book_ids[recommendation_idx], 'Title']
-    print(f'Recommended books for user {user_id}:')
-    for r in recommendations:
-        print(r)
-
-```
-
-通过调整模型结构和参数，可以得到更加精确和个性化的推荐结果。
+其中，步骤 1 到 6构成了通用的协同过滤推荐算法，而步骤 7到 8 则是针对本代码实现的扩展，用于在已有推荐基础上，实时更新推荐结果。
 
 #### 2.2.3 综合作者，题材，用户给出的评分等综合推荐
 
@@ -430,3 +427,75 @@ dependencies {
     classpath 'com.android.tools.build:gradle:7.0.3'
 }
 ```
+
+## 4.数学相关
+
+### 4.1ALS
+
+ALS（Alternating Least Squares）是一种矩阵分解算法。它通过对评分矩阵进行分解，将用户和物品映射到低维的隐空间，从而可以预测用户对未评分物品的评分。ALS 算法的基本思想是通过交替优化用户和物品的隐式表示向量，以最小化预测评分和实际评分之间的均方误差。
+
+在实现中，ALS 算法会将评分矩阵分解为用户因子矩阵和物品因子矩阵，分别为*U*和 *V*，矩阵元素为实数。其中，矩阵 U 表示用户在潜在空间中的向量表示，矩阵 *V*表示物品在潜在空间中的向量表示。当训练完成后，我们可以使用矩阵相乘的方式来计算预测评分矩阵 ，如下所示：
+$$
+\hat{R}=U \cdot V^T
+
+$$
+
+$$
+其中，对于用户 u 和物品 i，预测评分 \hat{r}_{ui} 为 \hat{R}_{ui} = U_{u} \cdot V_{i}^T。
+$$
+
+矩阵分解的目的是将原始的评分矩阵分解为两个低维的因子矩阵，这样就可以在保留大量原始信息的情况下，将矩阵的存储和计算复杂度显著降低。由于ALS算法本质上是一个矩阵分解算法，因此它也是一种经典的推荐系统算法，在许多业界和学术界的系统中得到了广泛应用。
+
+### 4.2 Adam 优化器
+
+Adam（Adaptive Moment Estimation）是一种基于梯度的优化算法，用于训练神经网络。它是一种自适应学习率算法，可以自适应地调整每个参数的学习率，从而更好地适应不同的梯度的特征以获得更好的学习效果。
+
+该算法通过分别计算梯度的一阶和二阶矩来确定参数的更新方向和大小。一阶矩是梯度的指数加权平均值，用来估计梯度的均值；而二阶矩是梯度平方的指数加权平均值，用来估计梯度的方差。具体来说，Adam的公式如下：
+$$
+1. 计算梯度的一阶矩和二阶矩：
+m_t = \beta_1m_{t-1} + (1-\beta_1)g_t\\
+
+v_t=\beta_2v_{t-1}+(1-\beta_2)g_t^2\\
+
+其中 m_t 和 v_t 分别表示了梯度的一阶矩和二阶矩， g_t 是当前时刻的梯度。\\
+
+2. 根据一阶矩和二阶矩，更新参数：\\
+
+\theta_{t+1}=\theta_t-\frac{\eta}{\sqrt{\hat{v}_t}+\epsilon}\hat{m}_t\\
+
+其中，\theta_t 表示参数值，\eta 表示学习率，\epsilon 是一个非常小的常数，用于防止除 0 错误。\hat{m}_t 和 \hat{v}_t 表示一阶矩和二阶矩的偏差修正：\\
+
+\hat{m}_t=\frac{m_t}{1-\beta_1^t}\\
+
+\hat{v}_t=\frac{v_t}{1-\beta_2^t}
+$$
+
+### 4.3 MES
+
+MSE指的是均方误差（Mean Squared Error），是一个评估回归模型性能好坏的指标。它计算预测值与实际值之间差值的平方的平均值。通常情况下，MSE值越小意味着模型的拟合效果越好。
+
+MSE可以用以下公式计算：
+
+$$
+MSE = \frac{1}{n} \sum_{i=1}^{n}(y_i - \hat{y_i})^2
+$$
+其中，$y_i$ 表示实际值，$\hat{y_i}$ 表示预测值，$n$ 表示样本数量。
+
+在机器学习中，MSE通常用于回归问题的损失函数，可以通过最小化MSE来训练模型，使得模型可以更好地拟合训练数据，同时避免过度拟合。
+
+在Tensorflow中，可以使用`tf.keras.losses.MeanSquaredError`类来计算MSE。例如：
+
+```python
+import tensorflow as tf
+
+mse_loss = tf.keras.losses.MeanSquaredError()
+
+y_true = [[0., 1.], [1., 1.]]
+y_pred = [[1., 1.], [1., 0.]]
+
+loss = mse_loss(y_true, y_pred)
+
+print(loss.numpy()) # 输出 0.5
+```
+
+其中，`y_true` 表示实际值，`y_pred` 表示预测值，`loss`表示计算得到的MSE。
