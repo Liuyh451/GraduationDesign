@@ -201,6 +201,26 @@ int responseCode = connection.getResponseCode();//responseCode:200,201....
 
 ### 1.4 用户个人中心模块
 
+### 1.5 不要更新Gradle
+
+网络被墙，会失败，会导致无法运行程序
+
+gradle-wrapper.properties文件下：
+
+```json
+distributionUrl=https\://services.gradle.org/distributions/gradle-7.0.2-bin.zip
+```
+
+目前版本号
+
+位于build.gradle(Module:app)
+
+```json
+dependencies {
+    classpath 'com.android.tools.build:gradle:7.0.3'
+}
+```
+
 ## 2.Flask后端
 
 ### 2.1注册登录模块
@@ -218,14 +238,15 @@ int responseCode = connection.getResponseCode();//responseCode:200,201....
 
 ###### todo
 
-- [ ] 学习python和mysql的交互
-- [ ] 查找数据集，并进行数据清洗
-- [ ] 学习如何从mysql中获取数据，并交由sklearn进行处理
+- [x] 学习python和mysql的交互
+- [x] 查找数据集，并进行数据清洗
+- [ ] ~~学习如何从mysql中获取数据，并交由sklearn进行处理~~
 - [x] 思考是否能只增加更新后那一个数据，而不必全部重新进行训练。
 - [ ] [基于用户的协同过滤推荐算法](https://www.bilibili.com/video/BV1wA41197hb)
 - [ ] [Apache Mahout初体验](https://blog.csdn.net/Jason_Nevermind/article/details/123982764 )
 - [x]  [基于tensorflow的个性化电影推荐系统实战](https://blog.csdn.net/weixin_62075168/article/details/128431395)
 - [ ] 考虑保存模型和加载模型，若无法加载模型，就推荐100个每次展示10个，曲线救国
+- [ ] 获得书的ID而不是下标
 
 初步设计思路如下：
 
@@ -406,27 +427,127 @@ public class BookRecommender {
 
 其中，步骤 1 到 6构成了通用的协同过滤推荐算法，而步骤 7到 8 则是针对本代码实现的扩展，用于在已有推荐基础上，实时更新推荐结果。
 
-#### 2.2.3 综合作者，题材，用户给出的评分等综合推荐
+#### ~~2.2.3 综合作者，题材，用户给出的评分等综合推荐~~
 
-## 3 不要更新Gradle
+### 2.3遇到的问题及解决方案
 
-网络被墙，会失败，会导致无法运行程序
+#### 2.3.1 去重问题：Index contains duplicate entries, cannot reshape
 
-gradle-wrapper.properties文件下：
+这个错误通常会在使用 pandas 进行数据透视表操作时出现。数据源包含了重复的记录，导致透视过程中生成的结果包含了重复的行或列索引，从而无法将结果矩阵进行成规模的重塑。
 
-```json
-distributionUrl=https\://services.gradle.org/distributions/gradle-7.0.2-bin.zip
+a.删除记录
+
+```python
+# 根据行和列索引判断记录是否重复
+is_duplicated = df.duplicated(subset=['row_id', 'column_id'])
+# 删除重复的记录
+df = df[~is_duplicated]
 ```
 
-目前版本号
+b.求平均（将重复的值求平均值）
 
-位于build.gradle(Module:app)
-
-```json
-dependencies {
-    classpath 'com.android.tools.build:gradle:7.0.3'
-}
+```python
+pivoted_table = pd.pivot_table(
+    df,
+    values='value',      # 数据字段，也就是需要进行计算的值
+    index='row_id',      # 行索引
+    columns='column_id', # 列索引
+    aggfunc='mean'       # 数据聚合方法，这里使用平均值
+)
 ```
+
+#### 2.3.2去除csv文件中的中文字符
+
+```python
+import pandas as pd
+import string
+# 定义过滤函数，将非 ASCII 字符替换为空白字符
+def filter_non_ascii(s):
+    return ''.join(filter(lambda x: x in string.printable, s))
+# 读取 CSV 文件
+df = pd.read_csv('data.csv')
+# 过滤掉中文字符
+df = df.applymap(filter_non_ascii)
+# 对 DataFrame 进行操作，例如筛选、计算等
+...
+```
+
+#### 2.3.3 如果某个用户a的评分发生变化，如何不重新训练模型的情况下更新a的推荐
+
+思路：只需要更新评分矩阵，再调用model进行预测即可
+
+缺点：变化的数据可能无法及时和模型进行更新，需要定期重新训练模型
+
+```python
+def update_ratings_matrix(ratings, user_id, book_id, new_rating):
+    updated_ratings = ratings.copy()
+    updated_ratings[user_id, book_id] = new_rating
+    return updated_ratings
+# 更新评分矩阵
+updated_ratings = update_ratings_matrix(ratings, user_id, book_id, new_rating)
+recommended_books = recommend_books(model, user_id, num_recommendations=3)
+```
+
+#### 2.3.4 tensorflow保存模型
+
+```python
+# 实例化模型并训练
+num_users, num_items = train_data.shape
+model = MatrixFactorization(num_users, num_items, latent_factors)
+train(model, train_data, epochs=100)
+
+# 保存模型权重
+model.save_weights('matrix_factorization_model_weights.h5')
+```
+
+加载模型权重并进行推荐。这部分代码可以放在您需要进行推荐的任何位置，例如在一个单独的脚本中或在同一脚本的后面：
+
+```python
+# 创建一个与训练过的模型具有相同结构的新模型实例
+loaded_model = MatrixFactorization(num_users, num_items, latent_factors)
+
+# 加载保存的权重
+loaded_model.load_weights('matrix_factorization_model_weights.h5')
+
+# 使用加载的模型进行推荐
+recommended_books = recommend_books(loaded_model, user_id, num_recommendations)
+```
+
+## 3 构建Mysql数据库
+
+### 3.1 Books_Table
+
+```python
+import pandas as pd
+import pymysql
+
+# 读取 CSV 文件
+df = pd.read_csv('test.csv', usecols=['id', 'name', 'age'])
+
+# 连接 MySQL 数据库
+conn = pymysql.connect(host='localhost', user='user', password='pwd', db='db_name', charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor)
+
+# 插入数据
+with conn.cursor() as cursor:
+    for index, row in df.iterrows():
+        sql = "INSERT INTO test_table (id, name, age) VALUES (%s, %s, %s)"
+        cursor.execute(sql, (row['id'], row['name'], row['age']))
+    conn.commit()
+
+# 关闭连接
+conn.close()
+
+```
+
+#### 3.2 遇到的问题
+
+##### 3.2.1 pymysql.err.IntegrityError: (1062, "Duplicate entry '1' for key 'test.PRIMARY'")
+
+重复的主键值，解决方案同2.3.1
+
+##### 3.2.2 UnicodeDecodeError: 'utf-8' codec can't decode byte 0xce in position 24274: invalid continuation byte
+
+中文字符的原因，解决方案同2.3.2 ，待测试
 
 ## 4.数学相关
 
@@ -437,7 +558,6 @@ ALS（Alternating Least Squares）是一种矩阵分解算法。它通过对评�
 在实现中，ALS 算法会将评分矩阵分解为用户因子矩阵和物品因子矩阵，分别为*U*和 *V*，矩阵元素为实数。其中，矩阵 U 表示用户在潜在空间中的向量表示，矩阵 *V*表示物品在潜在空间中的向量表示。当训练完成后，我们可以使用矩阵相乘的方式来计算预测评分矩阵 ，如下所示：
 $$
 \hat{R}=U \cdot V^T
-
 $$
 
 $$
