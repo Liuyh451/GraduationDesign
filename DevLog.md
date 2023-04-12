@@ -458,9 +458,47 @@ pivoted_table = pd.pivot_table(
 
 #### 2.3.2去除csv文件中的中文字符
 
+曲线救国，换个编码方式
+
+解决UnicodeDecodeError: 'utf-8' codec can't decode bytes in position 68763-68764: invalid continuation byte
+原因是里面包含中文字符（乱码）
+这里是用gbk18030解决的
+
+```python
+def read_csv(file_path):
+
+    try:
+        df = pd.read_csv(file_path, encoding='utf-8')
+    except UnicodeDecodeError:
+        try:
+            df = pd.read_csv(file_path, encoding='gbk')
+            print('gbk')
+        except UnicodeDecodeError:
+            df = pd.read_csv(file_path, encoding='gb18030')
+            print('gbk18030')
+    return df
+```
+
+下面这种方法不好使，try-except都不行
+
 ```python
 import pandas as pd
 import string
+try:
+    df = pd.read_csv('2.csv', index_col=False, encoding='utf-8')
+except pd.errors.ParserError as e:
+    # 打印出出错信息
+    print(e)
+    # 打印出不能读取的行的索引
+    with open('2.csv', 'r', encoding='utf-8') as f:
+        for i, line in enumerate(f):
+            try:
+                # 尝试读取一行数据
+                pd.read_csv(line, header=None, encoding='utf-8')
+            except pd.errors.ParserError as e:
+                # 如果读取出错则说明该行不能被解析
+                print(f"Cannot parse line {i}: {line}")
+
 # 定义过滤函数，将非 ASCII 字符替换为空白字符
 def filter_non_ascii(s):
     return ''.join(filter(lambda x: x in string.printable, s))
@@ -547,7 +585,26 @@ conn.close()
 
 ##### 3.2.2 UnicodeDecodeError: 'utf-8' codec can't decode byte 0xce in position 24274: invalid continuation byte
 
-中文字符的原因，解决方案同2.3.2 ，待测试
+中文字符的原因，解决方案同2.3.2 ，~~待测试~~
+
+##### 3.2.3 pymysql.err.DataError: (1406, "Data too long for column 'author' at row 1")，如何把太长的数据写为unknown
+
+可以在代码中对过长的字段进行处理，将过长的字段写为 `unknown` 或者其他默认值。
+
+```python
+def truncate_string(s, max_len):
+    """
+    当字符串长度超过数据库限制时，将其截断或写为默认值
+    """
+    if s is None:
+        return 'unknown'
+
+    if len(s) > max_len:
+        return 'unknown'
+    else:
+        return s
+
+```
 
 ## 4.数学相关
 
