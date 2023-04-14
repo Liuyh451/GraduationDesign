@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+
+        <item
+            android:id="@+id/navigation_item1"
+            android:icon="@drawable/ic_bottom_nav_item1"
+            android:title="为您推荐"
+            app:showAsAction="ifRoom" />
+
+        <item
+            android:id="@+id/navigation_item2"
+            android:icon="@drawable/ic_bottom_nav_item2"
+            android:title="时下流行"
+            app:showAsAction="ifRoom" />
+
+        <item
+            android:id="@+id/navigation_item3"
+            android:icon="@drawable/ic_bottom_nav_item3"
+            android:title="关于我"
+            app:showAsAction="ifRoom" />
+
+</menu>

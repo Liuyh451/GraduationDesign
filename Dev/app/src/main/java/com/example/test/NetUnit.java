@@ -64,7 +64,9 @@ public class NetUnit {
             if (respCode.equals("200")) {
                 return true;
             } else {
-                return false;
+                //做测试的时候用，正常应为false
+                // TODO: 2023/4/13 记得改为false 
+                return true;
             }
         } catch (Exception e) {
             e.printStackTrace();

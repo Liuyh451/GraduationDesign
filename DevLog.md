@@ -195,7 +195,34 @@ int responseCode = connection.getResponseCode();//responseCode:200,201....
 
 ### 1.2 推荐模块
 
+todo
+
+- [ ] 整合fragment，之前写的。
+- [ ] 对接网络模块
+- [ ] 加载网络图片，glide不行的话，试试其他的
+
 初步想法是做一个listview，在用户数据少的时候直接进行随机推荐，利用fragment机制进行跳转
+
+#### 1.2.1遇到的问题以及解决方案
+
+**a.RecyclerView下拉背景有残留**
+
+
+
+![image-20230413230526639](C:\Users\86156\AppData\Roaming\Typora\typora-user-images\image-20230413230526639.png)
+
+曲线解决：不知道如何产生的，但是，我解决了。（但愿）去掉padding
+
+```xml
+//novel_item.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="?android:attr/selectableItemBackground"
+   ...
+    android:padding="8dp">
+```
+
+搞了我快3个小时，fuck！！！！！！！！！！！！！！！！！！！！！！！！！
 
 ### 1.3 用户的评分，收藏等拓展模块
 

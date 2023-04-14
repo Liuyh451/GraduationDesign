@@ -49,7 +49,7 @@ def createBooksDb():
         conn.commit()
     conn.close()
 
-book_id_list = [1, 11, 1202]
+
 def searchBooks(book_id_list):
     # 连接到MySQL数据库
     db = pymysql.connect(
@@ -109,7 +109,7 @@ def encrypt_password(password):
     return md5.hexdigest()
 
 
-def register(username, password):
+def register_db(username, password):
     """
     注册账号
     """
@@ -133,7 +133,7 @@ def register(username, password):
     return True
 
 
-def login(username, password):
+def login_db(username, password):
     """
     账号登录
     """
@@ -156,5 +156,4 @@ def login(username, password):
     db.close()
     return True
 
-#print(searchBooks(book_id_list))
 
