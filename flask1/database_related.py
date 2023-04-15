@@ -4,6 +4,7 @@ import json
 import hashlib
 import random
 
+
 def read_csv(file_path):
     """
     解决UnicodeDecodeError: 'utf-8' codec can't decode bytes in position 68763-68764: invalid continuation byte
@@ -20,6 +21,8 @@ def read_csv(file_path):
             df = pd.read_csv(file_path, encoding='gb18030')
             print('gbk18030')
     return df
+
+
 def truncate_string(s, max_len):
     """
     当字符串长度超过数据库限制时，将其截断或写为默认值
@@ -32,13 +35,15 @@ def truncate_string(s, max_len):
     else:
         return s
 
+
 def createBooksDb():
     # 连接 MySQL 数据库
     conn = pymysql.connect(host='localhost', user='root', password='123456',
-                       db='reccom_system', charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor)
+                           db='reccom_system', charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor)
     # 读取 CSV 文件
-    df = pd.read_csv('books.csv', encoding='gb18030',usecols=['book_id', 'title', 'authors', 'original_publication_year',
-                     'language_code', 'average_rating', 'work_text_reviews_count', 'image_url'])
+    df = pd.read_csv('books.csv', encoding='gb18030',
+                     usecols=['book_id', 'title', 'authors', 'original_publication_year',
+                              'language_code', 'average_rating', 'work_text_reviews_count', 'image_url'])
     print(df)
     df = df.fillna('')
     # 插入数据
@@ -47,7 +52,8 @@ def createBooksDb():
             authors = truncate_string(row[0], 255)
             sql = "INSERT INTO books(book_id, title, author,year,language,rating,review_count,image_url) VALUES (%s, %s, %s,%s, %s, %s, %s, %s)"
             cursor.execute(sql, (row['book_id'], row['title'], authors, row['original_publication_year'],
-                           row['language_code'], row['average_rating'], row['work_text_reviews_count'], row['image_url']))
+                                 row['language_code'], row['average_rating'], row['work_text_reviews_count'],
+                                 row['image_url']))
         conn.commit()
     conn.close()
 
@@ -60,7 +66,7 @@ def searchBooks(book_id_list):
         password="123456",
         database="reccom_system"
     )
-     # 准备查询语句
+    # 准备查询语句
     ids = ",".join([str(id) for id in book_id_list])
     query = f"SELECT * FROM books WHERE book_id IN ({ids})"
 
@@ -82,7 +88,7 @@ def searchBooks(book_id_list):
             "language_code": row[4],
             "average_rating": row[5],
             "work_text_reviews_count": row[6],
-            "image_url": row[7],            
+            "image_url": row[7],
             # 添加其他需要的字段
         }
         result.append(row_data)
@@ -93,15 +99,19 @@ def searchBooks(book_id_list):
     db.close()
 
     return json_result
+
+
 # 连接数据库
 def connect_mysql():
     db = pymysql.connect(host="localhost",
-                        user="root",
-                        password="123456",
-                        db="reccom_system",
-                        charset='utf8mb4')
+                         user="root",
+                         password="123456",
+                         db="reccom_system",
+                         charset='utf8mb4')
     # 获取游标对象
     return db
+
+
 def encrypt_password(password):
     """
     对密码进行加密
@@ -115,7 +125,7 @@ def register_db(username, password):
     """
     注册账号
     """
-    db=connect_mysql()
+    db = connect_mysql()
     cursor = db.cursor()
     # 查询用户名是否已经存在
     sql = "SELECT id FROM user WHERE username=%s"
@@ -162,9 +172,11 @@ def login_db(username, password):
         return 2
     else:
         return 1
-#查询评分前100的书，随机返回6本
+
+
+# 查询评分前100的书，随机返回6本
 def search_top_books():
-    db=connect_mysql()
+    db = connect_mysql()
     cursor = db.cursor()
     query = 'SELECT * FROM books ORDER BY rating DESC LIMIT 100'
     cursor.execute(query)
@@ -183,9 +195,11 @@ def search_top_books():
 
     json_result = json.dumps(book_list)
     return json_result
+
+
 def get_all_Books_db():
-    db=connect_mysql()
-    cursor=db.cursor()
+    db = connect_mysql()
+    cursor = db.cursor()
 
     # 查询随机生成的300个图书
     query = 'SELECT * FROM books ORDER BY rating DESC LIMIT 1000'
@@ -200,13 +214,20 @@ def get_all_Books_db():
             'title': row[1],
             'authors': row[2],
             'image_url': row[3],
-            #todo 加入 'price': row[4]
+            # todo 加入 'price': row[4]
         }
         books.append(book)
     return books
 
 
+def get_all_reviews_db():
+    db = connect_mysql()
+    cursor = db.cursor()
+    # 查询reviews表中的review列
+    query = 'SELECT review, user_id FROM reviews'
+    cursor.execute(query)
+    results = cursor.fetchall()
 
-
-
-
+    # 构造包含review列的列表
+    review_list = [{'review': r[0], 'user_id': r[1]} for r in results]
+    return review_list

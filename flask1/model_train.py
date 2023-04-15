@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
+
 # 准备数据：用户-物品评分矩阵
 # 评分范围为1-5，0表示用户没有评分（未读）nrows 读取csv文件的前n行
 ratings = pd.read_csv('ratings.csv')
@@ -23,6 +24,7 @@ latent_factors = 3
 train_data, test_data = train_test_split(
     ratings, test_size=0.2, random_state=42)
 
+
 # 定义模型
 
 
@@ -37,6 +39,8 @@ class MatrixFactorization(tf.keras.Model):
         user_embedding = self.user_embeddings(user_ids)
         item_embedding = self.item_embeddings(item_ids)
         return tf.reduce_sum(user_embedding * item_embedding, axis=1)
+
+
 # 训练模型
 
 
@@ -53,9 +57,9 @@ def train(model, train_data, epochs=100, batch_size=2):
         item_ids_shuffled = item_ids[shuffled_indices]
         ratings_shuffled = ratings
         for i in range(0, len(ratings), batch_size):
-            batch_user_ids = user_ids_shuffled[i:i+batch_size]
-            batch_item_ids = item_ids_shuffled[i:i+batch_size]
-            batch_ratings = ratings_shuffled[i:i+batch_size]
+            batch_user_ids = user_ids_shuffled[i:i + batch_size]
+            batch_item_ids = item_ids_shuffled[i:i + batch_size]
+            batch_ratings = ratings_shuffled[i:i + batch_size]
 
         with tf.GradientTape() as tape:
             predictions = model([batch_user_ids, batch_item_ids])
@@ -65,7 +69,9 @@ def train(model, train_data, epochs=100, batch_size=2):
         optimizer.apply_gradients(zip(gradients, model.trainable_variables))
 
     if (epoch + 1) % 10 == 0:
-        print(f'Epoch {epoch+1}/{epochs}, Loss: {loss.numpy()}')
+        print(f'Epoch {epoch + 1}/{epochs}, Loss: {loss.numpy()}')
+
+
 # 评估模型
 
 

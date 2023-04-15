@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from model_train import *
 from sklearn.model_selection import train_test_split
+
 ratings = pd.read_csv('ratings.csv')
 # 删除重复的记录
 is_duplicated = ratings.duplicated(subset=['user_id', 'book_id'])
@@ -39,9 +40,11 @@ def recommend_books(model, user_id, num_recommendations=30):
     user_ratings = ratings[user_id]
     unrated_books = np.where(user_ratings == 0)[0]
     predicted_ratings = model(
-        [np.array([user_id]*len(unrated_books)), unrated_books])
+        [np.array([user_id] * len(unrated_books)), unrated_books])
     top_book_indices = np.argsort(-predicted_ratings)[:num_recommendations]
     return unrated_books[top_book_indices]
+
+
 # 获取书的iD
 
 
@@ -52,6 +55,8 @@ def get_books_id(books_index, ratings_matrix):
         col_key = col_names[i]
         recommend_books_list.append(col_key)
     return recommend_books_list
+
+
 # 更新推荐
 
 
@@ -59,7 +64,7 @@ def recommend_books_update(model, user_id, num_recommendations=30):
     user_ratings = update_ratings[user_id]
     unrated_books = np.where(user_ratings == 0)[0]
     predicted_ratings = model(
-        [np.array([user_id]*len(unrated_books)), unrated_books])
+        [np.array([user_id] * len(unrated_books)), unrated_books])
     top_book_indices = np.argsort(-predicted_ratings)[:num_recommendations]
     return unrated_books[top_book_indices]
 
