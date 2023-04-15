@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <!-- 订单号 -->
+    <TextView
+        android:id="@+id/tv_order_id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textColor="#000"
+        android:textStyle="bold"
+        android:text="Order No. 12345" />
+
+    <!-- 图书封面和信息 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="8dp">
+
+        <!-- 图书封面 -->
+        <ImageView
+            android:id="@+id/book_cover"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/book_cover" />
+
+        <!-- 图书信息 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+            <TextView
+                android:id="@+id/book_author"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="#000"
+                android:textStyle="bold"
+                android:text="Author: John Doe" />
+            <TextView
+                android:id="@+id/book_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="#000"
+                android:textStyle="bold"
+                android:text="Title: The Book Title" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 购买者信息 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="8dp">
+        <TextView
+            android:id="@+id/buyer_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="#000"
+            android:textStyle="bold"
+            android:text="Buyer: Jane Doe" />
+        <TextView
+            android:id="@+id/buyer_quantity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="#000"
+            android:textStyle="bold"
+            android:text="Quantity: 2" />
+        <TextView
+            android:id="@+id/buyer_address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="#000"
+            android:textStyle="bold"
+            android:text="Address: 123 Main St." />
+        <TextView
+            android:id="@+id/buyer_phone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="#000"
+            android:textStyle="bold"
+            android:text="Phone: (123) 456-7890" />
+    </LinearLayout>
+
+</LinearLayout>
