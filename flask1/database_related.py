@@ -49,7 +49,7 @@ def createBooksDb():
         conn.commit()
     conn.close()
 
-book_id_list = [1, 11, 1202]
+
 def searchBooks(book_id_list):
     # 连接到MySQL数据库
     db = pymysql.connect(
@@ -109,7 +109,7 @@ def encrypt_password(password):
     return md5.hexdigest()
 
 
-def register(username, password):
+def register_db(username, password):
     """
     注册账号
     """
@@ -133,7 +133,7 @@ def register(username, password):
     return True
 
 
-def login(username, password):
+def login_db(username, password):
     """
     账号登录
     """
@@ -155,6 +155,29 @@ def login(username, password):
     # 关闭数据库连接
     db.close()
     return True
+#查询评分前100的书，随机返回6本
+def search_top_books():
+    db=connect_mysql()
+    cursor = db.cursor()
+    cursor.execute('SELECT book_id FROM books ORDER BY RAND() LIMIT 6')
+    ids = cursor.fetchall()
+    id_list = [str(book[0]) for book in ids]
+    # Query the book details based on the selected IDs
+    cursor.execute('SELECT * FROM books WHERE book_id IN (' + ','.join(id_list) + ') ORDER BY rating DESC')
+    books = cursor.fetchall()
+    cursor.close()
+    result = []
+    for row in books:
+        row_data = {
+            "title": row[1],
+            "authors": row[2],
+            "image_url": row[7],            
+            # 添加其他需要的字段
+        }
+        result.append(row_data)
 
-#print(searchBooks(book_id_list))
+    json_result = json.dumps(result)
+    return json_result
+
+
 
