@@ -2,6 +2,8 @@ import pandas as pd
 import pymysql
 import json
 import hashlib
+import random
+
 def read_csv(file_path):
     """
     解决UnicodeDecodeError: 'utf-8' codec can't decode bytes in position 68763-68764: invalid continuation byte
@@ -164,25 +166,47 @@ def login_db(username, password):
 def search_top_books():
     db=connect_mysql()
     cursor = db.cursor()
-    cursor.execute('SELECT book_id FROM books ORDER BY RAND() LIMIT 6')
-    ids = cursor.fetchall()
-    id_list = [str(book[0]) for book in ids]
-    # Query the book details based on the selected IDs
-    cursor.execute('SELECT * FROM books WHERE book_id IN (' + ','.join(id_list) + ') ORDER BY rating DESC')
-    books = cursor.fetchall()
-    cursor.close()
-    result = []
+    query = 'SELECT * FROM books ORDER BY rating DESC LIMIT 100'
+    cursor.execute(query)
+    results = cursor.fetchall()
+    books = random.sample(results, k=6)
+    book_list = []
     for row in books:
         row_data = {
             "title": row[1],
             "authors": row[2],
-            "image_url": row[7],            
+            "rating": row[5],
+            "image_url": row[7],
             # 添加其他需要的字段
         }
-        result.append(row_data)
+        book_list.append(row_data)
 
-    json_result = json.dumps(result)
+    json_result = json.dumps(book_list)
     return json_result
+def get_all_Books_db():
+    db=connect_mysql()
+    cursor=db.cursor()
+
+    # 查询随机生成的300个图书
+    query = 'SELECT * FROM books ORDER BY rating DESC LIMIT 1000'
+    cursor.execute(query)
+    results = cursor.fetchall()
+    books = random.sample(results, k=300)
+    # 将查询结果转换成字典类型的列表，并返回JSON格式响应
+    books = []
+    for row in results:
+        book = {
+            'book_id': row[0],
+            'title': row[1],
+            'authors': row[2],
+            'image_url': row[3],
+            #todo 加入 'price': row[4]
+        }
+        books.append(book)
+    return books
+
+
+
 
 
 

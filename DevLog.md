@@ -173,7 +173,11 @@ new Thread(new Runnable() {
 
 #### 1.1.2 待思考和解决的问题
 
+a. ~~str应该为字符串，但是这里明显是个对象，不知道如何读出里面的数据~~    **已解决：参见1.1.1.6**
+
 ```java
+
+
 int responseCode = connection.getResponseCode();//responseCode:200,201....
             String numString = Integer.toString(responseCode);
             Log.d("TAG",numString);
@@ -193,13 +197,52 @@ int responseCode = connection.getResponseCode();//responseCode:200,201....
 
 上面的str应该为字符串，但是这里明显是个对象，不知道如何读出里面的数据
 
+#### 1.1.3 设计思路：
+
+**(a):用户端**
+
+**(b):管理端**：本来想通过switch调整登录的状态（on：表示管理员，off：表示用户），在进行设置Listener的时候遇到了函数外部的值传不进去，后来改为在后端实现。在数据表user中加入isAdmin字段，以此判断是否为管理员
+
+```python
+sql = "SELECT id, password,isAdmin FROM user WHERE username=%s"
+result = cursor.fetchone()
+# 加入验证是否为管理员
+if (result[2] == '1'):
+        return 2
+    else:
+        return 1
+#在API函数中
+    if login_db(username,password)==1:
+        print("ok")
+        return jsonify(code=200, message='notAdmin')
+    elif login_db(username,password)==2:
+        return jsonify(code=200, message='isAdmin')
+    else:
+        print("no")
+        return jsonify(code=201, message='用户名或密码错误')
+```
+
+在Java的`public static int sendLoginRequest(String urlStr, String username, String password)`函数中识别meg，进行判断是否为管理员，在根据此进行启动对应的活动。
+
+```Java
+if (respMsg.equals("isAdmin")) {
+                return 2;
+            } else if (respMsg.equals("notAdmin")) {
+                return 1;
+            } else {
+                //做测试的时候用，正常应为false
+                // TODO: 2023/4/13 记得改为false 
+                return 0;
+            }
+```
+
 ### 1.2 推荐模块
 
 todo
 
-- [ ] 整合fragment，之前写的。
-- [ ] 对接网络模块
-- [ ] 加载网络图片，glide不行的话，试试其他的
+- [x] 整合fragment，之前写的。
+- [x] 对接网络模块
+- [x] 加载网络图片，glide不行的话，试试其他的
 
 初步想法是做一个listview，在用户数据少的时候直接进行随机推荐，利用fragment机制进行跳转
 
@@ -224,11 +267,15 @@ todo
 
 搞了我快3个小时，fuck！！！！！！！！！！！！！！！！！！！！！！！！！
 
-### 1.3 用户的评分，收藏等拓展模块
+### 1.3 用户个人中心模块（信息、评分、评论、订单等）
 
-### 1.4 用户个人中心模块
+### 1.4 管理员：用户管理
 
-### 1.5 不要更新Gradle
+### 1.5 管理员：图书管理
+
+### 1.6 管理员：订单管理
+
+### 1.7 不要更新Gradle
 
 网络被墙，会失败，会导致无法运行程序
 
@@ -273,7 +320,8 @@ dependencies {
 - [ ] [Apache Mahout初体验](https://blog.csdn.net/Jason_Nevermind/article/details/123982764 )
 - [x]  [基于tensorflow的个性化电影推荐系统实战](https://blog.csdn.net/weixin_62075168/article/details/128431395)
 - [ ] 考虑保存模型和加载模型，若无法加载模型，就推荐100个每次展示10个，曲线救国
-- [ ] 获得书的ID而不是下标
+- [x] 获得书的ID而不是下标
+- [ ] 解决加载慢的问题：放弃使用ratings.csv直接从mysql中读取数据，以自己创建的用户为元素进行学习
 
 初步设计思路如下：
 
@@ -604,7 +652,7 @@ conn.close()
 
 ```
 
-#### 3.2 遇到的问题
+### 3.2 遇到的问题
 
 ##### 3.2.1 pymysql.err.IntegrityError: (1062, "Duplicate entry '1' for key 'test.PRIMARY'")
 

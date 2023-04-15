@@ -81,6 +81,30 @@ def get_novels():
 @app.route('/api/topBooks', methods=['GET'])
 def get_random_highest_ratings():
     return search_top_books()
+@app.route('/getAllUsers',methods=['GET'])
+def get_all_users():
+    query = 'SELECT * FROM user'
+    db=connect_mysql()
+    cursor = db.cursor()
+    cursor.execute(query)
+    result = cursor.fetchall()
+    user=[]
+    for row in result:
+        row_data = {
+            "id": row[0],
+            "username": row[1],
+            "password": row[2],
+            "isAdmin":row[3]
+            # 添加其他需要的字段
+        }
+        user.append(row_data)
+    json_result = json.dumps(user)
+
+    return  user
+@app.route('/getAllBooks',methods=['GET'])
+def get_all_books():
+    books=get_all_Books_db()
+    return jsonify({'books': books})
 
 
 if __name__ == '__main__':
