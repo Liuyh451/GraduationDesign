@@ -1,0 +1,61 @@
+package com.example.test;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+
+import java.util.List;
+
+public class NovelAdapter extends RecyclerView.Adapter<NovelAdapter.ViewHolder> {
+    private List<Novel> novels;
+    private Context context;
+
+    public NovelAdapter(Context context, List<Novel> novels) {
+        this.context = context;
+        this.novels = novels;
+    }
+
+    @Override
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.novel_item, parent, false);
+        return new ViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(ViewHolder holder, int position) {
+        Novel novel = novels.get(position);
+        holder.title.setText(novel.getTitle());
+        holder.author.setText(novel.getAuthor());
+        holder.description.setText(novel.getDescription());
+        Glide.with(context).load(novel.getImageUrl()).into(holder.image);
+    }
+
+    @Override
+    public int getItemCount() {
+        return novels.size();
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        ImageView image;
+        TextView title;
+        TextView author;
+        TextView description;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+            image = itemView.findViewById(R.id.novel_image);
+            title = itemView.findViewById(R.id.novel_title);
+            author = itemView.findViewById(R.id.novel_author);
+            description = itemView.findViewById(R.id.novel_description);
+        }
+    }
+}

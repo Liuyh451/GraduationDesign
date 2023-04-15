@@ -1,15 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
     tools:context=".Frag_2">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <!-- 顶部搜索栏 -->
+    <EditText
+        android:id="@+id/search_field"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="the second page"
-        android:textSize="30dp"/>
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:hint="搜索图书" />
 
-</FrameLayout>
+    <!-- 书籍列表 GridView -->
+    <GridView
+        android:id="@+id/books_grid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:numColumns="3"
+        android:verticalSpacing="8dp"
+        android:horizontalSpacing="8dp"
+        android:padding="8dp"
+        android:clipToPadding="false"
+        android:background="@color/white"
+        android:columnWidth="150dp"
+        android:stretchMode="columnWidth"
+        android:layout_centerInParent="true" />
+
+    <!-- 刷新按钮 -->
+    <Button
+        android:id="@+id/refresh_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="80dp"
+        android:text="换一批"
+        android:padding="8dp"/>
+
+</RelativeLayout>
