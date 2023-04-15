@@ -11,7 +11,9 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
@@ -24,14 +26,17 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            boolean result = (Boolean) msg.obj;
-
-            Toast.makeText(MainActivity.this, result ? "登录成功" : "用户名或密码错误", Toast.LENGTH_SHORT).show();
+            int result = msg.arg1;
+            boolean boolValue = (result != 0);
+            Toast.makeText(MainActivity.this, boolValue ? "登录成功" : "用户名或密码错误", Toast.LENGTH_SHORT).show();
             // 通过 msg.arg1, msg.arg2, msg.obj 等获取子线程数据，然后在主线程中处理
             // 如果用户名和密码均输入正确，登录到主界面
-            if(result){
+            if(result==1){
                 Intent intent = new Intent(MainActivity.this, MainActivity2.class);
                 startActivity(intent);
+            }
+            if(result==2){
+                Toast.makeText(MainActivity.this, "管理员登录", Toast.LENGTH_SHORT).show();
             }
 
         }
@@ -64,9 +69,9 @@ public class MainActivity extends AppCompatActivity {
                     new Thread(new Runnable() {
                         public void run() {
                             String loginUrl = "http://10.0.2.2:5000/login";
-                            boolean loginResult = NetUnit.sendLoginRequest(loginUrl, username, password);
+                            int loginResult = NetUnit.sendLoginRequest(loginUrl, username, password);
                             Message msg = new Message();
-                            msg.obj = loginResult;
+                            msg.arg1 = loginResult;
                             mHandler.sendMessage(msg);
                             // 在此处执行网络操作
                         }

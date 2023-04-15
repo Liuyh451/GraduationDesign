@@ -49,4 +49,6 @@
         android:onClick="openNextActivity"
         android:text="注册"/>
 
+
+
 </RelativeLayout>

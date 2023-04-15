@@ -137,24 +137,29 @@ def login_db(username, password):
     """
     账号登录
     """
-    db=connect_mysql()
+    db = connect_mysql()
     cursor = db.cursor()
     # 查询用户信息
-    sql = "SELECT id, password FROM user WHERE username=%s"
+    sql = "SELECT id, password,isAdmin FROM user WHERE username=%s"
     cursor.execute(sql, (username,))
     result = cursor.fetchone()
     if not result:
         print("Error: user name does not exist")
-        return False
-    #校验密码是否正确
+        return 0
+    # 校验密码是否正确
     if result[1] != encrypt_password(password):
         print("Error: Incorrect password")
-        return False
-    # 登录时使用错误密码，会提示密码不正确   
+        return 0
+    # 登录时使用错误密码，会提示密码不正确
+    print(result)
     print("Login successful!")
     # 关闭数据库连接
     db.close()
-    return True
+    # 加入验证是否为管理员
+    if (result[2] == '1'):
+        return 2
+    else:
+        return 1
 #查询评分前100的书，随机返回6本
 def search_top_books():
     db=connect_mysql()

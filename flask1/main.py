@@ -17,9 +17,11 @@ def login():
     password = request.form.get('password')
     print(username,password)
     # 根据用户名和密码判断登录是否成功
-    if login_db(username,password):
+    if login_db(username,password)==1:
         print("ok")
-        return jsonify(code=200, message='登录成功')
+        return jsonify(code=200, message='notAdmin')
+    elif login_db(username,password)==2:
+        return jsonify(code=200, message='isAdmin')
     else:
         print("no")
         return jsonify(code=201, message='用户名或密码错误')

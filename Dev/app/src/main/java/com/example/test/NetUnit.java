@@ -22,7 +22,7 @@ public class NetUnit {
      * @param password 密码
      * @return 登录结果
      */
-    public static boolean sendLoginRequest(String urlStr, String username, String password) {
+    public static int sendLoginRequest(String urlStr, String username, String password) {
         HttpURLConnection connection = null;
         BufferedReader reader = null;
         try {
@@ -59,18 +59,22 @@ public class NetUnit {
             //将json字符串转为JsonObj，方便读取返回值
             JSONObject person = new JSONObject(response.toString());
             String respCode = person.getString("code");
+            String respMsg = person.getString("message");
+            Log.d("TAG", "resmsg---" +respMsg);
             Log.d("TAG", "rescode---" +respCode );
             // 判断响应结果
-            if (respCode.equals("200")) {
-                return true;
+            if (respMsg.equals("isAdmin")) {
+                return 2;
+            } else if (respMsg.equals("notAdmin")) {
+                return 1;
             } else {
                 //做测试的时候用，正常应为false
                 // TODO: 2023/4/13 记得改为false 
-                return true;
+                return 0;
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return 0;
         } finally {
             try {
                 if (reader != null) {
