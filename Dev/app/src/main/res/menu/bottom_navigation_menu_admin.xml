@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+
+    <item
+        android:id="@+id/navigation_admin_item1"
+        android:icon="@drawable/ic_bottom_nav_admin_item1"
+        android:title="用户管理"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/navigation_admin_item2"
+        android:icon="@drawable/ic_bottom_nav_admin_item2"
+        android:title="图书管理"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/navigation_admin_item3"
+        android:icon="@drawable/ic_bottom_nav_admin_item3"
+        android:title="订单管理"
+        app:showAsAction="ifRoom" />
+
+</menu>

@@ -14,6 +14,27 @@
         android:theme="@style/Theme.Test"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".AdminEBookEditActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AdminUserEditActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MainActivity3_Admin"
+            android:exported="false" />
+        <activity
+            android:name=".MyReviewsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MyFavoritesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MyRatingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MyOrdersActivity"
+            android:exported="false" />
+        <activity
             android:name=".Fragment"
             android:exported="false" />
         <activity
