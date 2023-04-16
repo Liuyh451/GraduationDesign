@@ -1,6 +1,6 @@
 package com.example.test;
 public class Order {
-    private String orderNumber;
+    private int orderNumber;
     private String bookCover;
     private String bookAuthor;
     private String bookTitle;
@@ -9,9 +9,10 @@ public class Order {
     private int quantity;
     private double totalPrice;
     private String address;
+    private String phone;
 
-    public Order(String orderNumber, String bookCover, String bookAuthor, String bookTitle, double price,
-                 String buyerName, int quantity, double totalPrice, String address) {
+    public Order(int orderNumber, String bookCover, String bookAuthor, String bookTitle, double price,
+                 String buyerName, int quantity, double totalPrice, String address,String phone) {
         this.orderNumber = orderNumber;
         this.bookCover = bookCover;
         this.bookAuthor = bookAuthor;
@@ -21,15 +22,16 @@ public class Order {
         this.quantity = quantity;
         this.totalPrice = totalPrice;
         this.address = address;
+        this.phone = phone;
     }
 
     // getters and setters
 
-    public String getOrderNumber() {
+    public int getOrderNumber() {
         return orderNumber;
     }
 
-    public void setOrderNumber(String orderNumber) {
+    public void setOrderNumber(int orderNumber) {
         this.orderNumber = orderNumber;
     }
 
@@ -95,5 +97,12 @@ public class Order {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 }

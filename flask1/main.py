@@ -7,9 +7,6 @@ app = Flask(__name__)
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 CORS(app)  # 解决跨域请求问题
 
-user_db = []
-
-
 @app.route('/login', methods=['POST'])
 def login():
     # 获取用户名和密码
@@ -96,24 +93,8 @@ def get_random_highest_ratings():
 # 获取全部用户，管理端接口
 @app.route('/getAllUsers', methods=['GET'])
 def get_all_users():
-    query = 'SELECT * FROM user'
-    db = connect_mysql()
-    cursor = db.cursor()
-    cursor.execute(query)
-    result = cursor.fetchall()
-    user = []
-    for row in result:
-        row_data = {
-            "id": row[0],
-            "username": row[1],
-            "password": row[2],
-            "isAdmin": row[3]
-            # 添加其他需要的字段
-        }
-        user.append(row_data)
-    json_result = json.dumps(user)
-
-    return user
+    json_result=get_all_users_db()
+    return jsonify({'users': json_result})
 
 
 # 获取全部图书，管理端接口
@@ -128,6 +109,11 @@ def get_all_books():
 def get_all_reviews():
     review_list = get_all_reviews_db()
     return jsonify({'reviews': review_list})
+# 获取全部订单，管理端接口
+@app.route('/allOrders', methods=['GET'])
+def get_all_orders():
+    json_result = get_all_orders_db()
+    return jsonify({'orders': json_result})
 
 
 if __name__ == '__main__':

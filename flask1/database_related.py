@@ -137,7 +137,7 @@ def register_db(username, password):
 
     # 插入新用户信息
     sql = "INSERT INTO user (username, password) VALUES (%s, %s)"
-    cursor.execute(sql, (username, encrypt_password(password)))
+    cursor.execute(sql, (username,password))
     db.commit()
     print("register success")
     # 关闭数据库连接
@@ -159,7 +159,7 @@ def login_db(username, password):
         print("Error: user name does not exist")
         return 0
     # 校验密码是否正确
-    if result[1] != encrypt_password(password):
+    if result[1] != password:
         print("Error: Incorrect password")
         return 0
     # 登录时使用错误密码，会提示密码不正确
@@ -202,22 +202,23 @@ def get_all_Books_db():
     cursor = db.cursor()
 
     # 查询随机生成的300个图书
-    query = 'SELECT * FROM books ORDER BY rating DESC LIMIT 1000'
+    query = 'SELECT * FROM books ORDER BY rating DESC LIMIT 3000'
     cursor.execute(query)
     results = cursor.fetchall()
     books = random.sample(results, k=300)
     # 将查询结果转换成字典类型的列表，并返回JSON格式响应
-    books = []
-    for row in results:
+    books_list = []
+    for row in books:
         book = {
             'book_id': row[0],
             'title': row[1],
             'authors': row[2],
-            'image_url': row[3],
+            'image_url': row[7],
             # todo 加入 'price': row[4]
         }
-        books.append(book)
-    return books
+        books_list.append(book)
+    json_result = json.dumps(books_list)
+    return json_result
 
 
 def get_all_reviews_db():
@@ -231,3 +232,46 @@ def get_all_reviews_db():
     # 构造包含review列的列表
     review_list = [{'review': r[0], 'user_id': r[1]} for r in results]
     return review_list
+def get_all_users_db():
+    query = 'SELECT * FROM user'
+    db = connect_mysql()
+    cursor = db.cursor()
+    cursor.execute(query)
+    result = cursor.fetchall()
+    user = []
+    for row in result:
+        row_data = {
+            "id": row[0],
+            "username": row[1],
+            "password": row[2],
+            "isAdmin": row[3],
+            "avatar":row[4]
+            # 添加其他需要的字段
+        }
+        user.append(row_data)
+    json_result = json.dumps(user)
+    return json_result
+def get_all_orders_db():
+    query = 'SELECT * FROM orders'
+    db = connect_mysql()
+    cursor = db.cursor()
+    cursor.execute(query)
+    result = cursor.fetchall()
+    orders = []
+    for row in result:
+        row_data = {
+            "orderid": row[0],
+            "book_cover": row[1],
+            "author": row[2],
+            "title": row[3],
+            "price":row[4],
+            "buyername":row[5],
+            "quantity":row[6],
+            "totalPrice":row[7],
+            "address":row[8],
+            "phone":row[9]
+            # 添加其他需要的字段
+        }
+        orders.append(row_data)
+    json_result = json.dumps(orders)
+    return json_result

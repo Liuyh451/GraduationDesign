@@ -1,15 +1,17 @@
 package com.example.test;
 
-public class Book {
+
+public class Books {
     private String title;
     private String author;
     private String coverUrl;
-    private int pages;
+    private int bookId;
 
-    public Book(String title, String author, String coverUrl) {
+    public Books(String title, String author, String coverUrl,int bookId) {
         this.title = title;
         this.author = author;
         this.coverUrl = coverUrl;
+        this.bookId=bookId;
 
     }
 
@@ -38,4 +40,12 @@ public class Book {
         this.coverUrl = coverUrl;
     }
 
+    public int getBookId() {
+        return bookId;
+    }
+
+    public void setBookId(int bookId) {
+        this.bookId = bookId;
+    }
 }
+

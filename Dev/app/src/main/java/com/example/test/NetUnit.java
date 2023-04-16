@@ -64,6 +64,7 @@ public class NetUnit {
             Log.d("TAG", "rescode---" +respCode );
             // 判断响应结果
             if (respMsg.equals("isAdmin")) {
+
                 return 2;
             } else if (respMsg.equals("notAdmin")) {
                 return 1;
@@ -149,4 +150,5 @@ public class NetUnit {
             }
         }
     }
+
 }

@@ -1,6 +1,7 @@
 package com.example.test;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,10 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+import com.example.test.R;
+import com.example.test.User;
 
 import java.util.List;
 
@@ -43,7 +48,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     }
 
     public interface OnUserClickListener {
-        void onUserClick(String userId);
+        void onUserClick(int userId);
     }
 
     public static class UserViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -51,7 +56,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         private ImageView ivUserAvatar;
         private TextView tvUserId, tvUserPassword;
         private OnUserClickListener onUserClickListener;
-        private String userId;
+        private int userId;
 
         public UserViewHolder(@NonNull View itemView, OnUserClickListener onUserClickListener) {
             super(itemView);
@@ -65,9 +70,14 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
         public void bind(User user) {
             // TODO: Load user avatar, for example using Glide
-            userId = user.getUsername();
+            userId = user.getUserId();
             tvUserId.setText("Username: " + user.getUsername());
             tvUserPassword.setText("Password: " + user.getPassword());
+            Glide.with(itemView)
+                    .load(user.getAvatar())  // 指定用户头像 URL
+                    .placeholder(R.drawable.default_avatar)  // 设置占位图
+                    .error(R.drawable.default_avatar)  // 设置加载错误时显示的图片
+                    .into(ivUserAvatar);  // 将头像显示在 ImageView 中
         }
 
         @Override
