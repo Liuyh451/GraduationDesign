@@ -171,6 +171,16 @@ new Thread(new Runnable() {
             String respCode = person.getString("code");
 ```
 
+##### 1.1.1.7 去掉顶部的导航栏
+
+把`values\themes\themes.xml`中的字段替换
+
+```xml
+<style name="Theme.Test" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+替换为
+<style name="Theme.Test" parent="Theme.AppCompat.Light.NoActionBar">
+```
+
 #### 1.1.2 待思考和解决的问题
 
 a. ~~str应该为字符串，但是这里明显是个对象，不知道如何读出里面的数据~~    **已解决：参见1.1.1.6**
@@ -271,9 +281,18 @@ todo
 
 ### 1.4 管理员：用户管理
 
+- [ ] 用户编辑
+- [ ] 搜索
+
 ### 1.5 管理员：图书管理
 
+- [ ] 图书编辑
+- [ ] 搜索
+
 ### 1.6 管理员：订单管理
+
+- [ ] 订单编辑
+- [ ] 搜索
 
 ### 1.7 不要更新Gradle
 
@@ -313,6 +332,9 @@ dependencies {
 ###### todo
 
 - [x] 学习python和mysql的交互
+- [ ] 整合代码，目前推荐代码还未完成，保存在lyh/...
+- [ ] 继续优化推荐函数，比如继续减少用户？
+- [ ] 冷启动问题
 - [x] 查找数据集，并进行数据清洗
 - [ ] ~~学习如何从mysql中获取数据，并交由sklearn进行处理~~
 - [x] 思考是否能只增加更新后那一个数据，而不必全部重新进行训练。

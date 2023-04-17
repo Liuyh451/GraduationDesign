@@ -1,5 +1,6 @@
 package com.example.test;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -65,6 +66,19 @@ public class Frag_1 extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext());
         novelRecyclerView.setLayoutManager(layoutManager);
 //        novelRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        novelAdapter.setOnItemClickListener(new NovelAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Novel novel) {
+                //更改：把novel的参数传过去，减少请求量 2023年4月17日18点12分
+                // 跳转到目标Activity，这里是NovelDetailActivity
+                Intent intent = new Intent(getActivity(), BookDetailsActivity.class);
+                intent.putExtra("novelId", novel.getNovelId());
+                intent.putExtra("novelTiltl", novel.getTitle());
+                intent.putExtra("novelAuthor", novel.getAuthor());
+                intent.putExtra("novelCover", novel.getImageUrl());
+                startActivity(intent);
+            }
+        });
 
         novelRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -100,11 +114,12 @@ public class Frag_1 extends Fragment {
                             for (int i = 0; i < novelsArray.length(); i++) {
                                 JSONObject novelObject = novelsArray.getJSONObject(i);
                                 String title = novelObject.getString("title");
+                                String novelId=novelObject.getString("book_id");
                                 String imageUrl = novelObject.getString("image_url");
                                 String author = novelObject.getString("authors");
                                 String description = novelObject.getString("language_code");
 
-                                Novel novel = new Novel(title, imageUrl, author, description);
+                                Novel novel = new Novel(novelId,title, imageUrl, author, description);
                                 novelList.add(novel);
                             }
                             novelAdapter.notifyDataSetChanged();
@@ -165,14 +180,14 @@ public class Frag_1 extends Fragment {
                                 JSONObject novelObject = novelsArray.getJSONObject(i);
                                 Log.d("TAG","novelsArray"+novelsArray.length());
                                 Log.d("TAG","novelObject"+novelObject.toString());
-
+                                String novelId=novelObject.getString("book_id");
                                 String title = novelObject.getString("title");
                                 Log.d("TAG","title"+title);
                                 String imageUrl = novelObject.getString("image_url");
                                 String author = novelObject.getString("authors");
                                 String description = novelObject.getString("language_code");
 
-                                Novel novel = new Novel(title, imageUrl, author, description);
+                                Novel novel = new Novel(novelId,title, imageUrl, author, description);
                                 novelList.add(novel);
                             }
                             novelAdapter.notifyDataSetChanged();

@@ -45,7 +45,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
     }
 
     public interface OnBookClickListener {
-        void onBookClick(int bookId);
+        void onBookClick(String bookId);
     }
 
     public static class BookViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -53,7 +53,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
         private ImageView ivBookCover;
         private TextView tvBookTitle, tvBookAuthor;
         private OnBookClickListener onBookClickListener;
-        private int bookId;
+        private String bookId;
 
         public BookViewHolder(@NonNull View itemView, OnBookClickListener onBookClickListener) {
             super(itemView);

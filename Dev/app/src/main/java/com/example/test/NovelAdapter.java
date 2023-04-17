@@ -18,10 +18,14 @@ import java.util.List;
 public class NovelAdapter extends RecyclerView.Adapter<NovelAdapter.ViewHolder> {
     private List<Novel> novels;
     private Context context;
+    private OnItemClickListener listener;
 
     public NovelAdapter(Context context, List<Novel> novels) {
         this.context = context;
         this.novels = novels;
+    }
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
     }
 
     @Override
@@ -37,6 +41,16 @@ public class NovelAdapter extends RecyclerView.Adapter<NovelAdapter.ViewHolder> 
         holder.author.setText(novel.getAuthor());
         holder.description.setText(novel.getDescription());
         Glide.with(context).load(novel.getImageUrl()).into(holder.image);
+        // 设置itemView的点击监听器
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (listener != null) {
+                    // 调用接口方法，通知Activity跳转到目标Activity
+                    listener.onItemClick(novel);
+                }
+            }
+        });
     }
 
     @Override
@@ -58,4 +72,8 @@ public class NovelAdapter extends RecyclerView.Adapter<NovelAdapter.ViewHolder> 
             description = itemView.findViewById(R.id.novel_description);
         }
     }
+    public interface OnItemClickListener {
+        void onItemClick(Novel novel);
+    }
+
 }

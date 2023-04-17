@@ -1,5 +1,5 @@
 package com.example.test;
-
+//这个类是为六宫格服务的
 public class Book {
     private String title;
     private String author;

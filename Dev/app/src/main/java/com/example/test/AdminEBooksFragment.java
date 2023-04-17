@@ -72,11 +72,10 @@ public class AdminEBooksFragment extends Fragment {
                             for (int i = 0; i < booksArray.length(); i++) {
                                 JSONObject booksObject = booksArray.getJSONObject(i);
                                 String bookid=booksObject.getString("book_id");
-                                int id = Integer.parseInt(bookid);
                                 String title = booksObject.getString("title");
                                 String author = booksObject.getString("authors");
                                 String coverUrl = booksObject.getString("image_url");
-                                Books book = new Books(title, author, coverUrl,id);
+                                Books book = new Books(title, author, coverUrl,bookid);
                                 bookList.add(book);
                             }
                             bookAdapter.notifyDataSetChanged();

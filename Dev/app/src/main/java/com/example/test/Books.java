@@ -1,13 +1,13 @@
 package com.example.test;
-
-
+//这个类是为RecyclerView服务的，区别于book
+//我把bookId从int改为了String类型的，相关联的还有对应的适配器
 public class Books {
     private String title;
     private String author;
     private String coverUrl;
-    private int bookId;
+    private String bookId;
 
-    public Books(String title, String author, String coverUrl,int bookId) {
+    public Books(String title, String author, String coverUrl,String bookId) {
         this.title = title;
         this.author = author;
         this.coverUrl = coverUrl;
@@ -40,11 +40,11 @@ public class Books {
         this.coverUrl = coverUrl;
     }
 
-    public int getBookId() {
+    public String getBookId() {
         return bookId;
     }
 
-    public void setBookId(int bookId) {
+    public void setBookId(String bookId) {
         this.bookId = bookId;
     }
 }
