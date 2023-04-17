@@ -56,6 +56,17 @@ def createBooksDb():
                                  row['image_url']))
         conn.commit()
     conn.close()
+def create_ratings_db():
+    # 连接 MySQL 数据库
+    conn = pymysql.connect(host='localhost', user='root', password='123456',
+                       db='reccom_system', charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor)
+    df = pd.read_csv('ratings.csv', encoding='utf-8',usecols=['user_id', 'book_id', 'rating',],nrows=50000)
+    with conn.cursor() as cursor:
+        for index, row in df.iterrows():
+            sql = "INSERT INTO ratings(user_id, book_id, ratings) VALUES (%s, %s, %s)"
+            cursor.execute(sql, (row['user_id'], row['book_id'],  row['rating']))
+        conn.commit()
+    conn.close()
 
 
 def searchBooks(book_id_list):
@@ -137,7 +148,7 @@ def register_db(username, password):
 
     # 插入新用户信息
     sql = "INSERT INTO user (username, password) VALUES (%s, %s)"
-    cursor.execute(sql, (username,password))
+    cursor.execute(sql, (username, password))
     db.commit()
     print("register success")
     # 关闭数据库连接
@@ -194,6 +205,7 @@ def search_top_books():
         book_list.append(row_data)
 
     json_result = json.dumps(book_list)
+    db.close()
     return json_result
 
 
@@ -218,6 +230,7 @@ def get_all_Books_db():
         }
         books_list.append(book)
     json_result = json.dumps(books_list)
+    db.close()
     return json_result
 
 
@@ -231,7 +244,10 @@ def get_all_reviews_db():
 
     # 构造包含review列的列表
     review_list = [{'review': r[0], 'user_id': r[1]} for r in results]
+    db.close()
     return review_list
+
+
 def get_all_users_db():
     query = 'SELECT * FROM user'
     db = connect_mysql()
@@ -245,12 +261,15 @@ def get_all_users_db():
             "username": row[1],
             "password": row[2],
             "isAdmin": row[3],
-            "avatar":row[4]
+            "avatar": row[4]
             # 添加其他需要的字段
         }
         user.append(row_data)
     json_result = json.dumps(user)
+    db.close()
     return json_result
+
+
 def get_all_orders_db():
     query = 'SELECT * FROM orders'
     db = connect_mysql()
@@ -264,14 +283,71 @@ def get_all_orders_db():
             "book_cover": row[1],
             "author": row[2],
             "title": row[3],
-            "price":row[4],
-            "buyername":row[5],
-            "quantity":row[6],
-            "totalPrice":row[7],
-            "address":row[8],
-            "phone":row[9]
+            "price": row[4],
+            "buyername": row[5],
+            "quantity": row[6],
+            "totalPrice": row[7],
+            "address": row[8],
+            "phone": row[9]
             # 添加其他需要的字段
         }
         orders.append(row_data)
     json_result = json.dumps(orders)
+    db.close()
     return json_result
+
+
+def get_book_reviews_db(book_id):
+    db = connect_mysql()
+    # 使用 with 语句保证连接自动关闭
+    with db.cursor() as cursor:
+        # 执行查询语句
+        sql = 'SELECT * FROM reviews WHERE book_id = %s'
+        cursor.execute(sql, (book_id,))
+        results = cursor.fetchall()
+        # 将查询结果组成一个列表，其中每个元素是一个包含用户名和评价内容的字典
+        reviews = []
+        for row in results:
+            row_data = {
+                "user_id": row[0],
+                "book_id": row[1],
+                "review": row[2],
+                # 添加其他需要的字段
+            }
+            reviews.append(row_data)
+        json_result = json.dumps(reviews)
+    # 关闭数据库连接
+    db.close()
+    # 返回评价列表
+    return json_result
+def get_ratings_from_db():
+    # 创建数据库连接
+    connection = pymysql.connect(host='localhost', user='root', password='123456',
+                        db='reccom_system', charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor)
+
+    # 执行查询
+    sql_query = "SELECT user_id, book_id, ratings FROM ratings"
+    with connection.cursor() as cursor:
+        cursor.execute(sql_query)
+        result = cursor.fetchall()
+    
+    # 将查询结果转换为DataFrame
+    ratings = pd.DataFrame(result)
+
+    # 删除重复的记录
+    is_duplicated = ratings.duplicated(subset=['user_id', 'book_id'])
+    ratings = ratings[~is_duplicated]
+    ratings['ratings'] = ratings['ratings'].astype(int)
+    # 将评分数据转化为矩阵
+    ratings_matrix = ratings.pivot(
+        index='user_id',
+        columns='book_id',
+        values='ratings'
+    ).fillna(0)
+    # 输出用户1对书籍1180的评分
+
+    # 关闭数据库连接
+    connection.close()
+
+    # 输出结果
+    return ratings_matrix

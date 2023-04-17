@@ -115,6 +115,22 @@ def get_all_orders():
     json_result = get_all_orders_db()
     return jsonify({'orders': json_result})
 
+@app.route('/book/reviews', methods=['POST'])
+#todo 注意参数的对接问题，有可能读不到
+def get_book_reviews():
+    book_id = request.form.get('book_id')
+    #data = request.get_json()  # 获取请求中的JSON数据
+    #book_id = data.get('book_id', None)  # 获取请求中的 book_id 字段
+    if book_id is None:
+        return jsonify({'error': 'book_id is required'}), 400  # 如果 book_id 不存在则返回错误信息
+
+    reviews = get_book_reviews_db(book_id)  # 调用自定义函数从数据库表中获取相关评价
+
+    if len(reviews) == 0:
+        return jsonify({'error': 'no reviews found for book_id {}'.format(book_id)}), 404  # 如果没有找到相关评价，则返回 404 错误
+
+    # 将包含评价信息的列表作为JSON返回值
+    return jsonify({'book_id': book_id, 'reviews': reviews}), 200
 
 if __name__ == '__main__':
     app.run()
