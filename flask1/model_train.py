@@ -2,31 +2,7 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
-
-# 准备数据：用户-物品评分矩阵
-# 评分范围为1-5，0表示用户没有评分（未读）nrows 读取csv文件的前n行
-ratings = pd.read_csv('ratings.csv')
-# 删除重复的记录
-is_duplicated = ratings.duplicated(subset=['user_id', 'book_id'])
-ratings = ratings[~is_duplicated]
-
-# 将评分数据转化为矩阵
-ratings_matrix = ratings.pivot(
-    index='user_id',
-    columns='book_id',
-    values='rating'
-).fillna(0)
-ratings = np.array(ratings_matrix)
-# 隐向量维度
-latent_factors = 3
-
-# 将数据分为训练集和测试集
-train_data, test_data = train_test_split(
-    ratings, test_size=0.2, random_state=42)
-
-
-# 定义模型
-
+from database_related import get_ratings_from_db
 
 class MatrixFactorization(tf.keras.Model):
     def __init__(self, num_users, num_items, latent_dim):
@@ -82,12 +58,22 @@ def evaluate(model, test_data):
     mse = tf.keras.losses.MeanSquaredError()(ratings, predictions)
     return mse.numpy()
 
+def model_train_fun():
+    # 准备数据：用户-物品评分矩阵
+    ratings_matrix = get_ratings_from_db()
+    ratings = np.array(ratings_matrix)
+    # 保存预处理后的评分矩阵为.npy文件
+    #np.save('processed_ratings.npy', ratings)
 
-# 实例化模型并训练
-num_users, num_items = train_data.shape
-model = MatrixFactorization(num_users, num_items, latent_factors)
-train(model, train_data, epochs=100)
-model.save_weights('matrix_factorization_model_weights.h5')
-# 评估模型
-mse = evaluate(model, test_data)
-print(f'Test MSE: {mse}')
+    # 隐向量维度
+    latent_factors = 3
+
+    # 将数据分为训练集和测试集
+    train_data, test_data = train_test_split(
+        ratings, test_size=0.2, random_state=42)
+    # 实例化模型并训练
+    num_users, num_items = train_data.shape
+    model = MatrixFactorization(num_users, num_items, latent_factors)
+    train(model, train_data, epochs=100)
+    model.save_weights('matrix_factorization_model_weights.h5')
+

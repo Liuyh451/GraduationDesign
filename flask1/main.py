@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 from database_related import *
+from model_train import model_train_fun
+from recom_algorithm import recom_fun
 
 app = Flask(__name__)
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
@@ -14,10 +16,11 @@ def login():
     password = request.form.get('password')
     print(username, password)
     # 根据用户名和密码判断登录是否成功
-    if login_db(username, password) == 1:
+    k,id=login_db(username, password)
+    if k == 1:
         print("ok")
-        return jsonify(code=200, message='notAdmin')
-    elif login_db(username, password) == 2:
+        return jsonify(code=200, message='notAdmin',uid=id)
+    elif k == 2:
         return jsonify(code=200, message='isAdmin')
     else:
         print("no")
@@ -40,20 +43,15 @@ def register():
         return jsonify({'code': 201, 'message': 'Error: User name already exists'})
 
 #这个和下面的那个基本一样，为预废弃版本
-@app.route('/getRecomBooks', methods=['GET'])
+@app.route('/getRecomBooks', methods=['POST'])
 def getRecomBooks():
     # 获取前端传递的用户ID
-
-    # todo 写一个根据用户ID获取推荐列表的函数（直接调用之前的recommendbook即可）这里为了测试方便，直接拿来用了
-    book_id_list = [5928, 4698, 4765, 3432, 2441, 5176, 8038, 9334, 2659, 2105, 104, 7384, 5067, 2206, 6784, 8166, 1534,
-                    560, 4734, 8639, 6945, 513, 1387, 1921, 9547, 5764, 6929, 802, 51, 4365]
-    # 调用A函数并获取JSON数据和状态码
-    data = searchBooks(book_id_list)
-    page_size = 6
-    init_page = 1
-
+    data = json.loads(request.form['data'])
+    uid = data['uid']
+    print("user_id",uid)
+    book_data=get_recom_books_for_user(uid)
     # 返回JSON数据和状态码给前端
-    return jsonify({'code': 200, "data": data})
+    return jsonify({'code': 200, "data": book_data})
 
 
 cnt = 0
@@ -118,7 +116,10 @@ def get_all_orders():
 @app.route('/book/reviews', methods=['POST'])
 #todo 注意参数的对接问题，有可能读不到
 def get_book_reviews():
-    book_id = request.form.get('book_id')
+    request_data = request.json  # 通过 request 对象获取请求数据
+    book_id = request_data.get('book_id')  # 获取 book_id 参数
+    #book_id = json.loads(request.form['book_id'])
+    #book_id = request.form.get('book_id')
     #data = request.get_json()  # 获取请求中的JSON数据
     #book_id = data.get('book_id', None)  # 获取请求中的 book_id 字段
     if book_id is None:
@@ -131,6 +132,26 @@ def get_book_reviews():
 
     # 将包含评价信息的列表作为JSON返回值
     return jsonify({'book_id': book_id, 'reviews': reviews}), 200
+
+@app.route("/rating_and_recom", methods=["POST"])
+def rating_and_recom_fun():
+    data = json.loads(request.form['data'])
+    user_id = data['user_id']
+    book_id = data['book_id']
+    rating = data['rating']
+    print(user_id,book_id,rating)
+    # 立即返回状态码 200
+    if(change_user_ratings(user_id,book_id,rating)):
+        calculation_thread = threading.Thread(target=model_train_fun)
+        calculation_thread.start()
+    # 开启新线程并执行计算任务
+    else:
+
+        if(get_user_modify(user_id)):
+
+            calculation_thread = threading.Thread(target=recom_fun(4))
+            calculation_thread.start()
+    return "OK", 200
 
 if __name__ == '__main__':
     app.run()

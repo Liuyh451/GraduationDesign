@@ -3,6 +3,7 @@ import pymysql
 import json
 import hashlib
 import random
+import threading
 
 
 def read_csv(file_path):
@@ -166,6 +167,7 @@ def login_db(username, password):
     sql = "SELECT id, password,isAdmin FROM user WHERE username=%s"
     cursor.execute(sql, (username,))
     result = cursor.fetchone()
+    id=result[0]
     if not result:
         print("Error: user name does not exist")
         return 0
@@ -180,9 +182,9 @@ def login_db(username, password):
     db.close()
     # 加入验证是否为管理员
     if (result[2] == '1'):
-        return 2
+        return 2,id
     else:
-        return 1
+        return 1,id
 
 
 # 查询评分前100的书，随机返回6本
@@ -351,3 +353,121 @@ def get_ratings_from_db():
 
     # 输出结果
     return ratings_matrix
+def get_recom_books_for_user(user_id):
+    db=connect_mysql()
+    cursor=db.cursor()
+    # 查询该用户的所有推荐书籍编号
+    sql = f"SELECT book_id FROM user_recom_books WHERE user_id={user_id}"
+    cursor.execute(sql)
+    results = cursor.fetchall()
+
+    # 若该用户没有推荐书籍则调用函数A
+    if len(results) == 0:
+        results=search_top_books()
+        #差一步jsonfy
+        return results
+    # 将查询结果转化为列表返回
+    bookids = [r[0] for r in results]
+    return  searchBooks(bookids)
+
+
+def save_user_books(user_id, book_ids):
+    # 连接数据库
+    db = connect_mysql()
+    cursor = db.cursor()
+
+    try:
+        # 删除 uid=n 的所有记录
+        delete_sql = "DELETE FROM user_recom_books WHERE user_id = %s"
+        cursor.execute(delete_sql, (user_id,))
+        db.commit()
+
+        # 构造待保存的数据列表
+        rows = [(user_id, book_id) for book_id in book_ids]
+
+        # 执行插入操作，并提交事务
+        insert_sql = "INSERT INTO user_recom_books(user_id, book_id) VALUES (%s, %s)"
+        cursor.executemany(insert_sql, rows)
+        db.commit()
+    except Exception as e:
+        # 如果出错，则回滚事务
+        db.rollback()
+        raise e
+    finally:
+        # 关闭数据库连接
+        cursor.close()
+        db.close()
+
+def A():
+    print('Total ratings count reached multiple of 5!')
+#开启子线程
+def run_in_thread(func):
+    def wrapper(*args, **kwargs):
+        t = threading.Thread(target=func, args=args, kwargs=kwargs)
+        t.start()
+    return wrapper
+def change_user_ratings(user_id,book_id,rating):
+    db=connect_mysql()
+    cursor=db.cursor()
+    try:
+        sql = "SELECT COUNT(*) FROM `ratings` WHERE user_id = %s" % user_id
+        cursor.execute(sql)
+        count = cursor.fetchone()[0]
+        # 查询用户，判断用户是否存在
+        if count == 0:
+            is_new_user= 1
+            print("is new user,train")
+        else:
+            is_new_user=0
+            print("not new user")
+        # 查询该用户对该书籍是否已经评分过
+        sql = f"SELECT ratings FROM ratings WHERE user_id={user_id} AND book_id={book_id}"
+        cursor.execute(sql)
+        result = cursor.fetchone()
+
+        # 如果该用户已经评分过，则更新评分值
+        if result is not None:
+            old_rating = result[0]
+            new_rating = rating
+            sql = f"UPDATE ratings SET ratings={new_rating} WHERE user_id={user_id} AND book_id={book_id}"
+            cursor.execute(sql)
+            db.commit()
+            print("update rating")
+
+        # 如果该用户未评分过，则插入评分值
+        else:
+            sql = f"INSERT INTO ratings(user_id, book_id, ratings) VALUES ({user_id}, {book_id}, {rating})"
+            cursor.execute(sql)
+            db.commit()
+            print("insert rating")
+        return is_new_user
+    except Exception as e:
+        # 如果出错，则回滚事务
+        db.rollback()
+        raise e
+    finally:
+        # 关闭数据库连接
+        cursor.close()
+        db.close()
+def get_user_modify(user_id):
+    db=connect_mysql()
+    cursor=db.cursor()
+    # 查询总评分数量，如果是5的倍数，调用函数A
+    sql = f"SELECT modify FROM user_modify WHERE user_id={user_id}"
+    cursor.execute(sql)
+    result = cursor.fetchone()
+    if result is None:
+        modify = 0
+    else:
+        modify = result[0]
+    modify=int(modify)
+    print("modify",modify)
+    modify += 1
+    if modify % 5 == 0:
+        updata=1
+    else: 
+        updata=0
+    sql = f"REPLACE INTO user_modify (user_id, modify) VALUES ({user_id}, {modify})"
+    cursor.execute(sql)
+    db.commit()
+    return updata
