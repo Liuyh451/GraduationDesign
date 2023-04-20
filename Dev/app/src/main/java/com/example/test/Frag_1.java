@@ -1,5 +1,7 @@
 package com.example.test;
 
+import static android.content.Intent.getIntent;
+
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -16,10 +18,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
@@ -32,7 +37,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Frag_1 extends Fragment {
     //jia
@@ -40,10 +47,18 @@ public class Frag_1 extends Fragment {
     private RecyclerView novelRecyclerView;
     private NovelAdapter novelAdapter;
     private List<Novel> novelList;
+    private String uid;
 
 
     public Frag_1() {
         // Required empty public constructor
+    }
+    public static Frag_1 newInstance(String uid) {
+        Frag_1 fragment = new Frag_1();
+        Bundle args = new Bundle();
+        args.putString("uid", uid);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
@@ -59,7 +74,17 @@ public class Frag_1 extends Fragment {
 //
 //        }
         // 请求初始数据
-        requestData();
+        // 在 Fragment 中获取传递的值
+        // 获取从 MainActivity2 传递过来的 uid
+        if (getArguments() != null) {
+            uid = getArguments().getString("uid");
+            Log.d("TAGF","Frag_1::::::::::::::"+uid);
+            int uid_int=Integer.parseInt(uid);
+            requestData(uid_int);
+        }
+        else {
+            requestData(1);
+        }
         novelRecyclerView = view.findViewById(R.id.novel_recycler_view);
         novelAdapter = new NovelAdapter(requireContext(), novelList);
         novelRecyclerView.setAdapter(novelAdapter);
@@ -103,6 +128,7 @@ public class Frag_1 extends Fragment {
         //int nextPage = novelList.size() / 4 + 1; // 假设每次请求6个小说
 //        Log.d("TAG", String.valueOf(nextPage) );
         String url = "http://10.0.2.2:5000/api/novels";
+
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
@@ -163,16 +189,63 @@ public class Frag_1 extends Fragment {
 //
 //    }
 
-    private void requestData() {
-        String url = "http://10.0.2.2:5000//api/novels"; // 替换为实际的API地址
+//    private void requestData() {
+//        String url = "http://10.0.2.2:5000//api/novels"; // 替换为实际的API地址
+//
+//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+//                Request.Method.GET, url, null,
+//                new Response.Listener<JSONObject>() {
+//                    @Override
+//                    public void onResponse(JSONObject response) {
+//                        try {
+//                            String dataStr = response.getString("data");
+//                            JSONArray novelsArray=new JSONArray(dataStr);
+////                            JSONArray novelsArray = resp.getJSONArray();
+//                            for (int i = 0; i < novelsArray.length(); i++) {
+//
+//                                JSONObject novelObject = novelsArray.getJSONObject(i);
+//                                Log.d("TAG","novelsArray"+novelsArray.length());
+//                                Log.d("TAG","novelObject"+novelObject.toString());
+//                                String novelId=novelObject.getString("book_id");
+//                                String title = novelObject.getString("title");
+//                                Log.d("TAG","title"+title);
+//                                String imageUrl = novelObject.getString("image_url");
+//                                String author = novelObject.getString("authors");
+//                                String description = novelObject.getString("language_code");
+//
+//                                Novel novel = new Novel(novelId,title, imageUrl, author, description);
+//                                novelList.add(novel);
+//                            }
+//                            novelAdapter.notifyDataSetChanged();
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                // 处理错误情况
+//            }
+//        });
+//
+//// 将请求添加到请求队列
+//        Volley.newRequestQueue(requireContext()).add(jsonObjectRequest);
+//            }
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                Request.Method.GET, url, null,
-                new Response.Listener<JSONObject>() {
+
+    private void requestData(int uid) {
+        String url = "http://10.0.2.2:5000/getRecomBooks";
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
                     @Override
-                    public void onResponse(JSONObject response) {
+                    public void onResponse(String response) {
+                        // 请求成功的处理
                         try {
-                            String dataStr = response.getString("data");
+                            // 将响应转换为 JSON 对象
+                            JSONObject jsonResponse = new JSONObject(response);
+                            String dataStr = jsonResponse.getString("data");
+                            Log.d("TAG",dataStr);
                             JSONArray novelsArray=new JSONArray(dataStr);
 //                            JSONArray novelsArray = resp.getJSONArray();
                             for (int i = 0; i < novelsArray.length(); i++) {
@@ -195,14 +268,37 @@ public class Frag_1 extends Fragment {
                             e.printStackTrace();
                         }
                     }
-                }, new Response.ErrorListener() {
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // 请求失败的处理
+                        Log.e("Error", error.toString());
+                    }
+                }) {
             @Override
-            public void onErrorResponse(VolleyError error) {
-                // 处理错误情况
-            }
-        });
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("uid", uid);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                params.put("data", jsonObject.toString());
 
-// 将请求添加到请求队列
-        Volley.newRequestQueue(requireContext()).add(jsonObjectRequest);
+                return params;
             }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/x-www-form-urlencoded; charset=UTF-8";
+            }
+        };
+
+        // 将请求添加到请求队列
+        Volley.newRequestQueue(requireContext()).add(stringRequest);
+    }
+
+
 }

@@ -398,6 +398,26 @@ public class BookRecommender {
 
 #### 2.2.2 基于tensorflow的推荐算法（目前使用）
 
+修改的思路：（伪代码）**2023年4月18日13点17分**
+
+```python
+#（1）直接搜索recom_books表若存在，则给出推荐，若是新用户则直接随机推荐：
+def getRecomBooks(user_id):
+    # 获取前端传递的用户ID
+    user_id = request.form.get('user_id')
+    data=get_recom_books_for_user(user_id)
+#（2）什么时候刷新推荐表
+#
+def change_user_ratings(user_id,book_id,rating):
+    if is_new_user==1:
+        #对于新用户，需要训练模型，此时可以不给出推荐
+        run_in_thread(model_train)()
+     else：
+    	#对于老用户来说，当他的评分修改达到5个时，开启子线程，调用recom_algorithm进行推荐既可（不必再训练）
+    	if change_rating%5==0:
+			run_in_thread(recom_algorithm)()
+```
+
 数据如下：
 
 | **User ID** | Book ID | **Rating** |
