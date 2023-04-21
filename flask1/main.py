@@ -21,7 +21,7 @@ def login():
         print("ok")
         return jsonify(code=200, message='notAdmin',uid=id)
     elif k == 2:
-        return jsonify(code=200, message='isAdmin')
+        return jsonify(code=200, message='isAdmin',uid=id)
     else:
         print("no")
         return jsonify(code=201, message='用户名或密码错误')
@@ -37,8 +37,10 @@ def register():
     if not (username and password):
         return jsonify({'message': 'Invalid username or password'}), 400
     # 校验用户是否已经存在
-    if (register_db(username, password)):
-        return jsonify({'code': 200, 'message': 'User registered successfully'})
+    flag, uid = register_db(username, password)
+    uid=int(uid)
+    if (flag):
+        return jsonify({'code': 200, 'uid': uid})
     else:
         return jsonify({'code': 201, 'message': 'Error: User name already exists'})
 
@@ -46,6 +48,7 @@ def register():
 @app.route('/getRecomBooks', methods=['POST'])
 def getRecomBooks():
     # 获取前端传递的用户ID
+    #uid = request.form.get('uid')#用于postman测试
     data = json.loads(request.form['data'])
     uid = data['uid']
     print("user_id",uid)
@@ -99,6 +102,7 @@ def get_all_users():
 @app.route('/getAllBooks', methods=['GET'])
 def get_all_books():
     books = get_all_Books_db()
+    #todo 这里有个小bug，有时候前端接收不到，也可能是前端的问题
     return jsonify({'books': books})
 
 
@@ -113,15 +117,13 @@ def get_all_orders():
     json_result = get_all_orders_db()
     return jsonify({'orders': json_result})
 
+#获取该书籍的全部评论，用户端接口
 @app.route('/book/reviews', methods=['POST'])
 #todo 注意参数的对接问题，有可能读不到
 def get_book_reviews():
     request_data = request.json  # 通过 request 对象获取请求数据
     book_id = request_data.get('book_id')  # 获取 book_id 参数
-    #book_id = json.loads(request.form['book_id'])
-    #book_id = request.form.get('book_id')
-    #data = request.get_json()  # 获取请求中的JSON数据
-    #book_id = data.get('book_id', None)  # 获取请求中的 book_id 字段
+    # book_id = request.form.get('book_id')
     if book_id is None:
         return jsonify({'error': 'book_id is required'}), 400  # 如果 book_id 不存在则返回错误信息
 
@@ -133,6 +135,7 @@ def get_book_reviews():
     # 将包含评价信息的列表作为JSON返回值
     return jsonify({'book_id': book_id, 'reviews': reviews}), 200
 
+#保存用户对书籍的评分，必要时更新模型，用户端接口
 @app.route("/rating_and_recom", methods=["POST"])
 def rating_and_recom_fun():
     data = json.loads(request.form['data'])
@@ -152,6 +155,31 @@ def rating_and_recom_fun():
             calculation_thread = threading.Thread(target=recom_fun(4))
             calculation_thread.start()
     return "OK", 200
+@app.route("/bookrating", methods=["POST"])
+def get_user_to_book_rating():
+    data = json.loads(request.form['data'])
+    user_id = data['user_id']
+    book_id = data['book_id']
+    print(user_id,book_id)
+    # book_id = request.form.get('book_id')
+    # user_id = request.form.get('user_id')
+    result=get_user_to_book_rating_db(user_id,book_id)
+    if result:
+        return jsonify({"ratings": result[0]})
+    else:
+        return jsonify({"ratings": "0"})
+@app.route("/getUserInfo", methods=["POST"])
+def get_user_info():
+    data = json.loads(request.form['data'])
+    user_id = data['user_id']
+
+    # user_id = request.form.get('user_id')
+    print(data)
+    result=getUserInfo_db(user_id)
+    return jsonify({"userInfo": result})
+
+
+
 
 if __name__ == '__main__':
     app.run()

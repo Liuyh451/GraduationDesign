@@ -48,6 +48,8 @@ public class Frag_1 extends Fragment {
     private NovelAdapter novelAdapter;
     private List<Novel> novelList;
     private String uid;
+    private String Uid = GlobalVariable.uid;
+
 
 
     public Frag_1() {
@@ -68,23 +70,12 @@ public class Frag_1 extends Fragment {
         View view = inflater.inflate(R.layout.fragment_frag_1, container, false);
 
         novelList = new ArrayList<>();
-//        // 添加测试数据
-//        for (int i = 0; i < 6; i++) {
-//            novelList.add(new Novel("dsadas" + i, "https://images.gr-assets.com/books/1447303603m/2767052.jpg", "Cormac McCarthy" + i, "简介" + i));
-//
-//        }
         // 请求初始数据
         // 在 Fragment 中获取传递的值
         // 获取从 MainActivity2 传递过来的 uid
-        if (getArguments() != null) {
-            uid = getArguments().getString("uid");
-            Log.d("TAGF","Frag_1::::::::::::::"+uid);
-            int uid_int=Integer.parseInt(uid);
-            requestData(uid_int);
-        }
-        else {
-            requestData(1);
-        }
+        int uid_int=Integer.parseInt(Uid);
+        Log.d("TAG","这里是frag的uid"+Uid);
+        requestData(uid_int);
         novelRecyclerView = view.findViewById(R.id.novel_recycler_view);
         novelAdapter = new NovelAdapter(requireContext(), novelList);
         novelRecyclerView.setAdapter(novelAdapter);
@@ -105,22 +96,22 @@ public class Frag_1 extends Fragment {
             }
         });
 
-        novelRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-
-                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-                int visibleItemCount = layoutManager.getChildCount();
-                int totalItemCount = layoutManager.getItemCount();
-                int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
-
-                if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
-                        && firstVisibleItemPosition >= 0) {
-                    loadMoreNovels();
-                }
-            }
-        });
+//        novelRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+//                super.onScrolled(recyclerView, dx, dy);
+//
+//                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+//                int visibleItemCount = layoutManager.getChildCount();
+//                int totalItemCount = layoutManager.getItemCount();
+//                int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+//
+//                if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
+//                        && firstVisibleItemPosition >= 0) {
+//                    loadMoreNovels();
+//                }
+//            }
+//        });
 
         return view;
     }
@@ -245,17 +236,14 @@ public class Frag_1 extends Fragment {
                             // 将响应转换为 JSON 对象
                             JSONObject jsonResponse = new JSONObject(response);
                             String dataStr = jsonResponse.getString("data");
-                            Log.d("TAG",dataStr);
+
                             JSONArray novelsArray=new JSONArray(dataStr);
 //                            JSONArray novelsArray = resp.getJSONArray();
                             for (int i = 0; i < novelsArray.length(); i++) {
-
                                 JSONObject novelObject = novelsArray.getJSONObject(i);
-                                Log.d("TAG","novelsArray"+novelsArray.length());
-                                Log.d("TAG","novelObject"+novelObject.toString());
                                 String novelId=novelObject.getString("book_id");
                                 String title = novelObject.getString("title");
-                                Log.d("TAG","title"+title);
+
                                 String imageUrl = novelObject.getString("image_url");
                                 String author = novelObject.getString("authors");
                                 String description = novelObject.getString("language_code");

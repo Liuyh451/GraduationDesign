@@ -1,60 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".register">
+    android:layout_height="match_parent">
 
+    <!-- 用户头像 -->
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:contentDescription="avatar"
+        android:src="@drawable/logo" />
+
+    <!-- 用户名输入框 -->
     <EditText
         android:id="@+id/username"
-        android:layout_width="253dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="173dp"
-        android:layout_marginBottom="36dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/logo"
+        android:layout_marginTop="50dp"
+        android:layout_marginHorizontal="32dp"
         android:hint="请输入用户名"
-        android:inputType="text"
-        app:layout_constraintBottom_toTopOf="@+id/password"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:inputType="text"/>
 
+    <!-- 密码输入框 -->
     <EditText
         android:id="@+id/password"
-        android:layout_width="243dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="42dp"
-        android:ems="10"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/username"
+        android:layout_marginTop="16dp"
+        android:layout_marginHorizontal="32dp"
         android:hint="请输入密码"
-        android:inputType="textPassword"
-        app:layout_constraintBottom_toTopOf="@+id/confirm_password"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/username" />
+        android:inputType="textPassword"/>
 
+    <!-- 确认密码输入框 -->
     <EditText
         android:id="@+id/confirm_password"
-        android:layout_width="222dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="2dp"
-        android:layout_marginBottom="26dp"
-        android:ems="10"
-        android:hint="请输入确认密码"
-        android:inputType="textPassword"
-        app:layout_constraintBottom_toTopOf="@+id/register_btn"
-        app:layout_constraintStart_toStartOf="@+id/password"
-        app:layout_constraintTop_toBottomOf="@+id/password" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/password"
+        android:layout_marginTop="16dp"
+        android:layout_marginHorizontal="32dp"
+        android:hint="请再次输入密码"
+        android:inputType="textPassword"/>
 
+    <!-- 注册按钮 -->
     <Button
         android:id="@+id/register_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="69dp"
-        android:layout_marginEnd="70dp"
-        android:layout_marginBottom="217dp"
-        android:text="注册"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/confirm_password"
-        app:layout_constraintStart_toStartOf="@+id/username"
-        app:layout_constraintTop_toBottomOf="@+id/confirm_password" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_below="@id/confirm_password"
+        android:layout_marginTop="50dp"
+        android:layout_centerHorizontal="true"
+        android:text="注册"/>
+
+</RelativeLayout>

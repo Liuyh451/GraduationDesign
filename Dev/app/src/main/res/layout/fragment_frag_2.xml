@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Frag_2">
 
@@ -17,17 +17,17 @@
     <GridView
         android:id="@+id/books_grid"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-
+        android:layout_height="match_parent"
         android:numColumns="3"
-        android:verticalSpacing="8dp"
+        android:verticalSpacing="24dp"
         android:horizontalSpacing="8dp"
         android:padding="8dp"
         android:clipToPadding="false"
         android:background="@color/white"
         android:columnWidth="150dp"
         android:stretchMode="columnWidth"
-        android:layout_centerInParent="true" />
+        android:layout_centerInParent="true"
+        android:layout_below="@id/search_field"/>
 
     <!-- 刷新按钮 -->
     <Button

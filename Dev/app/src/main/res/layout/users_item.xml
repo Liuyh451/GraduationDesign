@@ -9,22 +9,6 @@
     app:cardCornerRadius="8dp"
     app:cardElevation="4dp"
     >
-
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:layout_margin="0dp"
-        android:elevation="8dp"
-        android:outlineProvider="background"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        app:cardBackgroundColor="#FFFFFF"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="8dp"
-        app:cardUseCompatPadding="true"
-        app:contentPadding="8dp">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -54,7 +38,5 @@
                 android:layout_gravity="center_vertical" />
 
         </LinearLayout>
-
-    </androidx.cardview.widget.CardView>
 
 </androidx.cardview.widget.CardView>

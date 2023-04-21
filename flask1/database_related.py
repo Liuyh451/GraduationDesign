@@ -143,18 +143,31 @@ def register_db(username, password):
     sql = "SELECT id FROM user WHERE username=%s"
     cursor.execute(sql, (username,))
     result = cursor.fetchone()
+    is_admin='0'
     if result:
         print("Error: User name already exists")
-        return False
+        return 0,0
 
     # 插入新用户信息
-    sql = "INSERT INTO user (username, password) VALUES (%s, %s)"
-    cursor.execute(sql, (username, password))
+    sql = "INSERT INTO user (username, password,isAdmin) VALUES (%s, %s,%s)"
+    cursor.execute(sql, (username, password,is_admin))
     db.commit()
     print("register success")
+    # 编写 SQL 语句
+    sql = "SELECT id FROM user WHERE username = %s"
+
+    # 执行 SQL 语句
+    cursor.execute(sql,(username,))
+
+    # 获取查询结果
+    result = cursor.fetchone()
+    print("查询id的结果：",result)
+    # 将查询结果中的第一列(user_id)赋值给变量id
+    id=result[0]
+
     # 关闭数据库连接
     db.close()
-    return True
+    return 1,id
 
 
 def login_db(username, password):
@@ -198,8 +211,10 @@ def search_top_books():
     book_list = []
     for row in books:
         row_data = {
+            "book_id":row[0],
             "title": row[1],
             "authors": row[2],
+            "language_code":row[4],
             "rating": row[5],
             "image_url": row[7],
             # 添加其他需要的字段
@@ -216,10 +231,10 @@ def get_all_Books_db():
     cursor = db.cursor()
 
     # 查询随机生成的300个图书
-    query = 'SELECT * FROM books ORDER BY rating DESC LIMIT 3000'
+    query = 'SELECT * FROM books ORDER BY rating DESC LIMIT 300'
     cursor.execute(query)
     results = cursor.fetchall()
-    books = random.sample(results, k=300)
+    books = random.sample(results, k=50)
     # 将查询结果转换成字典类型的列表，并返回JSON格式响应
     books_list = []
     for row in books:
@@ -364,6 +379,7 @@ def get_recom_books_for_user(user_id):
     # 若该用户没有推荐书籍则调用函数A
     if len(results) == 0:
         results=search_top_books()
+        print("未找到推荐书籍，随机推荐")
         #差一步jsonfy
         return results
     # 将查询结果转化为列表返回
@@ -471,3 +487,33 @@ def get_user_modify(user_id):
     cursor.execute(sql)
     db.commit()
     return updata
+def get_user_to_book_rating_db(user_id,book_id):
+    # 建立数据库连接
+    conn = connect_mysql()
+
+    # 使用游标查询数据
+    with conn.cursor() as cursor:
+        sql = f"SELECT ratings FROM ratings WHERE user_id=%s AND book_id=%s"
+        cursor.execute(sql, (user_id, book_id))
+        result = cursor.fetchone()
+
+    # 关闭数据库连接
+    conn.close()
+    return result
+def getUserInfo_db(uid):
+    conn = connect_mysql()
+    cursor = conn.cursor()
+
+    # 查询 uid 的 username 和 avatar
+    sql = """SELECT username, avatar FROM user WHERE id = %s"""
+    cursor.execute(sql, uid)
+    result = cursor.fetchone()
+
+    data = {'username': result[0], 'avatar': result[1]}
+    json_data = json.dumps(data)
+
+    # 关闭数据库连接
+    cursor.close()
+    conn.close()
+    return  json_data
+

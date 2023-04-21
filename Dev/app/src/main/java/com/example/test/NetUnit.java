@@ -1,9 +1,15 @@
 package com.example.test;
 
+import android.content.Context;
 import android.util.Log;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -12,6 +18,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
 
 public class NetUnit {
     /**
@@ -94,7 +102,7 @@ public class NetUnit {
             }
         }
     }
-    public static boolean sendRegisterRequest(String urlStr, String username, String password) {
+    public static int[] sendRegisterRequest(String urlStr, String username, String password) {
         HttpURLConnection connection = null;
         BufferedReader reader = null;
         try {
@@ -133,15 +141,19 @@ public class NetUnit {
             JSONObject person = new JSONObject(response.toString());
             String respCode = person.getString("code");
             Log.d("TAG", "rescode---" +respCode );
+            int resid=person.getInt("uid");
             // 判断响应结果
             if (respCode.equals("200")) {
-                return true;
+                int[] result = {1, resid};
+                return result;
             } else {
-                return false;
+                int[] result = {0, 0};
+                return result;
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            int[] result = {0, 0};
+            return result;
         } finally {
             try {
                 if (reader != null) {
@@ -155,6 +167,62 @@ public class NetUnit {
             }
         }
     }
+    public static void getRating(Context context, String uid, String book_id,  Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        String url = "http://10.0.2.2:5000/bookrating";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("user_id", uid);
+                    jsonObject.put("book_id", book_id);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                params.put("data", jsonObject.toString());
+
+                return params;
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/x-www-form-urlencoded; charset=UTF-8";
+            }
+        };
+
+        // 将请求添加到请求队列
+        Volley.newRequestQueue(context).add(stringRequest);
+    }
+    public static void getUserInfo(Context context, String uid,  Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        String url = "http://10.0.2.2:5000/getUserInfo";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("user_id", uid);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                params.put("data", jsonObject.toString());
+                Log.d("param",params.toString());
+                return params;
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/x-www-form-urlencoded; charset=UTF-8";
+            }
+        };
+
+        // 将请求添加到请求队列
+        Volley.newRequestQueue(context).add(stringRequest);
+    }
+
 
 
 }

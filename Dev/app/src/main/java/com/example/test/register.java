@@ -20,12 +20,16 @@ public class register extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            boolean result = (Boolean) msg.obj;
+            int result = msg.arg1;
+            int uid= msg.arg2;
+            boolean result_f = (result != 0);
             // 通过 msg.arg1, msg.arg2, msg.obj 等获取子线程数据，然后在主线程中处理
-            Toast.makeText(register.this, result ? "注册成功，已为您自动登录" : "用户名已存在请重新注册", Toast.LENGTH_SHORT).show();
+            Toast.makeText(register.this, result_f ? "注册成功，已为您自动登录" : "用户名已存在请重新注册", Toast.LENGTH_SHORT).show();
             // 注册完成后自动登录主界面，登录到主界面
-            if(result){
+            if(result_f){
                 Intent intent = new Intent(register.this, MainActivity2.class);
+                String str = Integer.toString(uid);
+                GlobalVariable.uid = str;
                 startActivity(intent);
             }
         }
@@ -60,13 +64,11 @@ public class register extends AppCompatActivity {
             }
             new Thread(new Runnable() {
                 public void run() {
-                    Log.d("TAG", username);
-                    Log.d("TAG", password);
                     String registerUrl = "http://10.0.2.2:5000/register";
-                    boolean loginResult = NetUnit.sendRegisterRequest(registerUrl, username, password);
-                    Log.d("TAG", registerUrl);
+                    int loginResult[]  = NetUnit.sendRegisterRequest(registerUrl, username, password);
                     Message msg = new Message();
-                    msg.obj = loginResult;
+                    msg.arg1 = loginResult[0];
+                    msg.arg2=loginResult[1];
                     mHandler.sendMessage(msg);
 
                     // 在此处执行网络操作

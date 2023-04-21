@@ -44,6 +44,9 @@ public class MainActivity extends AppCompatActivity {
             if(result==2){
                 Toast.makeText(MainActivity.this, "管理员登录", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(MainActivity.this, MainActivity3_Admin.class);
+                String str = Integer.toString(uid);
+                GlobalVariable.uid = str;
+                intent.putExtra("uid", str);
                 startActivity(intent);
             }
 

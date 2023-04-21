@@ -45,6 +45,7 @@ public class BookDetailsActivity extends AppCompatActivity {
     private String Uid = GlobalVariable.uid;
 
     private Books book;
+    private  float bookRating;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,16 +68,40 @@ public class BookDetailsActivity extends AppCompatActivity {
         tvTitle.setText(book.getTitle());
         tvAuthor.setText(book.getAuthor()); // 请替换成你自己的获取书籍作者的方法
 //        //tvScore.setText(String.format("%.1f", book.getScore())); // 请替换成你自己的获取书籍平均评分的方法
-        ratingBar.setRating(3); // 请替换成你自己的获取用户对这本书的评分的方法
-        //requestReviews(book.getBookId());
-//        reviewList = new ArrayList<>();
-//        reviewAdapter = new ReviewAdapter(reviewList);
-//        rvReviews.setAdapter(reviewAdapter);
-//        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-//        rvReviews.setLayoutManager(layoutManager);
-//
-//        // TODO: 添加获取所有用户评价的代码，并将评价数据存入 reviewList 中
-//
+        NetUnit.getRating(this, Uid, book.getBookId(),  new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                // 请求成功的处理
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+                    String ratings = jsonObject.optString("ratings");
+                    bookRating=Float.parseFloat(ratings);
+                    //todo 更新评分值
+                    Log.d("NetUnit", "Ratings: " + bookRating);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // 请求失败的处理
+                Log.e("Error", error.toString());
+            }
+        });
+
+        ratingBar.setRating(bookRating); // 请替换成你自己的获取用户对这本书的评分的方法
+        //todo 网络没问题，解决一下为什么显示星星
+        requestReviews(book.getBookId());
+        reviewList = new ArrayList<>();
+        reviewAdapter = new ReviewAdapter(reviewList);
+        rvReviews.setAdapter(reviewAdapter);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        rvReviews.setLayoutManager(layoutManager);
+
+        // TODO: 减小卡片的间隔
+
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,7 +111,7 @@ public class BookDetailsActivity extends AppCompatActivity {
                 String ratingStr = Float.toString(rating);
                 saveRating(Uid,book.getBookId(),ratingStr);
                 Log.d("TAG","ratingBar"+rating);
-                // TODO: 将评价信息传递给后台服务保存，并更新界面上的评分信息和评价列表
+                // TODO: 将评价信息传递给后台服务保存，并更新界面评价列表
             }
         });
     }
@@ -105,15 +130,15 @@ public class BookDetailsActivity extends AppCompatActivity {
             @Override
             public void onResponse(JSONObject response) {
                 try {
-                    String dataStr = response.getString("data");
+                    String dataStr = response.getString("reviews");
                     JSONArray reviewsArray = new JSONArray(dataStr);
 
                     reviewList.clear(); // 清除原有数据
 
                     for (int i = 0; i < reviewsArray.length(); i++) {
                         JSONObject reviewObject = reviewsArray.getJSONObject(i);
-                        String username = reviewObject.getString("username");
-                        String content = reviewObject.getString("content");
+                        String username = reviewObject.getString("user_id");
+                        String content = reviewObject.getString("review");
 
                         Review review = new Review(username, content);
                         reviewList.add(review);
@@ -159,7 +184,7 @@ public class BookDetailsActivity extends AppCompatActivity {
                 JSONObject jsonObject = new JSONObject();
                 try {
 
-                    jsonObject.put("user_id", Uid);
+                    jsonObject.put("user_id", uid);
                     jsonObject.put("book_id", book_id);
                     jsonObject.put("rating", rating);
                 } catch (JSONException e) {
@@ -179,5 +204,6 @@ public class BookDetailsActivity extends AppCompatActivity {
         // 将请求添加到请求队列
         Volley.newRequestQueue(this).add(stringRequest);
     }
+
 
 }
