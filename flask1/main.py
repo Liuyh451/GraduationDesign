@@ -151,8 +151,9 @@ def rating_and_recom_fun():
     else:
 
         if(get_user_modify(user_id)):
+            user_id=int(user_id)
 
-            calculation_thread = threading.Thread(target=recom_fun(4))
+            calculation_thread = threading.Thread(target=recom_fun(user_id-1))
             calculation_thread.start()
     return "OK", 200
 @app.route("/bookrating", methods=["POST"])
