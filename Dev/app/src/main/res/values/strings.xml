@@ -2,4 +2,8 @@
     <string name="app_name">Test</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="prompt_address">请选择送货地址</string>
+    <string name="address1">aaaaa</string>
+    <string name="address2">bbbbbbbb</string>
+
 </resources>

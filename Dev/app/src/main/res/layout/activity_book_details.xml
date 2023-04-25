@@ -83,12 +83,27 @@
         android:hint="请留下你的评价"
         android:inputType="text"/>
 
-    <Button
-        android:id="@+id/btn_submit"
-        android:layout_width="wrap_content"
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:text="提交"/>
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <Button
+            android:id="@+id/btn_buy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="购买"/>
+
+        <Button
+            android:id="@+id/btn_submit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:text="提交"/>
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tv_reviews_header"

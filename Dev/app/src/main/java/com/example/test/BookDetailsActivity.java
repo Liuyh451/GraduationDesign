@@ -39,6 +39,7 @@ public class BookDetailsActivity extends AppCompatActivity {
     private RatingBar ratingBar;
     private EditText etComment;
     private Button btnSubmit;
+    private Button btnBuy;
     private RecyclerView rvReviews;
     private List<Review> reviewList;
     private ReviewAdapter reviewAdapter;
@@ -63,6 +64,7 @@ public class BookDetailsActivity extends AppCompatActivity {
         etComment = findViewById(R.id.et_comment);
         btnSubmit = findViewById(R.id.btn_submit);
         rvReviews = findViewById(R.id.rv_reviews);
+        btnBuy = findViewById(R.id.btn_buy);
 //
         Glide.with(this).load(book.getCoverUrl()).into(ivCover);
         tvTitle.setText(book.getTitle());
@@ -112,6 +114,18 @@ public class BookDetailsActivity extends AppCompatActivity {
                 saveRating(Uid,book.getBookId(),ratingStr);
                 Log.d("TAG","ratingBar"+rating);
                 // TODO: 将评价信息传递给后台服务保存，并更新界面评价列表
+            }
+        });
+        btnBuy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 处理提交评价的事件
+                Intent intent = new Intent(BookDetailsActivity.this, OrderEBook.class);
+                intent.putExtra("bookid", book.getBookId());
+                intent.putExtra("book_cover", book.getCoverUrl());
+                intent.putExtra("title",book.getTitle());
+                intent.putExtra("author",book.getAuthor());
+                startActivity(intent);
             }
         });
     }

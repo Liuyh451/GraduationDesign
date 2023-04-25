@@ -135,7 +135,7 @@ def get_book_reviews():
     # 将包含评价信息的列表作为JSON返回值
     return jsonify({'book_id': book_id, 'reviews': reviews}), 200
 
-#保存用户对书籍的评分，必要时更新模型，用户端接口
+# 保存用户对书籍的评分，必要时更新模型，用户端接口
 @app.route("/rating_and_recom", methods=["POST"])
 def rating_and_recom_fun():
     data = json.loads(request.form['data'])
@@ -178,9 +178,32 @@ def get_user_info():
     print(data)
     result=getUserInfo_db(user_id)
     return jsonify({"userInfo": result})
+@app.route('/bookSearch',methods=["POST"])
+def book_search():
+    title = request.form.get('title')
+    print(title)
+    # title = request.args.get('title') # 获取查询参数
+    books = fuzzy_search_book(title)
+    return jsonify(books)
+# 下单接口，用户端接口
+@app.route('/createOrder', methods=['POST'])
+def create_order():
+    user_id = request.form.get('userid')
+    book_id = request.form.get('bookid')
+    title = request.form.get('title')
+    author = request.form.get('author')
+    book_cover = request.form.get('book_cover')
+    price = request.form.get('price')
+    quantity = request.form.get('quantity')
+    address = request.form.get('address')
+    phone = request.form.get('phone')
 
-
-
+    # 计算总价
+    total_price = float(price) * float(quantity)
+    if(place_an_order(user_id, book_id, title, author, book_cover, price, quantity, total_price, address, phone)):
+        return jsonify({'success': 'Order created successfully!'})
+    else:
+        return jsonify({'error': 'Failed to insert data into database'})
 
 if __name__ == '__main__':
     app.run()

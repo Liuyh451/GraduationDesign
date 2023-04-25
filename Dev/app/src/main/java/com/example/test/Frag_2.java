@@ -1,5 +1,6 @@
 package com.example.test;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -46,6 +47,7 @@ public class Frag_2 extends Fragment {
         searchField = rootView.findViewById(R.id.search_field);
         gridView = rootView.findViewById(R.id.books_grid);
         refreshButton = rootView.findViewById(R.id.refresh_button);
+        searchField=rootView.findViewById(R.id.search_field);
 
         // 创建 GridView 的适配器
         adapter = new BookGridAdapter(getActivity(), books);
@@ -63,6 +65,14 @@ public class Frag_2 extends Fragment {
             public void onClick(View v) {
                 // 更新书籍列表
                 loadBooks();
+            }
+        });
+        searchField.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 跳转到搜索页面
+                Intent intent = new Intent(getActivity(), SearchBook.class);
+                startActivity(intent);
             }
         });
 

@@ -516,4 +516,29 @@ def getUserInfo_db(uid):
     cursor.close()
     conn.close()
     return  json_data
+def fuzzy_search_book(title):
+    conn=connect_mysql()
+    cur = conn.cursor()
+    # 使用拼接字符串的方式实现模糊搜索
+    sql = "SELECT book_id, title, author, image_url FROM books WHERE title LIKE '%%" + title + "%%'"
+    cur.execute(sql)
+    results = cur.fetchall()
+    return results
+def place_an_order(user_id, book_id, title, author, book_cover, price, quantity, total_price, address, phone):
+    # 保存订单信息到orders表
+    conn = connect_mysql()
+    try:
+        with conn.cursor() as cursor:
+            sql = "INSERT INTO orders (buyername, book_id, title, author, book_cover, price, quantity, totalPrice, address, phone) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            cursor.execute(sql,
+                           (user_id, book_id, title, author, book_cover, price, quantity, total_price, address, phone))
+            conn.commit()
+    except Exception as e:
+        conn.rollback()
+        print(str(e))
+        return False
+    finally:
+        conn.close()
+    return True
+
 
