@@ -2,6 +2,8 @@ package com.example.test;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -20,6 +22,8 @@ import com.bumptech.glide.Glide;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.File;
 
 public class Frag_3 extends Fragment {
     private String Uid = GlobalVariable.uid;
@@ -63,10 +67,16 @@ public class Frag_3 extends Fragment {
                     String username = userInfo.getString("username");
                     String avatar = userInfo.getString("avatar");
                     Username.setText(username);
-                    Glide.with(context)
-                            .load(avatar)
-                            .into(imUserAvatar);
-
+                    if (new File(avatar).exists()) {
+                        // 如果本地文件存在，则使用本地文件
+                        Bitmap bitmap = BitmapFactory.decodeFile(avatar);
+                        imUserAvatar.setImageBitmap(bitmap);
+                    }
+                    else {
+                        Glide.with(context)
+                                .load(avatar)
+                                .into(imUserAvatar);
+                    }
                     //在Logcat中输出结果
                     Log.d("JSON", "Username is: " + username);
                     Log.d("JSON", "Avatar is: " + avatar);

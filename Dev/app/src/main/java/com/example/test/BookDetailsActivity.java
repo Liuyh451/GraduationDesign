@@ -1,5 +1,6 @@
 package com.example.test;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -55,7 +56,8 @@ public class BookDetailsActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Books book = new Books(getIntent().getStringExtra("novelTitle"), getIntent().getStringExtra("novelAuthor"), getIntent().getStringExtra("novelCover"), getIntent().getStringExtra("novelId"));
         Log.d("TAG", "这里是详情页的uid" + Uid);
-//
+        Context context = this;
+        // or getBaseContext();
         ivCover = findViewById(R.id.iv_book_cover);
         tvTitle = findViewById(R.id.tv_book_title);
         tvAuthor = findViewById(R.id.tv_book_author);
@@ -108,10 +110,31 @@ public class BookDetailsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // 处理提交评价的事件
-                //String comment = etComment.getText().toString();
+                String comment = etComment.getText().toString();
                 float rating = ratingBar.getRating();
                 String ratingStr = Float.toString(rating);
                 saveRating(Uid,book.getBookId(),ratingStr);
+                NetUnit.makeComment(context, Uid, book.getBookId(), ratingStr,comment, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // 请求成功的处理
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            String msg=jsonObject.getString("msg");
+                            Log.d("comment",msg);
+                            //requestReviews(book.getBookId());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // 请求失败的处理
+                        Log.e("Error", error.toString());
+                    }
+                });
                 Log.d("TAG","ratingBar"+rating);
                 // TODO: 将评价信息传递给后台服务保存，并更新界面评价列表
             }

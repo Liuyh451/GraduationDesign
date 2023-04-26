@@ -284,6 +284,71 @@ todo
 - [ ] 用户编辑
 - [ ] 搜索
 
+#### 1.4.1 设计思路
+
+采用RecyclerView的形式展示用户列表，使用Volley库向后端请求用户信息。当管理员点击某个用户时，跳转到用户详情页面，使用基于回调函数实现参数的传递（用户名，密码，头像等）直接展示在用户详情页面，管理员可以对用户信息进行编辑。对于用户头像的修改，直接使用本地图库里的照片，并把路径上传到数据库。
+
+#### 1.4.2遇到的问题及解决方案
+
+a.用户上传图片后，根据路径解码加载图片遇到权限问题
+
+E/BitmapFactory: Unable to decode stream: java.io.FileNotFoundException: /storage/emulated/0/Download/640.jpeg: open failed: EACCES (Permission denied)
+
+```xml
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+```
+
+```Java
+// 检查是否有读取存储权限
+if (ContextCompat.checkSelfPermission(this,
+        Manifest.permission.READ_EXTERNAL_STORAGE)
+        != PackageManager.PERMISSION_GRANTED) {
+
+    // 申请读取存储权限
+    ActivityCompat.requestPermissions(this,
+            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+            MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+}
+@Override
+public void onRequestPermissionsResult(int requestCode,
+        String[] permissions, int[] grantResults) {
+    switch (requestCode) {
+        case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE: {
+            // 如果请求被取消，则结果数组为空
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // 读取存储权限已授权，可以进行后续操作
+            } else {
+                // 读取存储权限被拒绝，无法进行后续操作
+            }
+            return;
+        }
+    }
+}
+```
+
+上面的方法是行不通的由chatgpt提供。查阅资料后得到了正确的解决方案
+
+```xml
+<application
+        .......
+        android:requestLegacyExternalStorage="true">
+```
+
+b.图片的路径改为了本地路径，而部分图片依然是网络图片的形式，两种加载方式冲突
+
+```Java
+// 加载图片
+if (new File(filePath).exists()) {
+    // 如果本地文件存在，则使用本地文件
+    Bitmap bitmap = BitmapFactory.decodeFile(filePath);
+    avatarImageView.setImageBitmap(bitmap);
+} else {
+    // 如果本地文件不存在，则使用 Glide 进行网络加载
+    Glide.with(this).load("https://www.example.com/avatar.jpg").into(avatarImageView);
+}
+```
+
 ### 1.5 管理员：图书管理
 
 - [ ] 图书编辑
@@ -294,7 +359,19 @@ todo
 - [ ] 订单编辑
 - [ ] 搜索
 
-### 1.7 不要更新Gradle
+### 1.7 用户：订单模块
+
+#### 1.7.1 设计思路
+
+通过intent进行值传递，加载图书的相关信息。使用两个button来控制购买的数量，使用spinner组件方便用户选择地址，editview获取用户的电话，将这些信息打包，上传到后端服务器。
+
+```python
+//TODO 通过网络获得用户的地址 
+```
+
+
+
+### 1.9 不要更新Gradle
 
 网络被墙，会失败，会导致无法运行程序
 

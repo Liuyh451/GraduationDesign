@@ -44,7 +44,7 @@ def register():
     else:
         return jsonify({'code': 201, 'message': 'Error: User name already exists'})
 
-#这个和下面的那个基本一样，为预废弃版本
+# 为用户推荐书籍，用户端接口
 @app.route('/getRecomBooks', methods=['POST'])
 def getRecomBooks():
     # 获取前端传递的用户ID
@@ -59,7 +59,7 @@ def getRecomBooks():
 
 cnt = 0
 
-#获取为用户推荐的图书，用户端接口
+# 获取为用户推荐的图书，用户端接口，废弃版本
 @app.route('/api/novels')
 def get_novels():
     # 获取前端传来的查询参数 "page"，默认值为 1
@@ -119,7 +119,6 @@ def get_all_orders():
 
 #获取该书籍的全部评论，用户端接口
 @app.route('/book/reviews', methods=['POST'])
-#todo 注意参数的对接问题，有可能读不到
 def get_book_reviews():
     request_data = request.json  # 通过 request 对象获取请求数据
     book_id = request_data.get('book_id')  # 获取 book_id 参数
@@ -188,15 +187,25 @@ def book_search():
 # 下单接口，用户端接口
 @app.route('/createOrder', methods=['POST'])
 def create_order():
-    user_id = request.form.get('userid')
-    book_id = request.form.get('bookid')
-    title = request.form.get('title')
-    author = request.form.get('author')
-    book_cover = request.form.get('book_cover')
-    price = request.form.get('price')
-    quantity = request.form.get('quantity')
-    address = request.form.get('address')
-    phone = request.form.get('phone')
+    data = json.loads(request.form['data'])
+    user_id = data['user_id']
+    book_id = data['book_id']
+    title = data['title']
+    author = data['author']
+    book_cover = data['book_cover']
+    price = data['price']
+    quantity = data['quantity']
+    address = data['address']
+    phone = data['phone']
+    # user_id = request.form.get('userid')
+    # book_id = request.form.get('bookid')
+    # title = request.form.get('title')
+    # author = request.form.get('author')
+    # book_cover = request.form.get('book_cover')
+    # price = request.form.get('price')
+    # quantity = request.form.get('quantity')
+    # address = request.form.get('address')
+    # phone = request.form.get('phone')
 
     # 计算总价
     total_price = float(price) * float(quantity)
@@ -204,6 +213,35 @@ def create_order():
         return jsonify({'success': 'Order created successfully!'})
     else:
         return jsonify({'error': 'Failed to insert data into database'})
-
+# 做出评论，用户端接口
+@app.route('/makecomment', methods=['POST'])
+def create_review():
+    data = json.loads(request.form['data'])
+    user_id = data['user_id']
+    book_id = data['book_id']
+    rating = data['rating']
+    comment = data['comment']
+    if(make_comment_db(user_id,book_id,comment,rating)):
+        return jsonify({'msg': 'review created successfully!'})
+    else:
+        return jsonify({'msg': 'Failed to insert data into database'})
+# 更新用户信息，管理端接口
+@app.route('/update_user_info', methods=['POST'])
+def update_user_info():
+    data = json.loads(request.form['data'])
+    user_id = data['user_id']
+    username = data['username']
+    password = data['password']
+    avatar = data['avatar']
+    address = data['address']
+    print(password)
+    if(address!=None):
+        print(address)
+    if(update_user_info_db(username,password,avatar,address,user_id)):
+        result = {'code': 1, 'message': 'success'}
+        return jsonify(result)
+    else:
+        result = {'code': 0, 'message': 'error', 'error_message': 'error'}
+        return jsonify(result)
 if __name__ == '__main__':
     app.run()

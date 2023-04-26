@@ -89,7 +89,7 @@ public class Frag_1 extends Fragment {
                 // 跳转到目标Activity，这里是NovelDetailActivity
                 Intent intent = new Intent(getActivity(), BookDetailsActivity.class);
                 intent.putExtra("novelId", novel.getNovelId());
-                intent.putExtra("novelTiltl", novel.getTitle());
+                intent.putExtra("novelTitle", novel.getTitle());
                 intent.putExtra("novelAuthor", novel.getAuthor());
                 intent.putExtra("novelCover", novel.getImageUrl());
                 startActivity(intent);

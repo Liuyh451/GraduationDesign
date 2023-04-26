@@ -524,6 +524,7 @@ def fuzzy_search_book(title):
     cur.execute(sql)
     results = cur.fetchall()
     return results
+# 下订单
 def place_an_order(user_id, book_id, title, author, book_cover, price, quantity, total_price, address, phone):
     # 保存订单信息到orders表
     conn = connect_mysql()
@@ -540,5 +541,49 @@ def place_an_order(user_id, book_id, title, author, book_cover, price, quantity,
     finally:
         conn.close()
     return True
+# 用户评论
+def make_comment_db(user_id,book_id,comment,rating):
+    connection=connect_mysql()
+    try:
+        with connection.cursor() as cursor:
+            # 插入数据到MySQL数据库中
+            sql = "INSERT INTO `reviews` (`user_id`, `book_id`,`review`, `rating` ) VALUES (%s, %s, %s, %s)"
+            cursor.execute(sql, (user_id, book_id, comment, rating))
+            connection.commit()
 
+            # 返回JSON响应
+
+            return True
+
+    except Exception as ex:
+        # 处理异常，返回错误响应
+        error_message = f"An error occurred: {ex}"
+        print(error_message)
+        return  False
+# 更新用户信息
+def update_user_info_db(username, password, avatar, address, uid):
+    try:
+        # 连接数据库并开启事务
+        db=connect_mysql()
+        cursor = db.cursor()
+        cursor.execute('START TRANSACTION')
+
+        # 执行更新操作
+        sql = 'UPDATE user SET username=%s, password=%s, avatar=%s, address=%s WHERE id=%s'
+        cursor.execute(sql, (username, password, avatar, address, uid))
+
+        # 提交事务
+        db.commit()
+
+        # 返回成功结果
+        return True
+    except Exception as e:
+        # 发生错误时回滚事务
+        db.rollback()
+        print(str(e))
+        # 返回错误结果
+        return False
+    finally:
+        # 关闭数据库连接
+        db.close()
 

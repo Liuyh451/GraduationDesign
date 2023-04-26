@@ -42,9 +42,9 @@ public class AdminUsersFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         userList = new ArrayList<>();
-        userAdapter = new UserAdapter(userList, userId -> {
+        userAdapter = new UserAdapter(userList, (userId,username, password, avatarPath)-> {
             // Handle user item click
-            navigateToUserEdit(userId);
+            navigateToUserEdit(userId,username, password, avatarPath);
 
         });
         recyclerView.setAdapter(userAdapter);
@@ -53,9 +53,13 @@ public class AdminUsersFragment extends Fragment {
 
         return view;
     }
-    private void navigateToUserEdit(int userId) {
+    private void navigateToUserEdit(int userId,String username,String password,String avatarpath) {
         Intent intent = new Intent(getActivity(), AdminUserEditActivity.class);
         intent.putExtra("user_id", userId);
+        // 添加需要传递的值
+        intent.putExtra("avatarPath", avatarpath);
+        intent.putExtra("username", username);
+        intent.putExtra("password", password);
         startActivity(intent);
     }
     private void requestData() {

@@ -222,6 +222,104 @@ public class NetUnit {
         // 将请求添加到请求队列
         Volley.newRequestQueue(context).add(stringRequest);
     }
+    public static void placeOrder(Context context, String uid,String bookid,String title,String author,String bookCover,String price,String quantity,String address,String phone,  Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        String url = "http://10.0.2.2:5000/createOrder";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("user_id", uid);
+                    jsonObject.put("book_id", bookid);
+                    jsonObject.put("title", title);
+                    jsonObject.put("author", author);
+                    jsonObject.put("book_cover", bookCover);
+                    jsonObject.put("price", price);
+                    jsonObject.put("quantity", quantity);
+                    jsonObject.put("address", address);
+                    jsonObject.put("phone", phone);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                params.put("data", jsonObject.toString());
+                Log.d("param",params.toString());
+                return params;
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/x-www-form-urlencoded; charset=UTF-8";
+            }
+        };
+
+        // 将请求添加到请求队列
+        Volley.newRequestQueue(context).add(stringRequest);
+    }
+    public static void makeComment(Context context, String uid,String bookid,String rating,String comment,  Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        String url = "http://10.0.2.2:5000/makecomment";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("user_id", uid);
+                    jsonObject.put("book_id", bookid);
+                    jsonObject.put("rating", rating);
+                    jsonObject.put("comment", comment);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                params.put("data", jsonObject.toString());
+                Log.d("param",params.toString());
+                return params;
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/x-www-form-urlencoded; charset=UTF-8";
+            }
+        };
+
+        // 将请求添加到请求队列
+        Volley.newRequestQueue(context).add(stringRequest);
+    }
+    public static void updateUserInfo(Context context, String uid,String username,String password,String avatarPath,String address,  Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        String url = "http://10.0.2.2:5000/update_user_info";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("user_id", uid);
+                    jsonObject.put("username", username);
+                    jsonObject.put("password", password);
+                    jsonObject.put("avatar", avatarPath);
+                    jsonObject.put("address", address);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                params.put("data", jsonObject.toString());
+                Log.d("param",params.toString());
+                return params;
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/x-www-form-urlencoded; charset=UTF-8";
+            }
+        };
+
+        // 将请求添加到请求队列
+        Volley.newRequestQueue(context).add(stringRequest);
+    }
 
 
 
