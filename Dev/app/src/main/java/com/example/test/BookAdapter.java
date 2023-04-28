@@ -19,6 +19,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
     private List<Books> bookList;
     private OnBookClickListener onBookClickListener;
 
+
     public BookAdapter(List<Books> bookList, OnBookClickListener onBookClickListener) {
         this.bookList = bookList;
         this.onBookClickListener = onBookClickListener;
@@ -45,7 +46,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
     }
 
     public interface OnBookClickListener {
-        void onBookClick(String bookId);
+        void onBookClick(String bookId,String title,String author,String bookcover);
     }
 
     public static class BookViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -54,6 +55,9 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
         private TextView tvBookTitle, tvBookAuthor;
         private OnBookClickListener onBookClickListener;
         private String bookId;
+        private String bookcover;
+        private String title;
+        private String author;
 
         public BookViewHolder(@NonNull View itemView, OnBookClickListener onBookClickListener) {
             super(itemView);
@@ -67,8 +71,12 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
 
         public void bind(Books book) {
             bookId = book.getBookId();
+            bookcover=book.getCoverUrl();
+            title=book.getTitle();
+            author=book.getAuthor();
             tvBookTitle.setText(book.getTitle());
             tvBookAuthor.setText(book.getAuthor());
+
             Glide.with(itemView)
                     .load(book.getCoverUrl())  // 指定书籍封面 URL
                     .placeholder(R.drawable.bookerror)  // 设置占位图
@@ -78,7 +86,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
 
         @Override
         public void onClick(View view) {
-            onBookClickListener.onBookClick(bookId);
+            onBookClickListener.onBookClick(bookId,title,author,bookcover);
         }
     }
 }

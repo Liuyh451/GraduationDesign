@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,6 +21,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.test.Book;
 import com.example.test.R;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,18 +43,35 @@ public class AdminEBooksFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         bookList = new ArrayList<>();
-        bookAdapter = new BookAdapter(bookList, bookId -> {
+        bookAdapter = new BookAdapter(bookList, (bookId,title,author,bookCover) -> {
+            navigateToEBookEdit(bookId,title,author,bookCover);
             // 处理书籍条目点击事件
         });
         recyclerView.setAdapter(bookAdapter);
 
         requestData();
+        FloatingActionButton fabButton = view.findViewById(R.id.fab);
+        fabButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), AdminEBookEditActivity.class);
+                // TODO: 点击事件处理
+                //Toast.makeText(getActivity(), "点击按钮", Toast.LENGTH_SHORT).show();
+                startActivity(intent);
+
+            }
+        });
+
 
         return view;
     }
-    private void navigateToEBookEdit(int ebookId) {
+    private void navigateToEBookEdit(String ebookId,String title,String author,String bookcover) {
         Intent intent = new Intent(getActivity(), AdminEBookEditActivity.class);
+        // 添加需要传递的值
         intent.putExtra("ebook_id", ebookId);
+        intent.putExtra("title", title);
+        intent.putExtra("author", author);
+        intent.putExtra("bookCover", bookcover);
         startActivity(intent);
     }
 

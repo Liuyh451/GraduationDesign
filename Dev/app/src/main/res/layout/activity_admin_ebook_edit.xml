@@ -1,9 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:background="?android:attr/selectableItemBackground"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AdminEBookEditActivity">
+    android:layout_margin="8dp"
+    app:cardBackgroundColor="@android:color/white"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/novel_image"
+            android:layout_width="120dp"
+            android:layout_height="200dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:orientation="vertical">
+            <EditText
+                android:id="@+id/novel_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="编号"
+                android:textSize="16sp"
+                android:textColor="#888888" />
+
+            <EditText
+                android:id="@+id/novel_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="书名"
+                android:textSize="16sp"
+                android:textColor="#888888" />
+
+            <EditText
+                android:id="@+id/novel_author"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="作者"
+                android:textSize="16sp"
+                android:textColor="#888888"
+                android:layout_marginTop="8dp" />
+
+            <EditText
+                android:id="@+id/novel_price"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="价格"
+                android:textSize="14sp"
+                android:textColor="#888888"
+                android:layout_marginTop="8dp" />
+
+            <EditText
+                android:id="@+id/novel_language"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="语言"
+                android:textColor="#888888"
+                android:textSize="14sp" />
+
+
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="8dp">
+        <EditText
+            android:id="@+id/novel_description"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginTop="280dp"
+            android:hint="简介"
+            android:textColor="#888888"
+            android:textSize="14sp"
+            android:background="@drawable/edit_text_background" />
+        <!-- 保存和取消按钮 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="40dp"
+            android:gravity="center_horizontal"
+            >
+
+            <Button
+                android:id="@+id/book_edit_save_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="保存" />
+
+            <Button
+                android:id="@+id/book_edit_cancel_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="取消" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</androidx.cardview.widget.CardView>
+

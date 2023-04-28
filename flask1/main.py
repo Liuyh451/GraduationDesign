@@ -243,5 +243,35 @@ def update_user_info():
     else:
         result = {'code': 0, 'message': 'error', 'error_message': 'error'}
         return jsonify(result)
+@app.route("/modify_book", methods=["POST"])
+def modify_book():
+    data = json.loads(request.form['data'])
+    book_id=data['book_id']
+    book_cover = data['bookCover']
+    book_title=data['title']
+    book_author=data['author']
+    book_price=data['price']
+    book_description=data['description']
+    book_language=data['language']
+    # book_id = request.form.get("book_id")
+    # book_cover = request.form.get("book_cover")
+    # book_title = request.form.get("book_title")
+    # book_author = request.form.get("book_author")
+    # book_price = request.form.get("book_price")
+    # book_description = request.form.get("book_description")
+    # book_language = request.form.get("book_language")
+    result=modify_book_db(book_id,book_cover,book_title,book_author,book_price,book_description,book_language)
+    print(result)
+    if(result==1):
+        return jsonify({"code": 1, "msg": "修改成功"})
+    elif(result==2):
+        #todo 加入书籍后需要进行训练
+        return jsonify({"code": 1, "msg": "添加成功"})
+    else:
+        return jsonify({"code": 0, "msg": "发生错误"})
+
+
+
+
 if __name__ == '__main__':
     app.run()

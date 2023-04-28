@@ -5,5 +5,7 @@
     <string name="prompt_address">请选择送货地址</string>
     <string name="address1">aaaaa</string>
     <string name="address2">bbbbbbbb</string>
+    <string name="add_ebook">Add Ebook</string>
+
 
 </resources>

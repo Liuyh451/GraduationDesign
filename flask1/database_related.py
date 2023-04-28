@@ -586,4 +586,38 @@ def update_user_info_db(username, password, avatar, address, uid):
     finally:
         # 关闭数据库连接
         db.close()
+def modify_book_db(book_id,book_cover,book_title,book_author,book_price,book_description,book_language):
+    db=connect_mysql()
+    cursor = db.cursor()
+    # 检查是否存在该书
+    select_query = f"SELECT * FROM books WHERE book_id='{book_id}'"
+    cursor.execute(select_query)
+    exist_book = cursor.fetchone()
+
+    if exist_book:
+        # 如果存在该书，则进行更新操作
+        update_query = f"UPDATE books SET image_url='{book_cover}', title='{book_title}', author='{book_author}', price={book_price}, description='{book_description}', language='{book_language}' WHERE book_id='{book_id}'"
+        try:
+            cursor.execute(update_query)
+            db.commit()
+            return 1
+        except Exception as e:
+            db.rollback()  # 回滚事务
+            msg = str(e)
+            print(msg)
+            return 0
+
+    else:
+        # 如果不存在该书，则进行插入操作
+        insert_query = f"INSERT INTO books(book_id, image_url, title, author, price, description, language) VALUES ('{book_id}', '{book_cover}', '{book_title}', '{book_author}', {book_price}, '{book_description}', '{book_language}')"
+        try:
+            cursor.execute(insert_query)
+            db.commit()
+            return 2
+        except Exception as e:
+            db.rollback()  # 回滚事务
+            msg = str(e)
+            print(msg)
+            return 0
+
 
