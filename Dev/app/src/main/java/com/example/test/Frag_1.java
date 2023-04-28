@@ -51,10 +51,10 @@ public class Frag_1 extends Fragment {
     private String Uid = GlobalVariable.uid;
 
 
-
     public Frag_1() {
         // Required empty public constructor
     }
+
     public static Frag_1 newInstance(String uid) {
         Frag_1 fragment = new Frag_1();
         Bundle args = new Bundle();
@@ -73,8 +73,8 @@ public class Frag_1 extends Fragment {
         // 请求初始数据
         // 在 Fragment 中获取传递的值
         // 获取从 MainActivity2 传递过来的 uid
-        int uid_int=Integer.parseInt(Uid);
-        Log.d("TAG","这里是frag的uid"+Uid);
+        int uid_int = Integer.parseInt(Uid);
+        Log.d("TAG", "这里是frag的uid" + Uid);
         requestData(uid_int);
         novelRecyclerView = view.findViewById(R.id.novel_recycler_view);
         novelAdapter = new NovelAdapter(requireContext(), novelList);
@@ -115,6 +115,7 @@ public class Frag_1 extends Fragment {
 
         return view;
     }
+
     private void loadMoreNovels() {
         //int nextPage = novelList.size() / 4 + 1; // 假设每次请求6个小说
 //        Log.d("TAG", String.valueOf(nextPage) );
@@ -127,16 +128,16 @@ public class Frag_1 extends Fragment {
                     public void onResponse(JSONObject response) {
                         try {
                             String dataStr = response.getString("data");
-                            JSONArray novelsArray=new JSONArray(dataStr);
+                            JSONArray novelsArray = new JSONArray(dataStr);
                             for (int i = 0; i < novelsArray.length(); i++) {
                                 JSONObject novelObject = novelsArray.getJSONObject(i);
                                 String title = novelObject.getString("title");
-                                String novelId=novelObject.getString("book_id");
+                                String novelId = novelObject.getString("book_id");
                                 String imageUrl = novelObject.getString("image_url");
                                 String author = novelObject.getString("authors");
                                 String description = novelObject.getString("language_code");
 
-                                Novel novel = new Novel(novelId,title, imageUrl, author, description);
+                                Novel novel = new Novel(novelId, title, imageUrl, author, description);
                                 novelList.add(novel);
                             }
                             novelAdapter.notifyDataSetChanged();
@@ -154,6 +155,7 @@ public class Frag_1 extends Fragment {
 // 将请求添加到请求队列
         Volley.newRequestQueue(requireContext()).add(jsonObjectRequest);
     }
+
     private Response.ErrorListener onErrorResponseListener = new Response.ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError error) {
@@ -237,18 +239,18 @@ public class Frag_1 extends Fragment {
                             JSONObject jsonResponse = new JSONObject(response);
                             String dataStr = jsonResponse.getString("data");
 
-                            JSONArray novelsArray=new JSONArray(dataStr);
+                            JSONArray novelsArray = new JSONArray(dataStr);
 //                            JSONArray novelsArray = resp.getJSONArray();
                             for (int i = 0; i < novelsArray.length(); i++) {
                                 JSONObject novelObject = novelsArray.getJSONObject(i);
-                                String novelId=novelObject.getString("book_id");
+                                String novelId = novelObject.getString("book_id");
                                 String title = novelObject.getString("title");
 
                                 String imageUrl = novelObject.getString("image_url");
                                 String author = novelObject.getString("authors");
                                 String description = novelObject.getString("language_code");
 
-                                Novel novel = new Novel(novelId,title, imageUrl, author, description);
+                                Novel novel = new Novel(novelId, title, imageUrl, author, description);
                                 novelList.add(novel);
                             }
                             novelAdapter.notifyDataSetChanged();

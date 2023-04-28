@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
+
 import java.util.ArrayList;
 
 
@@ -47,7 +48,7 @@ public class Frag_2 extends Fragment {
         searchField = rootView.findViewById(R.id.search_field);
         gridView = rootView.findViewById(R.id.books_grid);
         refreshButton = rootView.findViewById(R.id.refresh_button);
-        searchField=rootView.findViewById(R.id.search_field);
+        searchField = rootView.findViewById(R.id.search_field);
 
         // 创建 GridView 的适配器
         adapter = new BookGridAdapter(getActivity(), books);

@@ -62,7 +62,7 @@ public class AdminOrderFragment extends Fragment {
                         try {
                             String dataStr = response.getString("orders");
                             JSONArray ordersArray = new JSONArray(dataStr);
-                            Log.d("TTT",dataStr);
+                            Log.d("TTT", dataStr);
                             orderList.clear(); // 清除原有数据
                             for (int i = 0; i < ordersArray.length(); i++) {
                                 JSONObject orderObject = ordersArray.getJSONObject(i);
@@ -77,7 +77,7 @@ public class AdminOrderFragment extends Fragment {
                                 double totalPrice = orderObject.getDouble("totalPrice");
                                 String address = orderObject.getString("address");
                                 String phone = orderObject.getString("phone");
-                                Order order = new Order(orderNumber, bookCover,bookAuthor, bookTitle,price, buyerName, quantity, totalPrice, address, phone);
+                                Order order = new Order(orderNumber, bookCover, bookAuthor, bookTitle, price, buyerName, quantity, totalPrice, address, phone);
                                 orderList.add(order);
                             }
                             orderAdapter.notifyDataSetChanged();

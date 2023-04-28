@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -20,10 +19,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/logo"
-        android:layout_marginTop="50dp"
         android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="50dp"
         android:hint="请输入用户名"
-        android:inputType="text"/>
+        android:inputType="text" />
 
     <!-- 密码输入框 -->
     <EditText
@@ -31,10 +30,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/username"
-        android:layout_marginTop="16dp"
         android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="16dp"
         android:hint="请输入密码"
-        android:inputType="textPassword"/>
+        android:inputType="textPassword" />
 
     <!-- 确认密码输入框 -->
     <EditText
@@ -42,10 +41,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/password"
-        android:layout_marginTop="16dp"
         android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="16dp"
         android:hint="请再次输入密码"
-        android:inputType="textPassword"/>
+        android:inputType="textPassword" />
 
     <!-- 注册按钮 -->
     <Button
@@ -53,8 +52,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/confirm_password"
-        android:layout_marginTop="50dp"
         android:layout_centerHorizontal="true"
-        android:text="注册"/>
+        android:layout_marginTop="50dp"
+        android:text="注册" />
 
 </RelativeLayout>

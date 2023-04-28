@@ -2,6 +2,8 @@ import numpy as np
 from model_train import *
 from database_related import get_ratings_from_db
 from database_related import save_user_books
+
+
 def recom_fun(user_id):
     # 准备数据：用户-物品评分矩阵
     ratings_matrix = get_ratings_from_db()
@@ -17,7 +19,7 @@ def recom_fun(user_id):
     loaded_model.load_weights('matrix_factorization_model_weights.h5')
     # 加载模型
     # 为用户0推荐3本书
-    
+
     num_recommendations = 50
     """
     @param model 训练好的模型
@@ -26,7 +28,6 @@ def recom_fun(user_id):
     @param num_recommendations=3 推荐的书的数量
     @return   推荐的书
     """
-
 
     def recommend_books(model, user_id, num_recommendations=50):
         user_ratings = ratings[user_id]
@@ -45,11 +46,10 @@ def recom_fun(user_id):
             col_key = col_names[i]
             recommend_books_list.append(col_key)
         return recommend_books_list
+
     recommended_books = recommend_books(
         loaded_model, user_id, num_recommendations=50)
     print(f'Recommended books for user 0: {recommended_books}')
     print('Recommended books_id for user 0',
-        get_books_id(recommended_books, ratings_matrix))
-    save_user_books(user_id+1,get_books_id(recommended_books, ratings_matrix))
-
-
+          get_books_id(recommended_books, ratings_matrix))
+    save_user_books(user_id + 1, get_books_id(recommended_books, ratings_matrix))

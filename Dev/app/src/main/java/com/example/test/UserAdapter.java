@@ -52,7 +52,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
     public interface OnUserClickListener {
         //void onUserClick(int userId);2023年4月26日21点14分修改为下面那个，目的是为了把相关的值传过去
-        void onUserClick(int userId, String username,String password, String avatarPath);
+        void onUserClick(int userId, String username, String password, String avatarPath);
     }
 
     public static class UserViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -80,10 +80,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             // TODO: Load user avatar, for example using Glide
             userId = user.getUserId();
             //2023年4月26日21点14分修改为下面pwd和avatarPath两行，目的是为了把相关的值传过去
-            pwd=user.getPassword();
-            avatarPath=user.getAvatar();
+            pwd = user.getPassword();
+            avatarPath = user.getAvatar();
             //增加上面的那两行
-            username=user.getUsername();
+            username = user.getUsername();
             tvUserId.setText("Username: " + user.getUsername());
             tvUserPassword.setText("Password: " + user.getPassword());
             if (new File(avatarPath).exists()) {
@@ -97,12 +97,12 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
                         .error(R.drawable.default_avatar)  // 设置加载错误时显示的图片
                         .into(ivUserAvatar);  // 将头像显示在 ImageView 中
             }
-            }
+        }
 
         @Override
         public void onClick(View view) {
             //2023年4月26日21点14分修改,，目的是为了把相关的值传过去
-            onUserClickListener.onUserClick(userId, username,tvUserPassword.getText().toString(), avatarPath);
+            onUserClickListener.onUserClick(userId, username, tvUserPassword.getText().toString(), avatarPath);
             //onUserClickListener.onUserClick(userId);
         }
     }

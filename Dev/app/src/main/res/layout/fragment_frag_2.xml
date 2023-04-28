@@ -10,24 +10,24 @@
         android:id="@+id/search_field"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:hint="搜索图书" />
+        android:hint="搜索图书"
+        android:padding="16dp" />
 
     <!-- 书籍列表 GridView -->
     <GridView
         android:id="@+id/books_grid"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:numColumns="3"
-        android:verticalSpacing="24dp"
-        android:horizontalSpacing="8dp"
-        android:padding="8dp"
-        android:clipToPadding="false"
-        android:background="@color/white"
-        android:columnWidth="150dp"
-        android:stretchMode="columnWidth"
+        android:layout_below="@id/search_field"
         android:layout_centerInParent="true"
-        android:layout_below="@id/search_field"/>
+        android:background="@color/white"
+        android:clipToPadding="false"
+        android:columnWidth="150dp"
+        android:horizontalSpacing="8dp"
+        android:numColumns="3"
+        android:padding="8dp"
+        android:stretchMode="columnWidth"
+        android:verticalSpacing="24dp" />
 
     <!-- 刷新按钮 -->
     <Button
@@ -37,7 +37,7 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="80dp"
-        android:text="换一批"
-        android:padding="8dp"/>
+        android:padding="8dp"
+        android:text="换一批" />
 
 </RelativeLayout>

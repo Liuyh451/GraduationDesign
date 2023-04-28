@@ -52,18 +52,18 @@ public class AdminEBookEditActivity extends AppCompatActivity {
         String title = intent.getStringExtra("title");
         String author = intent.getStringExtra("author");
         String bookCover = intent.getStringExtra("bookCover");
-        filePath=bookCover;
+        filePath = bookCover;
         //初始化控件
         bookIdEditText = findViewById(R.id.novel_id);
         bookTitleEditText = findViewById(R.id.novel_title);
         bookAuthorEditText = findViewById(R.id.novel_author);
-        bookCoverImageview=findViewById(R.id.novel_image);
+        bookCoverImageview = findViewById(R.id.novel_image);
         bookPriceEditText = findViewById(R.id.novel_price);
         bookLanguageEditText = findViewById(R.id.novel_language);
         bookDescriptionEditText = findViewById(R.id.novel_description);
         bookEditSaveButton = findViewById(R.id.book_edit_save_button);
         bookEditCancelButton = findViewById(R.id.book_edit_cancel_button);
-        if(bookid!=null){
+        if (bookid != null) {
             bookIdEditText.setText(bookid);
             bookTitleEditText.setText(title);
             bookAuthorEditText.setText(author);
@@ -76,8 +76,7 @@ public class AdminEBookEditActivity extends AppCompatActivity {
                 // 如果本地文件不存在，则使用 Glide 进行网络加载
                 Glide.with(this).load(bookCover).placeholder(R.drawable.placeholder_add).into(bookCoverImageview);
             }
-        }
-        else{
+        } else {
             bookCoverImageview.setImageResource(R.drawable.placeholder_add);
         }
 
@@ -95,20 +94,20 @@ public class AdminEBookEditActivity extends AppCompatActivity {
         bookEditSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String newBookId=bookIdEditText.getText().toString();
-                String newBookTitle=bookTitleEditText.getText().toString();
-                String newBookAuthor=bookAuthorEditText.getText().toString();
-                String newBookPrice=bookPriceEditText.getText().toString();
-                String newBookDescription=bookDescriptionEditText.getText().toString();
-                String newBookCove=filePath;
-                String newLanguage=bookLanguageEditText.getText().toString();
-                NetUnit.modifyBook(context, newBookId, newBookTitle, newBookAuthor,filePath,newBookPrice,newBookDescription,newLanguage, new Response.Listener<String>() {
+                String newBookId = bookIdEditText.getText().toString();
+                String newBookTitle = bookTitleEditText.getText().toString();
+                String newBookAuthor = bookAuthorEditText.getText().toString();
+                String newBookPrice = bookPriceEditText.getText().toString();
+                String newBookDescription = bookDescriptionEditText.getText().toString();
+                String newBookCove = filePath;
+                String newLanguage = bookLanguageEditText.getText().toString();
+                NetUnit.modifyBook(context, newBookId, newBookTitle, newBookAuthor, filePath, newBookPrice, newBookDescription, newLanguage, new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         // 请求成功的处理
                         try {
                             JSONObject jsonObject = new JSONObject(response);
-                            String msg=jsonObject.getString("msg");
+                            String msg = jsonObject.getString("msg");
                             Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
                             //requestReviews(book.getBookId());
                         } catch (JSONException e) {
@@ -137,8 +136,8 @@ public class AdminEBookEditActivity extends AppCompatActivity {
         });
 
 
-
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

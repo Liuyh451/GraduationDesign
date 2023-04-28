@@ -2,16 +2,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingLeft="16dp"
-    android:paddingRight="16dp"
     android:paddingTop="50dp"
+    android:paddingRight="16dp"
     android:paddingBottom="16dp">
 
     <ImageView
         android:id="@+id/profile_image"
         android:layout_width="120dp"
         android:layout_height="120dp"
-        android:src="@drawable/logo"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/logo" />
 
     <EditText
         android:id="@+id/username_edittext"
@@ -20,7 +20,7 @@
         android:layout_below="@+id/profile_image"
         android:layout_marginTop="24dp"
         android:hint="用户名"
-        android:maxLines="1"/>
+        android:maxLines="1" />
 
     <EditText
         android:id="@+id/password_edittext"
@@ -30,7 +30,7 @@
         android:layout_marginTop="8dp"
         android:hint="密码"
         android:inputType="textPassword"
-        android:maxLines="1"/>
+        android:maxLines="1" />
 
     <Button
         android:id="@+id/login_button"
@@ -38,7 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/password_edittext"
         android:layout_marginTop="16dp"
-        android:text="登录"/>
+        android:text="登录" />
 
     <Button
         android:id="@+id/register_button"
@@ -47,6 +47,6 @@
         android:layout_below="@+id/login_button"
         android:layout_marginTop="8dp"
         android:onClick="openNextActivity"
-        android:text="注册"/>
+        android:text="注册" />
 
 </RelativeLayout>

@@ -29,19 +29,19 @@ public class MainActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             int result = msg.arg1;
-            int uid=msg.arg2;
+            int uid = msg.arg2;
             boolean boolValue = (result != 0);
             Toast.makeText(MainActivity.this, boolValue ? "登录成功" : "用户名或密码错误", Toast.LENGTH_SHORT).show();
             // 通过 msg.arg1, msg.arg2, msg.obj 等获取子线程数据，然后在主线程中处理
             // 如果用户名和密码均输入正确，登录到主界面
-            if(result==1){
+            if (result == 1) {
                 Intent intent = new Intent(MainActivity.this, MainActivity2.class);
                 String str = Integer.toString(uid);
                 GlobalVariable.uid = str;
                 intent.putExtra("uid", str);
                 startActivity(intent);
             }
-            if(result==2){
+            if (result == 2) {
                 Toast.makeText(MainActivity.this, "管理员登录", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(MainActivity.this, MainActivity3_Admin.class);
                 String str = Integer.toString(uid);
@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
                             int loginResult[] = NetUnit.sendLoginRequest(loginUrl, username, password);
                             Message msg = new Message();
                             msg.arg1 = loginResult[0];
-                            msg.arg2=loginResult[1];
+                            msg.arg2 = loginResult[1];
 
                             mHandler.sendMessage(msg);
                             // 在此处执行网络操作
@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
     //点击注册按钮后跳转到注册页面
     public void openNextActivity(View view) {
         Intent intent = new Intent(this, register.class);

@@ -68,10 +68,10 @@ public class NetUnit {
             JSONObject person = new JSONObject(response.toString());
             String respCode = person.getString("code");
             String respMsg = person.getString("message");
-            int resid=person.getInt("uid");
-            Log.d("TAG", "resmsg---" +respMsg);
-            Log.d("TAG", "rescode---" +respCode );
-            Log.d("TAG", "resid---" +resid );
+            int resid = person.getInt("uid");
+            Log.d("TAG", "resmsg---" + respMsg);
+            Log.d("TAG", "rescode---" + respCode);
+            Log.d("TAG", "resid---" + resid);
             // 判断响应结果
             if (respMsg.equals("isAdmin")) {
                 int[] result = {2, resid};
@@ -102,6 +102,7 @@ public class NetUnit {
             }
         }
     }
+
     public static int[] sendRegisterRequest(String urlStr, String username, String password) {
         HttpURLConnection connection = null;
         BufferedReader reader = null;
@@ -140,8 +141,8 @@ public class NetUnit {
             //将json字符串转为JsonObj，方便读取返回值
             JSONObject person = new JSONObject(response.toString());
             String respCode = person.getString("code");
-            Log.d("TAG", "rescode---" +respCode );
-            int resid=person.getInt("uid");
+            Log.d("TAG", "rescode---" + respCode);
+            int resid = person.getInt("uid");
             // 判断响应结果
             if (respCode.equals("200")) {
                 int[] result = {1, resid};
@@ -167,7 +168,8 @@ public class NetUnit {
             }
         }
     }
-    public static void getRating(Context context, String uid, String book_id,  Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+    public static void getRating(Context context, String uid, String book_id, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         String url = "http://10.0.2.2:5000/bookrating";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 listener, errorListener) {
@@ -195,7 +197,8 @@ public class NetUnit {
         // 将请求添加到请求队列
         Volley.newRequestQueue(context).add(stringRequest);
     }
-    public static void getUserInfo(Context context, String uid,  Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+    public static void getUserInfo(Context context, String uid, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         String url = "http://10.0.2.2:5000/getUserInfo";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 listener, errorListener) {
@@ -209,7 +212,7 @@ public class NetUnit {
                     e.printStackTrace();
                 }
                 params.put("data", jsonObject.toString());
-                Log.d("param",params.toString());
+                Log.d("param", params.toString());
                 return params;
             }
 
@@ -222,7 +225,8 @@ public class NetUnit {
         // 将请求添加到请求队列
         Volley.newRequestQueue(context).add(stringRequest);
     }
-    public static void placeOrder(Context context, String uid,String bookid,String title,String author,String bookCover,String price,String quantity,String address,String phone,  Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+    public static void placeOrder(Context context, String uid, String bookid, String title, String author, String bookCover, String price, String quantity, String address, String phone, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         String url = "http://10.0.2.2:5000/createOrder";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 listener, errorListener) {
@@ -244,7 +248,7 @@ public class NetUnit {
                     e.printStackTrace();
                 }
                 params.put("data", jsonObject.toString());
-                Log.d("param",params.toString());
+                Log.d("param", params.toString());
                 return params;
             }
 
@@ -257,7 +261,8 @@ public class NetUnit {
         // 将请求添加到请求队列
         Volley.newRequestQueue(context).add(stringRequest);
     }
-    public static void makeComment(Context context, String uid,String bookid,String rating,String comment,  Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+    public static void makeComment(Context context, String uid, String bookid, String rating, String comment, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         String url = "http://10.0.2.2:5000/makecomment";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 listener, errorListener) {
@@ -275,7 +280,7 @@ public class NetUnit {
                     e.printStackTrace();
                 }
                 params.put("data", jsonObject.toString());
-                Log.d("param",params.toString());
+                Log.d("param", params.toString());
                 return params;
             }
 
@@ -288,7 +293,8 @@ public class NetUnit {
         // 将请求添加到请求队列
         Volley.newRequestQueue(context).add(stringRequest);
     }
-    public static void updateUserInfo(Context context, String uid,String username,String password,String avatarPath,String address,  Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+    public static void updateUserInfo(Context context, String uid, String username, String password, String avatarPath, String address, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         String url = "http://10.0.2.2:5000/update_user_info";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 listener, errorListener) {
@@ -307,7 +313,7 @@ public class NetUnit {
                     e.printStackTrace();
                 }
                 params.put("data", jsonObject.toString());
-                Log.d("param",params.toString());
+                Log.d("param", params.toString());
                 return params;
             }
 
@@ -320,7 +326,8 @@ public class NetUnit {
         // 将请求添加到请求队列
         Volley.newRequestQueue(context).add(stringRequest);
     }
-    public static void modifyBook(Context context, String bookId,String title,String author,String bookCover,String price,String description,String language,  Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+    public static void modifyBook(Context context, String bookId, String title, String author, String bookCover, String price, String description, String language, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         String url = "http://10.0.2.2:5000/modify_book";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 listener, errorListener) {
@@ -341,7 +348,7 @@ public class NetUnit {
                     e.printStackTrace();
                 }
                 params.put("data", jsonObject.toString());
-                Log.d("param",params.toString());
+                Log.d("param", params.toString());
                 return params;
             }
 
@@ -354,7 +361,6 @@ public class NetUnit {
         // 将请求添加到请求队列
         Volley.newRequestQueue(context).add(stringRequest);
     }
-
 
 
 }

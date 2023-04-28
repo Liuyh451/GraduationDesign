@@ -57,15 +57,17 @@ def createBooksDb():
                                  row['image_url']))
         conn.commit()
     conn.close()
+
+
 def create_ratings_db():
     # 连接 MySQL 数据库
     conn = pymysql.connect(host='localhost', user='root', password='123456',
-                       db='reccom_system', charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor)
-    df = pd.read_csv('ratings.csv', encoding='utf-8',usecols=['user_id', 'book_id', 'rating',],nrows=50000)
+                           db='reccom_system', charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor)
+    df = pd.read_csv('ratings.csv', encoding='utf-8', usecols=['user_id', 'book_id', 'rating', ], nrows=50000)
     with conn.cursor() as cursor:
         for index, row in df.iterrows():
             sql = "INSERT INTO ratings(user_id, book_id, ratings) VALUES (%s, %s, %s)"
-            cursor.execute(sql, (row['user_id'], row['book_id'],  row['rating']))
+            cursor.execute(sql, (row['user_id'], row['book_id'], row['rating']))
         conn.commit()
     conn.close()
 
@@ -143,31 +145,31 @@ def register_db(username, password):
     sql = "SELECT id FROM user WHERE username=%s"
     cursor.execute(sql, (username,))
     result = cursor.fetchone()
-    is_admin='0'
+    is_admin = '0'
     if result:
         print("Error: User name already exists")
-        return 0,0
+        return 0, 0
 
     # 插入新用户信息
     sql = "INSERT INTO user (username, password,isAdmin) VALUES (%s, %s,%s)"
-    cursor.execute(sql, (username, password,is_admin))
+    cursor.execute(sql, (username, password, is_admin))
     db.commit()
     print("register success")
     # 编写 SQL 语句
     sql = "SELECT id FROM user WHERE username = %s"
 
     # 执行 SQL 语句
-    cursor.execute(sql,(username,))
+    cursor.execute(sql, (username,))
 
     # 获取查询结果
     result = cursor.fetchone()
-    print("查询id的结果：",result)
+    print("查询id的结果：", result)
     # 将查询结果中的第一列(user_id)赋值给变量id
-    id=result[0]
+    id = result[0]
 
     # 关闭数据库连接
     db.close()
-    return 1,id
+    return 1, id
 
 
 def login_db(username, password):
@@ -180,7 +182,7 @@ def login_db(username, password):
     sql = "SELECT id, password,isAdmin FROM user WHERE username=%s"
     cursor.execute(sql, (username,))
     result = cursor.fetchone()
-    id=result[0]
+    id = result[0]
     if not result:
         print("Error: user name does not exist")
         return 0
@@ -195,9 +197,9 @@ def login_db(username, password):
     db.close()
     # 加入验证是否为管理员
     if (result[2] == '1'):
-        return 2,id
+        return 2, id
     else:
-        return 1,id
+        return 1, id
 
 
 # 查询评分前100的书，随机返回6本
@@ -211,10 +213,10 @@ def search_top_books():
     book_list = []
     for row in books:
         row_data = {
-            "book_id":row[0],
+            "book_id": row[0],
             "title": row[1],
             "authors": row[2],
-            "language_code":row[4],
+            "language_code": row[4],
             "rating": row[5],
             "image_url": row[7],
             # 添加其他需要的字段
@@ -337,17 +339,19 @@ def get_book_reviews_db(book_id):
     db.close()
     # 返回评价列表
     return json_result
+
+
 def get_ratings_from_db():
     # 创建数据库连接
     connection = pymysql.connect(host='localhost', user='root', password='123456',
-                        db='reccom_system', charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor)
+                                 db='reccom_system', charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor)
 
     # 执行查询
     sql_query = "SELECT user_id, book_id, ratings FROM ratings"
     with connection.cursor() as cursor:
         cursor.execute(sql_query)
         result = cursor.fetchall()
-    
+
     # 将查询结果转换为DataFrame
     ratings = pd.DataFrame(result)
 
@@ -368,9 +372,11 @@ def get_ratings_from_db():
 
     # 输出结果
     return ratings_matrix
+
+
 def get_recom_books_for_user(user_id):
-    db=connect_mysql()
-    cursor=db.cursor()
+    db = connect_mysql()
+    cursor = db.cursor()
     # 查询该用户的所有推荐书籍编号
     sql = f"SELECT book_id FROM user_recom_books WHERE user_id={user_id}"
     cursor.execute(sql)
@@ -378,13 +384,13 @@ def get_recom_books_for_user(user_id):
 
     # 若该用户没有推荐书籍则调用函数A
     if len(results) == 0:
-        results=search_top_books()
+        results = search_top_books()
         print("未找到推荐书籍，随机推荐")
-        #差一步jsonfy
+        # 差一步jsonfy
         return results
     # 将查询结果转化为列表返回
     bookids = [r[0] for r in results]
-    return  searchBooks(bookids)
+    return searchBooks(bookids)
 
 
 def save_user_books(user_id, book_ids):
@@ -414,27 +420,33 @@ def save_user_books(user_id, book_ids):
         cursor.close()
         db.close()
 
+
 def A():
     print('Total ratings count reached multiple of 5!')
-#开启子线程
+
+
+# 开启子线程
 def run_in_thread(func):
     def wrapper(*args, **kwargs):
         t = threading.Thread(target=func, args=args, kwargs=kwargs)
         t.start()
+
     return wrapper
-def change_user_ratings(user_id,book_id,rating):
-    db=connect_mysql()
-    cursor=db.cursor()
+
+
+def change_user_ratings(user_id, book_id, rating):
+    db = connect_mysql()
+    cursor = db.cursor()
     try:
         sql = "SELECT COUNT(*) FROM `ratings` WHERE user_id = %s" % user_id
         cursor.execute(sql)
         count = cursor.fetchone()[0]
         # 查询用户，判断用户是否存在
         if count == 0:
-            is_new_user= 1
+            is_new_user = 1
             print("is new user,train")
         else:
-            is_new_user=0
+            is_new_user = 0
             print("not new user")
         # 查询该用户对该书籍是否已经评分过
         sql = f"SELECT ratings FROM ratings WHERE user_id={user_id} AND book_id={book_id}"
@@ -465,9 +477,11 @@ def change_user_ratings(user_id,book_id,rating):
         # 关闭数据库连接
         cursor.close()
         db.close()
+
+
 def get_user_modify(user_id):
-    db=connect_mysql()
-    cursor=db.cursor()
+    db = connect_mysql()
+    cursor = db.cursor()
     # 查询总评分数量，如果是5的倍数，调用函数A
     sql = f"SELECT modify FROM user_modify WHERE user_id={user_id}"
     cursor.execute(sql)
@@ -476,18 +490,20 @@ def get_user_modify(user_id):
         modify = 0
     else:
         modify = result[0]
-    modify=int(modify)
-    print("modify",modify)
+    modify = int(modify)
+    print("modify", modify)
     modify += 1
     if modify % 5 == 0:
-        updata=1
-    else: 
-        updata=0
+        updata = 1
+    else:
+        updata = 0
     sql = f"REPLACE INTO user_modify (user_id, modify) VALUES ({user_id}, {modify})"
     cursor.execute(sql)
     db.commit()
     return updata
-def get_user_to_book_rating_db(user_id,book_id):
+
+
+def get_user_to_book_rating_db(user_id, book_id):
     # 建立数据库连接
     conn = connect_mysql()
 
@@ -500,6 +516,8 @@ def get_user_to_book_rating_db(user_id,book_id):
     # 关闭数据库连接
     conn.close()
     return result
+
+
 def getUserInfo_db(uid):
     conn = connect_mysql()
     cursor = conn.cursor()
@@ -515,15 +533,19 @@ def getUserInfo_db(uid):
     # 关闭数据库连接
     cursor.close()
     conn.close()
-    return  json_data
+    return json_data
+
+
 def fuzzy_search_book(title):
-    conn=connect_mysql()
+    conn = connect_mysql()
     cur = conn.cursor()
     # 使用拼接字符串的方式实现模糊搜索
     sql = "SELECT book_id, title, author, image_url FROM books WHERE title LIKE '%%" + title + "%%'"
     cur.execute(sql)
     results = cur.fetchall()
     return results
+
+
 # 下订单
 def place_an_order(user_id, book_id, title, author, book_cover, price, quantity, total_price, address, phone):
     # 保存订单信息到orders表
@@ -541,9 +563,11 @@ def place_an_order(user_id, book_id, title, author, book_cover, price, quantity,
     finally:
         conn.close()
     return True
+
+
 # 用户评论
-def make_comment_db(user_id,book_id,comment,rating):
-    connection=connect_mysql()
+def make_comment_db(user_id, book_id, comment, rating):
+    connection = connect_mysql()
     try:
         with connection.cursor() as cursor:
             # 插入数据到MySQL数据库中
@@ -559,12 +583,14 @@ def make_comment_db(user_id,book_id,comment,rating):
         # 处理异常，返回错误响应
         error_message = f"An error occurred: {ex}"
         print(error_message)
-        return  False
+        return False
+
+
 # 更新用户信息
 def update_user_info_db(username, password, avatar, address, uid):
     try:
         # 连接数据库并开启事务
-        db=connect_mysql()
+        db = connect_mysql()
         cursor = db.cursor()
         cursor.execute('START TRANSACTION')
 
@@ -586,8 +612,10 @@ def update_user_info_db(username, password, avatar, address, uid):
     finally:
         # 关闭数据库连接
         db.close()
-def modify_book_db(book_id,book_cover,book_title,book_author,book_price,book_description,book_language):
-    db=connect_mysql()
+
+
+def modify_book_db(book_id, book_cover, book_title, book_author, book_price, book_description, book_language):
+    db = connect_mysql()
     cursor = db.cursor()
     # 检查是否存在该书
     select_query = f"SELECT * FROM books WHERE book_id='{book_id}'"
@@ -619,5 +647,3 @@ def modify_book_db(book_id,book_cover,book_title,book_author,book_price,book_des
             msg = str(e)
             print(msg)
             return 0
-
-

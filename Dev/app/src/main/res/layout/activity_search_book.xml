@@ -7,8 +7,8 @@
         android:id="@+id/search_field"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:hint="搜索电子书" />
+        android:hint="搜索电子书"
+        android:padding="16dp" />
 
     <Button
         android:id="@+id/search_button"

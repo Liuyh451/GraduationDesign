@@ -42,9 +42,9 @@ public class AdminUsersFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         userList = new ArrayList<>();
-        userAdapter = new UserAdapter(userList, (userId,username, password, avatarPath)-> {
+        userAdapter = new UserAdapter(userList, (userId, username, password, avatarPath) -> {
             // Handle user item click
-            navigateToUserEdit(userId,username, password, avatarPath);
+            navigateToUserEdit(userId, username, password, avatarPath);
 
         });
         recyclerView.setAdapter(userAdapter);
@@ -53,7 +53,8 @@ public class AdminUsersFragment extends Fragment {
 
         return view;
     }
-    private void navigateToUserEdit(int userId,String username,String password,String avatarpath) {
+
+    private void navigateToUserEdit(int userId, String username, String password, String avatarpath) {
         Intent intent = new Intent(getActivity(), AdminUserEditActivity.class);
         intent.putExtra("user_id", userId);
         // 添加需要传递的值
@@ -62,11 +63,12 @@ public class AdminUsersFragment extends Fragment {
         intent.putExtra("password", password);
         startActivity(intent);
     }
+
     private void requestData() {
         String url = "http://10.0.2.2:5000/getAllUsers"; // 替换为实际的API地址
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                Request.Method.GET, url, null,new Response.Listener<JSONObject>() {
+                Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -77,13 +79,13 @@ public class AdminUsersFragment extends Fragment {
 
                     for (int i = 0; i < usersArray.length(); i++) {
                         JSONObject usersObject = usersArray.getJSONObject(i);
-                        String userid=usersObject.getString("id");
+                        String userid = usersObject.getString("id");
                         int id = Integer.parseInt(userid);
                         String username = usersObject.getString("username");
                         String password = usersObject.getString("password");
                         String avatar = usersObject.getString("avatar");
 
-                        User user = new User(username, password, avatar,id);
+                        User user = new User(username, password, avatar, id);
                         userList.add(user);
                     }
                     userAdapter.notifyDataSetChanged();

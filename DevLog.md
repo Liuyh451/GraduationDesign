@@ -281,7 +281,7 @@ todo
 
 ### 1.4 管理员：用户管理
 
-- [ ] 用户编辑
+- [x] 用户编辑
 - [ ] 搜索
 
 #### 1.4.1 设计思路
@@ -351,8 +351,36 @@ if (new File(filePath).exists()) {
 
 ### 1.5 管理员：图书管理
 
-- [ ] 图书编辑
+- [x] 图书编辑
 - [ ] 搜索
+- [ ] 漂浮按钮图标太小
+
+#### 1.5.1设计思路
+
+使用RecyclerView的形式展示图书列表，并借助Volley库向后端请求图书信息。当管理员点击其中一个图书时，就会跳转到相应的图书详情页面。使用基于回调函数实现参数传递（书名、作者、出版社等），直接展示在图书详情页面中，并且管理员可以对图书信息进行修改。
+
+在管理员编辑信息时，我们提供了上传基于本地图库里的照片的功能，管理员可以为图书选择一个本地照片并上传到后端数据库中，以便于更方便地对图书信息进行维护与管理。
+
+当管理员想要添加用户时，不再向编辑页面传递值。
+
+#### 1.5.2 遇到问题及解决方案
+
+a).漂浮按钮
+
+```xml
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+                       .......                     >
+<androidx.recyclerview.widget.RecyclerView/>
+<com.google.android.material.floatingactionbutton.FloatingActionButton
+    android:id="@+id/fab_button"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:src="@drawable/my_icon"
+    android:contentDescription="@string/add_ebook"
+    app:backgroundTint="@color/my_fab_color" />
+   </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+```
 
 ### 1.6 管理员：订单管理
 
@@ -369,7 +397,9 @@ if (new File(filePath).exists()) {
 //TODO 通过网络获得用户的地址 
 ```
 
+### 1.8 电子书详情模块
 
+- [ ] 解决ratingbar的评分无法显示的问题
 
 ### 1.9 不要更新Gradle
 
@@ -420,7 +450,7 @@ dependencies {
 - [x]  [基于tensorflow的个性化电影推荐系统实战](https://blog.csdn.net/weixin_62075168/article/details/128431395)
 - [ ] 考虑保存模型和加载模型，若无法加载模型，就推荐100个每次展示10个，曲线救国
 - [x] 获得书的ID而不是下标
-- [ ] 解决加载慢的问题：放弃使用ratings.csv直接从mysql中读取数据，以自己创建的用户为元素进行学习
+- [x] 解决加载慢的问题：放弃使用ratings.csv直接从mysql中读取数据，以自己创建的用户为元素进行学习
 
 初步设计思路如下：
 

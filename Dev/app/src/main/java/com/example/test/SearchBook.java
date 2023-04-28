@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 
-
 public class SearchBook extends AppCompatActivity {
     private EditText searchField;
     private ImageView searchIcon;
@@ -44,7 +43,7 @@ public class SearchBook extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String keyword = searchField.getText().toString().trim();
-               // searchBooks(keyword);
+                // searchBooks(keyword);
             }
         });
     }

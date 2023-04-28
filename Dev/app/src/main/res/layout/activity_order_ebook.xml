@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -16,7 +15,7 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_margin="10dp"
-            android:src="@drawable/default_avatar"/>
+            android:src="@drawable/default_avatar" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -29,14 +28,14 @@
                 android:layout_height="wrap_content"
                 android:text="电子书标题"
                 android:textSize="18sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/book_author"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="电子书作者"
-                android:textSize="14sp"/>
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/book_price"
@@ -45,7 +44,7 @@
                 android:text="¥20.00"
                 android:textColor="@color/gray_500"
                 android:textSize="18sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
         </LinearLayout>
 
     </LinearLayout>
@@ -54,15 +53,15 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
             android:text="数量："
-            android:textSize="16sp"
-            android:layout_marginStart="10dp"/>
+            android:textSize="16sp" />
 
         <!-- 使用您之前建议的加减按钮组件 -->
         <LinearLayout
@@ -74,21 +73,21 @@
                 android:id="@+id/minus_button"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:text="-"/>
+                android:text="-" />
 
             <TextView
                 android:id="@+id/quantity_text"
                 android:layout_width="40dp"
                 android:layout_height="wrap_content"
+                android:gravity="center"
                 android:text="0"
-                android:textSize="16sp"
-                android:gravity="center"/>
+                android:textSize="16sp" />
 
             <Button
                 android:id="@+id/add_button"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:text="+"/>
+                android:text="+" />
         </LinearLayout>
     </LinearLayout>
 
@@ -103,7 +102,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="送货地址："
-            android:textSize="16sp"/>
+            android:textSize="16sp" />
 
         <!-- 使用Spinner组件来选择地址 -->
         <Spinner
@@ -111,14 +110,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:prompt="@string/prompt_address"
-            android:spinnerMode="dropdown"/>
+            android:spinnerMode="dropdown" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:text="联系电话："
-            android:textSize="16sp"
-            android:layout_marginTop="10dp"/>
+            android:textSize="16sp" />
 
         <!-- 使用EditText组件来输入电话号码 -->
         <EditText
@@ -128,7 +127,7 @@
             android:hint="请输入电话号码"
             android:inputType="phone"
             android:maxLines="1"
-            android:textSize="16sp"/>
+            android:textSize="16sp" />
     </LinearLayout>
 
     <!-- 提交订单按钮 -->
@@ -137,6 +136,6 @@
         android:id="@+id/btn_place_order"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="提交订单"/>
+        android:text="提交订单" />
 
 </LinearLayout>

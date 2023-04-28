@@ -92,18 +92,18 @@ public class AdminUserEditActivity extends AppCompatActivity {
         saveChangesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String address=addressEditText.getText().toString();
-                String newUsername=usernameEditText.getText().toString();
-                String newPassword=passwordEditText.getText().toString();
-                Log.d("updateUinfo",address);
-                NetUnit.updateUserInfo(context, userIdString, newUsername, newPassword,filePath,address, new Response.Listener<String>() {
+                String address = addressEditText.getText().toString();
+                String newUsername = usernameEditText.getText().toString();
+                String newPassword = passwordEditText.getText().toString();
+                Log.d("updateUinfo", address);
+                NetUnit.updateUserInfo(context, userIdString, newUsername, newPassword, filePath, address, new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         // 请求成功的处理
                         try {
                             JSONObject jsonObject = new JSONObject(response);
-                            String msg=jsonObject.getString("message");
-                            Log.d("updateuserinfo",msg);
+                            String msg = jsonObject.getString("message");
+                            Log.d("updateuserinfo", msg);
                             //requestReviews(book.getBookId());
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -167,7 +167,6 @@ public class AdminUserEditActivity extends AppCompatActivity {
             }
         }
     }
-
 
 
 }

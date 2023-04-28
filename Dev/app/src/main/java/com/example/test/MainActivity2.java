@@ -25,7 +25,7 @@ public class MainActivity2 extends AppCompatActivity {
         setContentView(R.layout.activity_main2);
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         uid = getIntent().getStringExtra("uid");
-        Log.d("TAG","m2------"+uid);
+        Log.d("TAG", "m2------" + uid);
 
         // 设置底部导航栏选中监听器
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -54,7 +54,7 @@ public class MainActivity2 extends AppCompatActivity {
         openFragment(Frag_1.newInstance(uid));
     }
 
-//    private void openFragment(Fragment fragment, String uid) {
+    //    private void openFragment(Fragment fragment, String uid) {
 //        if (fragment instanceof Frag_1 && uid != null) {
 //            Bundle bundle = new Bundle();
 //            bundle.putString("uid", uid);

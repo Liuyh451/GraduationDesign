@@ -1,4 +1,5 @@
 package com.example.test;
+
 public class Order {
     private int orderNumber;
     private String bookCover;
@@ -12,7 +13,7 @@ public class Order {
     private String phone;
 
     public Order(int orderNumber, String bookCover, String bookAuthor, String bookTitle, double price,
-                 String buyerName, int quantity, double totalPrice, String address,String phone) {
+                 String buyerName, int quantity, double totalPrice, String address, String phone) {
         this.orderNumber = orderNumber;
         this.bookCover = bookCover;
         this.bookAuthor = bookAuthor;
@@ -98,6 +99,7 @@ public class Order {
     public void setAddress(String address) {
         this.address = address;
     }
+
     public String getPhone() {
         return phone;
     }

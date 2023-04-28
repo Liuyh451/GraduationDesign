@@ -44,6 +44,7 @@ public class MainActivity3_Admin extends AppCompatActivity {
         // 默认选中第一个导航栏项
         bottomNavigationView.setSelectedItemId(R.id.navigation_admin_item1);
     }
+
     private void openFragment(Fragment fragment) {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.admin_fragment_container, fragment)

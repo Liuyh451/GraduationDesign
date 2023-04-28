@@ -43,8 +43,8 @@ public class AdminEBooksFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         bookList = new ArrayList<>();
-        bookAdapter = new BookAdapter(bookList, (bookId,title,author,bookCover) -> {
-            navigateToEBookEdit(bookId,title,author,bookCover);
+        bookAdapter = new BookAdapter(bookList, (bookId, title, author, bookCover) -> {
+            navigateToEBookEdit(bookId, title, author, bookCover);
             // 处理书籍条目点击事件
         });
         recyclerView.setAdapter(bookAdapter);
@@ -65,7 +65,8 @@ public class AdminEBooksFragment extends Fragment {
 
         return view;
     }
-    private void navigateToEBookEdit(String ebookId,String title,String author,String bookcover) {
+
+    private void navigateToEBookEdit(String ebookId, String title, String author, String bookcover) {
         Intent intent = new Intent(getActivity(), AdminEBookEditActivity.class);
         // 添加需要传递的值
         intent.putExtra("ebook_id", ebookId);
@@ -86,15 +87,15 @@ public class AdminEBooksFragment extends Fragment {
                         try {
                             String dataStr = response.getString("books");
                             JSONArray booksArray = new JSONArray(dataStr);
-                            Log.d("TTT",dataStr);
+                            Log.d("TTT", dataStr);
                             bookList.clear(); // 清除原有数据
                             for (int i = 0; i < booksArray.length(); i++) {
                                 JSONObject booksObject = booksArray.getJSONObject(i);
-                                String bookid=booksObject.getString("book_id");
+                                String bookid = booksObject.getString("book_id");
                                 String title = booksObject.getString("title");
                                 String author = booksObject.getString("authors");
                                 String coverUrl = booksObject.getString("image_url");
-                                Books book = new Books(title, author, coverUrl,bookid);
+                                Books book = new Books(title, author, coverUrl, bookid);
                                 bookList.add(book);
                             }
                             bookAdapter.notifyDataSetChanged();

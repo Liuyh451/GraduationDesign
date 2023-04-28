@@ -45,14 +45,14 @@ public class Frag_3 extends Fragment {
         View view = inflater.inflate(R.layout.fragment_frag_3, container, false);
 
         // Find TextViews by id
-        ImageView imUserAvatar=view.findViewById(R.id.user_image);
+        ImageView imUserAvatar = view.findViewById(R.id.user_image);
         TextView Username = view.findViewById(R.id.user_name);
 //        TextView tvMyOrders = view.findViewById(R.id.tv_my_orders);
 //        TextView tvMyRatings = view.findViewById(R.id.tv_my_ratings);
 //        TextView tvMyFavorites = view.findViewById(R.id.tv_my_favorites);
 //        TextView tvMyReviews = view.findViewById(R.id.tv_my_reviews);
-        Log.d("UID",Uid);
-        NetUnit.getUserInfo(context, Uid,   new Response.Listener<String>() {
+        Log.d("UID", Uid);
+        NetUnit.getUserInfo(context, Uid, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 // 请求成功的处理
@@ -71,8 +71,7 @@ public class Frag_3 extends Fragment {
                         // 如果本地文件存在，则使用本地文件
                         Bitmap bitmap = BitmapFactory.decodeFile(avatar);
                         imUserAvatar.setImageBitmap(bitmap);
-                    }
-                    else {
+                    } else {
                         Glide.with(context)
                                 .load(avatar)
                                 .into(imUserAvatar);

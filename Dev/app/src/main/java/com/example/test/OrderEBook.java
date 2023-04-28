@@ -1,6 +1,7 @@
 package com.example.test;
 
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -28,7 +29,7 @@ public class OrderEBook extends AppCompatActivity {
     private TextView tvTitle;
     private TextView tvAuthor;
     private EditText evphone;
-    private  String selectedAddress;
+    private String selectedAddress;
     private String Uid = GlobalVariable.uid;
 
 
@@ -63,7 +64,7 @@ public class OrderEBook extends AppCompatActivity {
             public void onClick(View view) {
                 String currentValue = quantityText.getText().toString();
                 int newValue = Integer.parseInt(currentValue) - 1;
-                if(newValue < 0){
+                if (newValue < 0) {
                     newValue = 0;
                 }
                 quantityText.setText(String.valueOf(newValue));
@@ -91,18 +92,18 @@ public class OrderEBook extends AppCompatActivity {
         //  这里获取的是空值会引起程序崩溃
         Button btnPlaceOrder = findViewById(R.id.btn_place_order);
         btnPlaceOrder.setOnClickListener(view -> {
-            Log.d("order",book.getBookId());
-            Log.d("order",book.getTitle());
-            Log.d("order",book.getAuthor());
-            Log.d("order",book.getCoverUrl());
-            Log.d("order",quantityText.getText().toString());
-            Log.d("order",selectedAddress);
-            Log.d("order",evphone.getText().toString());
+            Log.d("order", book.getBookId());
+            Log.d("order", book.getTitle());
+            Log.d("order", book.getAuthor());
+            Log.d("order", book.getCoverUrl());
+            Log.d("order", quantityText.getText().toString());
+            Log.d("order", selectedAddress);
+            Log.d("order", evphone.getText().toString());
 
 
             // Handle place order click
             Toast.makeText(this, "Order placed successfully!", Toast.LENGTH_SHORT).show();
-            NetUnit.placeOrder(this, Uid, book.getBookId(), book.getTitle(),book.getAuthor(), book.getCoverUrl(),"9.9",quantityText.getText().toString(),selectedAddress,evphone.getText().toString(),new Response.Listener<String>() {
+            NetUnit.placeOrder(this, Uid, book.getBookId(), book.getTitle(), book.getAuthor(), book.getCoverUrl(), "9.9", quantityText.getText().toString(), selectedAddress, evphone.getText().toString(), new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                     // 请求成功的处理

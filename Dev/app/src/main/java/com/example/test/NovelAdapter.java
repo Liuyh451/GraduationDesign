@@ -24,6 +24,7 @@ public class NovelAdapter extends RecyclerView.Adapter<NovelAdapter.ViewHolder> 
         this.context = context;
         this.novels = novels;
     }
+
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.listener = listener;
     }
@@ -72,6 +73,7 @@ public class NovelAdapter extends RecyclerView.Adapter<NovelAdapter.ViewHolder> 
             description = itemView.findViewById(R.id.novel_description);
         }
     }
+
     public interface OnItemClickListener {
         void onItemClick(Novel novel);
     }

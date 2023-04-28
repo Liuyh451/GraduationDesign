@@ -46,7 +46,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
     }
 
     public interface OnBookClickListener {
-        void onBookClick(String bookId,String title,String author,String bookcover);
+        void onBookClick(String bookId, String title, String author, String bookcover);
     }
 
     public static class BookViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -71,9 +71,9 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
 
         public void bind(Books book) {
             bookId = book.getBookId();
-            bookcover=book.getCoverUrl();
-            title=book.getTitle();
-            author=book.getAuthor();
+            bookcover = book.getCoverUrl();
+            title = book.getTitle();
+            author = book.getAuthor();
             tvBookTitle.setText(book.getTitle());
             tvBookAuthor.setText(book.getAuthor());
 
@@ -86,7 +86,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
 
         @Override
         public void onClick(View view) {
-            onBookClickListener.onBookClick(bookId,title,author,bookcover);
+            onBookClickListener.onBookClick(bookId, title, author, bookcover);
         }
     }
 }

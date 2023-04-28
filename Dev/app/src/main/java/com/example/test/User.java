@@ -7,11 +7,11 @@ public class User {
     private String avatar;
 
 
-    public User(String username, String password, String avatar,int userId) {
+    public User(String username, String password, String avatar, int userId) {
         this.username = username;
         this.password = password;
         this.avatar = avatar;
-        this.userId=userId;
+        this.userId = userId;
     }
 
     // getters and setters
