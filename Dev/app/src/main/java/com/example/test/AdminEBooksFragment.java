@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -41,6 +42,7 @@ public class AdminEBooksFragment extends Fragment {
 
         RecyclerView recyclerView = view.findViewById(R.id.rv_ebooks);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        RelativeLayout searchField = (RelativeLayout) view.findViewById(R.id.search_field);
 
         bookList = new ArrayList<>();
         bookAdapter = new BookAdapter(bookList, (bookId, title, author, bookCover) -> {
@@ -59,6 +61,15 @@ public class AdminEBooksFragment extends Fragment {
                 //Toast.makeText(getActivity(), "点击按钮", Toast.LENGTH_SHORT).show();
                 startActivity(intent);
 
+            }
+        });
+        searchField.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 跳转到搜索页面
+                Intent intent = new Intent(getActivity(), SearchBook.class);
+                intent.putExtra("is_Admin", "1");
+                startActivity(intent);
             }
         });
 

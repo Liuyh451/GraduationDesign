@@ -196,11 +196,13 @@ def get_user_info():
 # 搜索图书接口，通用接口
 @app.route('/bookSearch', methods=["POST"])
 def book_search():
-    title = request.form.get('title')
+    data = json.loads(request.form['data'])
+    title = data['title']
+    #title = request.form.get('title')
     print(title)
     # title = request.args.get('title') # 获取查询参数
     books = fuzzy_search_book(title)
-    return jsonify(books)
+    return jsonify({"data": books})
 
 
 # 下单接口，用户端接口

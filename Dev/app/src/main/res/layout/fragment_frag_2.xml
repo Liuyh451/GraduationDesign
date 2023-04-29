@@ -6,12 +6,31 @@
     tools:context=".Frag_2">
 
     <!-- 顶部搜索栏 -->
-    <EditText
+    <RelativeLayout
         android:id="@+id/search_field"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="搜索图书"
-        android:padding="16dp" />
+        android:padding="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/light_gray"
+            android:orientation="horizontal"
+            android:padding="4dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/search_box_bg"
+                android:hint="搜索电子书"
+                android:padding="8dp"
+                android:textColor="@color/black" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
 
     <!-- 书籍列表 GridView -->
     <GridView

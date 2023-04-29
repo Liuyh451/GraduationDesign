@@ -401,7 +401,15 @@ a).漂浮按钮
 
 - [ ] 解决ratingbar的评分无法显示的问题
 
-### 1.9 不要更新Gradle
+### 1.9 电子书搜索模块
+
+- [ ] 加入搜索历史的功能
+
+#### 1.9.1 设计思路
+
+每个页面的搜索框都只是个摆设，点击后直接跳转到搜索的activity，加入一个判断是否为管理员的字段is_admin，通过intent.putExtra方法传递，在search活动中监听novelAdapter.setOnItemClickListener，并通过is_admin判断跳转到图书详情页面还是图书编辑页面。
+
+### 1.10 不要更新Gradle
 
 网络被墙，会失败，会导致无法运行程序
 

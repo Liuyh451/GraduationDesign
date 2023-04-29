@@ -17,11 +17,11 @@ import java.util.List;
 public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHolder> {
 
     private List<Order> ordersList;
-    private OrderAdapter.OnOrderClickListener OnOrderClickListener;
+    private OnOrderClickListener onOrderClickListener;
 
-    public OrderAdapter(List<Order> ordersList, OrderAdapter.OnOrderClickListener onUserClickListener) {
+    public OrderAdapter(List<Order> ordersList, OnOrderClickListener onOrderClickListener) {
         this.ordersList = ordersList;
-        this.OnOrderClickListener = OnOrderClickListener;
+        this.onOrderClickListener = onOrderClickListener;
     }
 
     @NonNull
@@ -30,7 +30,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.item_order, parent, false);
-        return new OrderViewHolder(view, OnOrderClickListener);
+        return new OrderViewHolder(view, onOrderClickListener);
     }
 
     @Override
@@ -45,7 +45,8 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
     }
 
     public interface OnOrderClickListener {
-        void OnOrderClick(int orderId);
+        //2023年4月30日00点20分修改,，目的是为了把相关的值传过去
+        void OnOrderClick(int orderId, String bookCover, String title, String author, String buyerQuantity, String buyerName, String price, String address, String phone);
     }
 
     public static class OrderViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -55,6 +56,14 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         private ImageView tvOrderBookCover;
         private OnOrderClickListener onOrderClickListener;
         private int orderId;
+        private String bookCover;
+        private String author;
+        private String title;
+        private String price;
+        private String phone;
+        private String address;
+        private String buyerName;
+        private String buyerQuantity;
 
         public OrderViewHolder(@NonNull View itemView, OnOrderClickListener onOrderClickListener) {
             super(itemView);
@@ -75,8 +84,16 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
         public void bind(Order order) {
             orderId = order.getOrderNumber();
+            bookCover = order.getBookCover();
+            title = order.getBookTitle();
+            author = order.getBookAuthor();
+            price = Double.toString(order.getPrice());
+            address = order.getAddress();
+            buyerName = order.getBuyerName();
+            phone = order.getPhone();
+            buyerQuantity = Integer.toString(order.getQuantity());
+            //2023年4月30日00点20分修改,，目的是为了把相关的值传过去
             tvOrderId.setText("Order ID: " + order.getOrderNumber());
-            //todo 用glide获取封面
             tvOrderBookAuthor.setText("作者" + order.getBookAuthor());
             tvOrderBookTitle.setText("标题" + order.getBookTitle());
             tvOrderBuyerName.setText("购买者" + order.getBuyerName());
@@ -94,7 +111,8 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
         @Override
         public void onClick(View view) {
-            onOrderClickListener.OnOrderClick(orderId);
+            //2023年4月30日00点20分修改,，目的是为了把相关的值传过去
+            onOrderClickListener.OnOrderClick(orderId, bookCover, title, author, buyerQuantity, buyerName, price, address, phone);
         }
     }
 }

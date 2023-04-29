@@ -543,7 +543,18 @@ def fuzzy_search_book(title):
     sql = "SELECT book_id, title, author, image_url FROM books WHERE title LIKE '%%" + title + "%%'"
     cur.execute(sql)
     results = cur.fetchall()
-    return results
+    books_list=[]
+    for row in results:
+        book = {
+            'book_id': row[0],
+            'title': row[1],
+            'authors': row[2],
+            'image_url': row[3],
+            # todo 加入 'price': row[4]
+        }
+        books_list.append(book)
+    json_result = json.dumps(books_list)
+    return json_result
 
 
 # 下订单

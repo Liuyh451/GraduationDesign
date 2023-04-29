@@ -1,5 +1,6 @@
 package com.example.test;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -41,14 +42,29 @@ public class AdminOrderFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         orderList = new ArrayList<>();
-        orderAdapter = new OrderAdapter(orderList, orderId -> {
+        orderAdapter = new OrderAdapter(orderList, (orderId,bookCover,title,author,buyerQuantity,buyerName,price,address,phone) -> {
             // 处理订单条目点击事件
+            navigateToOrderEdit(orderId,bookCover,title,author,buyerQuantity,buyerName,price,address,phone);
         });
         recyclerView.setAdapter(orderAdapter);
 
         requestData();
 
         return view;
+    }
+    private void navigateToOrderEdit(int orderId,String bookCover,String title,String author,String buyerQuantity,String buyerName,String price,String address,String phone) {
+        Intent intent = new Intent(getActivity(), AdminOrderEditActivity.class);
+        // 添加需要传递的值
+        intent.putExtra("orderId", Integer.toString(orderId));
+        intent.putExtra("title", title);
+        intent.putExtra("author", author);
+        intent.putExtra("bookCover", bookCover);
+        intent.putExtra("buyerQuantity", buyerQuantity);
+        intent.putExtra("buyerName", buyerName);
+        intent.putExtra("price", price);
+        intent.putExtra("address", address);
+        intent.putExtra("phone", phone);
+        startActivity(intent);
     }
 
     private void requestData() {

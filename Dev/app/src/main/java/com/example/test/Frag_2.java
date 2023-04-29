@@ -7,8 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.GridView;
+
 
 import java.util.ArrayList;
 
@@ -22,6 +22,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import android.widget.RelativeLayout;
+
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,7 +34,6 @@ import java.util.ArrayList;
 public class Frag_2 extends Fragment {
 
     private GridView gridView;
-    private EditText searchField;
     private Button refreshButton;
 
     private BookGridAdapter adapter;
@@ -45,10 +47,13 @@ public class Frag_2 extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_frag_2, container, false);
 
         // 初始化界面元素
-        searchField = rootView.findViewById(R.id.search_field);
+        // 查找该布局中的 "my_relative_layout" 视图
+        RelativeLayout searchField = (RelativeLayout) rootView.findViewById(R.id.search_field);
+
+
         gridView = rootView.findViewById(R.id.books_grid);
         refreshButton = rootView.findViewById(R.id.refresh_button);
-        searchField = rootView.findViewById(R.id.search_field);
+
 
         // 创建 GridView 的适配器
         adapter = new BookGridAdapter(getActivity(), books);
@@ -73,6 +78,7 @@ public class Frag_2 extends Fragment {
             public void onClick(View v) {
                 // 跳转到搜索页面
                 Intent intent = new Intent(getActivity(), SearchBook.class);
+                intent.putExtra("is_Admin", "0");
                 startActivity(intent);
             }
         });
