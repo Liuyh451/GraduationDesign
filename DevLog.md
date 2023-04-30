@@ -352,7 +352,7 @@ if (new File(filePath).exists()) {
 ### 1.5 管理员：图书管理
 
 - [x] 图书编辑
-- [ ] 搜索
+- [x] 搜索
 - [ ] 漂浮按钮图标太小
 
 #### 1.5.1设计思路
@@ -382,10 +382,119 @@ a).漂浮按钮
 
 ```
 
+b).添加或者修改图书时不能输入空值，否则服务器报错
+
+获取焦点法，整个背景都是红色，不好看，放弃
+
+```Java
+private EditText bookIdEditText;
+private EditText bookTitleEditText;
+private EditText bookAuthorEditText;
+
+private void initView() {
+    bookIdEditText = findViewById(R.id.novel_id);
+    bookTitleEditText = findViewById(R.id.novel_title);
+    bookAuthorEditText = findViewById(R.id.novel_author);
+    
+    // 为每个EditText添加OnFocusChangeListener来处理焦点变化事件
+    bookIdEditText.setOnFocusChangeListener(new EditTextFocusChangeListener());
+    bookTitleEditText.setOnFocusChangeListener(new EditTextFocusChangeListener());
+    bookAuthorEditText.setOnFocusChangeListener(new EditTextFocusChangeListener());
+    
+    // ...
+}
+private class EditTextFocusChangeListener implements View.OnFocusChangeListener {
+    @Override
+    public void onFocusChange(View v, boolean hasFocus) {
+        if (!hasFocus) {  // 输入框失去焦点时
+            EditText editText = (EditText) v;
+            String text = editText.getText().toString();
+            if (TextUtils.isEmpty(text.trim())) {
+                editText.setBackgroundColor(Color.RED);  // 设置背景颜色为红色
+            } else {
+                editText.setBackgroundColor(Color.WHITE);  // 设置背景颜色为白色
+            }
+        }
+    }
+}
+```
+
+修改布局文件，用来提醒用户
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   <item android:state_focused="true">
+       <shape android:shape="rectangle">
+           <solid android:color="@android:color/white"/>
+           <stroke android:color="@android:color/holo_red_dark" android:width="2dp"/>
+           <corners android:radius="5dp"/>
+       </shape>
+   </item>
+   <item android:state_focused="false" android:state_empty="true">
+       <shape android:shape="rectangle">
+           <solid android:color="@android:color/white"/>
+           <stroke android:color="@android:color/holo_red_dark" android:width="2dp"/>
+           <corners android:radius="5dp"/>
+       </shape>
+   </item>
+   <item android:state_focused="false">
+       <shape android:shape="rectangle">
+           <solid android:color="@android:color/white"/>
+           <stroke android:color="@android:color/darker_gray" android:width="2dp"/>
+           <corners android:radius="5dp"/>
+       </shape>
+   </item>
+</selector>
+```
+
+
+
 ### 1.6 管理员：订单管理
 
 - [ ] 订单编辑
 - [ ] 搜索
+
+#### 1.6.1 设计思路
+
+只可对价格，数量，收货地址，姓名，电话等信息进行编辑，可以对订单进行删除。
+
+#### 1.6.2 遇到问题及解决方案
+
+a）.对订单进行删除或者修改后，finish完成页面后，页面并不刷新，有些愚蠢。
+
+在`FragmentA`中调用`startActivityForResult`方法，跳转到`ActivityB`：
+
+```Java
+Intent intent = new Intent(getActivity(), ActivityB.class);
+startActivityForResult(intent, REQUEST_CODE_B);
+```
+
+在`ActivityB`中通过`setResult`方法将数据返回给`FragmentA`并关闭当前页面：
+
+```Java
+setResult(RESULT_OK, intent);
+finish();
+```
+
+在`FragmentA`中重写`onActivityResult`方法，获取返回数据并进行页面数据的更新
+
+```Java
+@Override
+public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+
+    if (requestCode == REQUEST_CODE_B && resultCode == RESULT_OK) {
+        // 获取从ActivityB返回的数据
+        String dataString = data.getStringExtra("data");
+
+        // 在此进行数据的更新操作
+        // ...
+    }
+}
+```
+
+**可以拓展到其他模块**
 
 ### 1.7 用户：订单模块
 
@@ -399,7 +508,17 @@ a).漂浮按钮
 
 ### 1.8 电子书详情模块
 
-- [ ] 解决ratingbar的评分无法显示的问题
+- [x] 解决ratingbar的评分无法显示的问题
+
+`onResponse` 中打印出 `bookRating` 的值是 `4.0`，但在函数外面却是 `0`，这可能是因为 `onResponse` 中的代码是在另一个线程中运行的，而函数外的打印语句则是在主线程中执行的。由于线程之间的数据不共享，所以可能会导致不同的线程对同一个变量的访问出现不一致的情况。
+
+a).将打印语句放在 `onResponse` 中：
+
+b).将 `bookRating` 定义为 `volatile`：
+
+```java
+private volatile float bookRating = 0.0f; // 将变量定义为 volatile
+```
 
 ### 1.9 电子书搜索模块
 

@@ -2,17 +2,26 @@ package com.example.test;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.bumptech.glide.Glide;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 
@@ -34,6 +43,7 @@ public class AdminOrderEditActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_order_edit);
+        Context context=this;
         Intent intent = getIntent();
         String orderId = intent.getStringExtra("orderId");
         String title = intent.getStringExtra("title");
@@ -75,6 +85,79 @@ public class AdminOrderEditActivity extends AppCompatActivity {
         } else {
             bookImage.setImageResource(R.drawable.placeholder_add);
         }
+        submitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 获取书籍价格
+                String newPrice = bookPrice.getText().toString();
+                //获取手机号
+                String newPhone = phoneEditText.getText().toString();
+                // 获取客户姓名
+                String newBuyerName = nameEditText.getText().toString();
+                //获取地址
+                String newAddress = addressSpinner.getText().toString();
+                //获取数量
+                String newQuantity = quantityText.getText().toString();
+
+
+                // 在此处理submitButton被点击后的逻辑代码
+                NetUnit.modifyOrder(context, orderId, newBuyerName, newPrice, newQuantity, address,newPhone, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // 请求成功的处理
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            String msg = jsonObject.getString("msg");
+                            Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+                            Log.d("updateuserinfo", msg);
+                            setResult(RESULT_OK);
+                            finish();
+                            //requestReviews(book.getBookId());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // 请求失败的处理
+                        Log.e("Error", error.toString());
+                    }
+                });
+            }
+        });
+
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                NetUnit.deleteOrder(context, orderId, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // 请求成功的处理
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            String msg = jsonObject.getString("msg");
+                            Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+                            Log.d("updateuserinfo", msg);
+                            setResult(RESULT_OK);
+                            finish();
+                            //requestReviews(book.getBookId());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // 请求失败的处理
+                        Log.e("Error", error.toString());
+                    }
+                });
+                // 在此处理deleteButton被点击后的逻辑代码
+            }
+        });
 
 
     }

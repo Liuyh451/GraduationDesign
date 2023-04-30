@@ -15,12 +15,12 @@ import com.bumptech.glide.Glide;
 
 import java.util.List;
 
-public class NovelAdapter extends RecyclerView.Adapter<NovelAdapter.ViewHolder> {
+public class MyFavoriteAdapter extends RecyclerView.Adapter<MyFavoriteAdapter.ViewHolder> {
     private List<Novel> novels;
     private Context context;
     private OnItemClickListener listener;
 
-    public NovelAdapter(Context context, List<Novel> novels) {
+    public MyFavoriteAdapter(Context context, List<Novel> novels) {
         this.context = context;
         this.novels = novels;
     }
@@ -31,7 +31,7 @@ public class NovelAdapter extends RecyclerView.Adapter<NovelAdapter.ViewHolder> 
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.novel_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.favorite_item, parent, false);
         return new ViewHolder(view);
     }
 
@@ -40,7 +40,8 @@ public class NovelAdapter extends RecyclerView.Adapter<NovelAdapter.ViewHolder> 
         Novel novel = novels.get(position);
         holder.title.setText(novel.getTitle());
         holder.author.setText(novel.getAuthor());
-        holder.description.setText(novel.getDescription());
+        holder.rating.setText(novel.getDescription());
+        holder.date.setText(novel.getNovelId());
         Glide.with(context).load(novel.getImageUrl()).into(holder.image);
         // 设置itemView的点击监听器
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -63,13 +64,15 @@ public class NovelAdapter extends RecyclerView.Adapter<NovelAdapter.ViewHolder> 
         ImageView image;
         TextView title;
         TextView author;
-        TextView description;
+        TextView rating;
+        TextView date;
         public ViewHolder(View itemView) {
             super(itemView);
             image = itemView.findViewById(R.id.novel_image);
             title = itemView.findViewById(R.id.novel_title);
             author = itemView.findViewById(R.id.novel_author);
-            description = itemView.findViewById(R.id.novel_description);
+            rating = itemView.findViewById(R.id.novel_rating);
+            date=itemView.findViewById(R.id.novel_date);
         }
     }
 

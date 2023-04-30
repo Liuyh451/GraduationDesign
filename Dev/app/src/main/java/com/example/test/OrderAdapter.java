@@ -94,12 +94,12 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             buyerQuantity = Integer.toString(order.getQuantity());
             //2023年4月30日00点20分修改,，目的是为了把相关的值传过去
             tvOrderId.setText("Order ID: " + order.getOrderNumber());
-            tvOrderBookAuthor.setText("作者" + order.getBookAuthor());
-            tvOrderBookTitle.setText("标题" + order.getBookTitle());
-            tvOrderBuyerName.setText("购买者" + order.getBuyerName());
-            tvOrderBuyerQuantity.setText("数量" + order.getQuantity());
-            tvOrderBuyerAddress.setText("地址" + order.getAddress());
-            tvOrderBuyerPhone.setText("电话" + order.getPhone());
+            tvOrderBookAuthor.setText("作者：" + order.getBookAuthor());
+            tvOrderBookTitle.setText("标题：" + order.getBookTitle());
+            tvOrderBuyerName.setText("购买者：" + order.getBuyerName());
+            tvOrderBuyerQuantity.setText("数量：" + order.getQuantity());
+            tvOrderBuyerAddress.setText("地址：" + order.getAddress());
+            tvOrderBuyerPhone.setText("电话：" + order.getPhone());
             //todo 价格
             //tvOrderDetails.setText("Order Details: " + order.getDetails());
             Glide.with(itemView)

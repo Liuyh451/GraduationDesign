@@ -92,6 +92,8 @@ public class Frag_1 extends Fragment {
                 intent.putExtra("novelTitle", novel.getTitle());
                 intent.putExtra("novelAuthor", novel.getAuthor());
                 intent.putExtra("novelCover", novel.getImageUrl());
+                // 这里本来是获取简介，但是为了获取评分，只好借用这个字段了
+                intent.putExtra("novelRating", novel.getDescription());
                 startActivity(intent);
             }
         });
@@ -248,9 +250,9 @@ public class Frag_1 extends Fragment {
 
                                 String imageUrl = novelObject.getString("image_url");
                                 String author = novelObject.getString("authors");
-                                String description = novelObject.getString("language_code");
+                                String rating = novelObject.getString("average_rating");
 
-                                Novel novel = new Novel(novelId, title, imageUrl, author, description);
+                                Novel novel = new Novel(novelId, title, imageUrl, author, rating);
                                 novelList.add(novel);
                             }
                             novelAdapter.notifyDataSetChanged();

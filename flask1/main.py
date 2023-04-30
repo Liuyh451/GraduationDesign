@@ -109,19 +109,11 @@ def get_all_books():
     # todo 这里有个小bug，有时候前端接收不到，也可能是前端的问题
     return jsonify({'books': books})
 
-
 # 获取全部评论，管理端接口
 @app.route('/allReviews', methods=['GET'])
 def get_all_reviews():
     review_list = get_all_reviews_db()
     return jsonify({'reviews': review_list})
-
-
-# 获取全部订单，管理端接口
-@app.route('/allOrders', methods=['GET'])
-def get_all_orders():
-    json_result = get_all_orders_db()
-    return jsonify({'orders': json_result})
 
 
 # 获取该书籍的全部评论，用户端接口
@@ -141,6 +133,27 @@ def get_book_reviews():
     # 将包含评价信息的列表作为JSON返回值
     return jsonify({'book_id': book_id, 'reviews': reviews}), 200
 
+# 添加用户收藏，用户端接口
+@app.route('/book/favorite', methods=['POST'])
+def my_favorite():
+    data = json.loads(request.form['data'])
+    user_id = data['user_id']
+    book_id = data['book_id']
+    rating = data['rating']
+    title = data['title']
+    date = data['date']
+    bookCover = data['bookCover']
+    author = data['author']
+    result, msg = add_favorite(user_id, book_id, title, author, rating, date, bookCover)
+    return jsonify({'msg': msg})
+# 获取用户收藏，用户端接口
+@app.route('/book/getfavorite', methods=['POST'])
+def get_my_favorite():
+    # userid = request.form.get("userid")
+    data=json.loads(request.form['data'])
+    user_id = data['user_id']
+    books=get_favorite(user_id)
+    return jsonify({"data": books})
 
 # 保存用户对书籍的评分，必要时更新模型，用户端接口
 @app.route("/rating_and_recom", methods=["POST"])
@@ -198,18 +211,34 @@ def get_user_info():
 def book_search():
     data = json.loads(request.form['data'])
     title = data['title']
-    #title = request.form.get('title')
+    # title = request.form.get('title')
     print(title)
     # title = request.args.get('title') # 获取查询参数
     books = fuzzy_search_book(title)
     return jsonify({"data": books})
 
 
+# 获取全部订单，管理端接口
+@app.route('/allOrders', methods=['GET'])
+def get_all_orders():
+    json_result = get_all_orders_db()
+    return jsonify({'orders': json_result})
+
+
+@app.route('/order/myOrder', methods=['POST'])
+def get_my_order():
+    data = json.loads(request.form['data'])
+    user_id = data['userId']
+    json_result = get_my_order_db(user_id)
+    return jsonify({'orders': json_result})
+
+
 # 下单接口，用户端接口
-@app.route('/createOrder', methods=['POST'])
+@app.route('/order/create', methods=['POST'])
 def create_order():
     data = json.loads(request.form['data'])
     user_id = data['user_id']
+    name = data['buyerName']
     book_id = data['book_id']
     title = data['title']
     author = data['author']
@@ -230,10 +259,41 @@ def create_order():
 
     # 计算总价
     total_price = float(price) * float(quantity)
-    if (place_an_order(user_id, book_id, title, author, book_cover, price, quantity, total_price, address, phone)):
-        return jsonify({'success': 'Order created successfully!'})
+    if (
+            place_an_order(user_id, name, book_id, title, author, book_cover, price, quantity, total_price, address,
+                           phone)):
+        return jsonify({'msg': '订单创建成功!'})
     else:
-        return jsonify({'error': 'Failed to insert data into database'})
+        return jsonify({'msg': '订单创建失败'})
+
+
+# 订单修改，管理端接口
+@app.route('/order/modify', methods=['POST'])
+def update_order():
+    data = json.loads(request.form['data'])
+    username = data['buyerName']
+    order_id = data['orderId']
+    price = data['price']
+    quantity = data['quantity']
+    address = data['address']
+    phone = data['phone']
+    # 计算总价
+    amount = float(quantity) * float(price)
+    if (update_order_db(order_id, quantity, price, username, phone, address, amount)):
+        return jsonify({'success': True, 'msg': '订单操作成功'})
+    else:
+        return jsonify({'success': False, 'msg': '订单操作失败'})
+
+
+# 订单删除，管理端接口
+@app.route('/order/delete', methods=['POST'])
+def delete_order():
+    data = json.loads(request.form['data'])
+    order_id = data['orderId']
+    if (delete_order_db(order_id)):
+        return jsonify({'success': True, 'msg': '订单删除成功'})
+    else:
+        return jsonify({'success': False, 'msg': '订单删除失败'})
 
 
 # 做出评论，用户端接口
@@ -251,7 +311,7 @@ def create_review():
 
 
 # 更新用户信息，管理端接口
-@app.route('/update_user_info', methods=['POST'])
+@app.route('/user/updateInfo', methods=['POST'])
 def update_user_info():
     data = json.loads(request.form['data'])
     user_id = data['user_id']
@@ -260,8 +320,6 @@ def update_user_info():
     avatar = data['avatar']
     address = data['address']
     print(password)
-    if (address != None):
-        print(address)
     if (update_user_info_db(username, password, avatar, address, user_id)):
         result = {'code': 1, 'message': 'success'}
         return jsonify(result)
@@ -270,8 +328,21 @@ def update_user_info():
         return jsonify(result)
 
 
+# 删除用户，管理端接口
+@app.route('/user/delete', methods=['POST'])
+def delete_user():
+    data = json.loads(request.form['data'])
+    user_id = data['user_id']
+    if (delete_user_db(user_id)):
+        result = {'code': 1, 'message': '用户删除成功'}
+        return jsonify(result)
+    else:
+        result = {'code': 0, 'message': '用户删除失败', 'error_message': 'error'}
+        return jsonify(result)
+
+
 # 修改图书，管理端接口
-@app.route("/modify_book", methods=["POST"])
+@app.route("/book/modify", methods=["POST"])
 def modify_book():
     data = json.loads(request.form['data'])
     book_id = data['book_id']
@@ -297,6 +368,20 @@ def modify_book():
         return jsonify({"code": 1, "msg": "添加成功"})
     else:
         return jsonify({"code": 0, "msg": "发生错误"})
+
+
+# 删除图书，管理员接口
+@app.route("/book/delete", methods=["POST"])
+def delete_book():
+    data = json.loads(request.form['data'])
+    book_id = data['book_id']
+    if (delete_book_db(book_id)):
+        result = {'code': 1, 'message': '图书删除成功'}
+        # todo 删除书籍后需要进行训练
+        return jsonify(result)
+    else:
+        result = {'code': 0, 'message': '图书删除失败', 'error_message': 'error'}
+        return jsonify(result)
 
 
 if __name__ == '__main__':

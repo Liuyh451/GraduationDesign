@@ -97,6 +97,22 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="10dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="收货人姓名："
+            android:textSize="16sp" />
+
+        <!-- 使用EditText组件来输入姓名 -->
+        <EditText
+            android:id="@+id/buyerName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="请输入收货人姓名"
+            android:inputType="phone"
+            android:maxLines="1"
+            android:textSize="16sp" />
 
         <TextView
             android:layout_width="wrap_content"

@@ -1,5 +1,6 @@
 package com.example.test;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,6 +33,8 @@ import java.util.List;
 public class AdminOrderFragment extends Fragment {
     private OrderAdapter orderAdapter;
     private List<Order> orderList;
+    public static final int REQUEST_CODE_B = 1;
+
 
     @Nullable
     @Override
@@ -52,6 +55,17 @@ public class AdminOrderFragment extends Fragment {
 
         return view;
     }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE_B && resultCode == Activity.RESULT_OK) {
+            requestData();
+            // 在此进行数据的更新操作
+            // ...
+        }
+    }
+
     private void navigateToOrderEdit(int orderId,String bookCover,String title,String author,String buyerQuantity,String buyerName,String price,String address,String phone) {
         Intent intent = new Intent(getActivity(), AdminOrderEditActivity.class);
         // 添加需要传递的值
@@ -64,7 +78,8 @@ public class AdminOrderFragment extends Fragment {
         intent.putExtra("price", price);
         intent.putExtra("address", address);
         intent.putExtra("phone", phone);
-        startActivity(intent);
+        startActivityForResult(intent, REQUEST_CODE_B);
+        //startActivity(intent);
     }
 
     private void requestData() {
@@ -78,7 +93,6 @@ public class AdminOrderFragment extends Fragment {
                         try {
                             String dataStr = response.getString("orders");
                             JSONArray ordersArray = new JSONArray(dataStr);
-                            Log.d("TTT", dataStr);
                             orderList.clear(); // 清除原有数据
                             for (int i = 0; i < ordersArray.length(); i++) {
                                 JSONObject orderObject = ordersArray.getJSONObject(i);

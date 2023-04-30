@@ -226,8 +226,8 @@ public class NetUnit {
         Volley.newRequestQueue(context).add(stringRequest);
     }
 
-    public static void placeOrder(Context context, String uid, String bookid, String title, String author, String bookCover, String price, String quantity, String address, String phone, Response.Listener<String> listener, Response.ErrorListener errorListener) {
-        String url = "http://10.0.2.2:5000/createOrder";
+    public static void placeOrder(Context context, String uid,String buyerName, String bookid, String title, String author, String bookCover, String price, String quantity, String address, String phone, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        String url = "http://10.0.2.2:5000/order/create";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 listener, errorListener) {
             @Override
@@ -236,6 +236,7 @@ public class NetUnit {
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject.put("user_id", uid);
+                    jsonObject.put("buyerName", buyerName);
                     jsonObject.put("book_id", bookid);
                     jsonObject.put("title", title);
                     jsonObject.put("author", author);
@@ -244,6 +245,92 @@ public class NetUnit {
                     jsonObject.put("quantity", quantity);
                     jsonObject.put("address", address);
                     jsonObject.put("phone", phone);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                params.put("data", jsonObject.toString());
+                Log.d("param", params.toString());
+                return params;
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/x-www-form-urlencoded; charset=UTF-8";
+            }
+        };
+
+        // 将请求添加到请求队列
+        Volley.newRequestQueue(context).add(stringRequest);
+    }
+    public static void modifyOrder(Context context, String orderId, String buyerName, String price,String quantity, String address, String phone, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        String url = "http://10.0.2.2:5000/order/modify";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("orderId", orderId);
+                    jsonObject.put("price", price);
+                    jsonObject.put("quantity", quantity);
+                    jsonObject.put("address", address);
+                    jsonObject.put("phone", phone);
+                    jsonObject.put("buyerName", buyerName);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                params.put("data", jsonObject.toString());
+                Log.d("param", params.toString());
+                return params;
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/x-www-form-urlencoded; charset=UTF-8";
+            }
+        };
+
+        // 将请求添加到请求队列
+        Volley.newRequestQueue(context).add(stringRequest);
+    }
+    public static void deleteOrder(Context context, String orderId,  Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        String url = "http://10.0.2.2:5000/order/delete";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("orderId", orderId);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                params.put("data", jsonObject.toString());
+                Log.d("param", params.toString());
+                return params;
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/x-www-form-urlencoded; charset=UTF-8";
+            }
+        };
+
+        // 将请求添加到请求队列
+        Volley.newRequestQueue(context).add(stringRequest);
+    }
+    public static void getMyOrder(Context context, String userId,  Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        String url = "http://10.0.2.2:5000/order/myOrder";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("userId", userId);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -295,7 +382,7 @@ public class NetUnit {
     }
 
     public static void updateUserInfo(Context context, String uid, String username, String password, String avatarPath, String address, Response.Listener<String> listener, Response.ErrorListener errorListener) {
-        String url = "http://10.0.2.2:5000/update_user_info";
+        String url = "http://10.0.2.2:5000/user/updateInfo";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 listener, errorListener) {
             @Override
@@ -328,7 +415,7 @@ public class NetUnit {
     }
 
     public static void modifyBook(Context context, String bookId, String title, String author, String bookCover, String price, String description, String language, Response.Listener<String> listener, Response.ErrorListener errorListener) {
-        String url = "http://10.0.2.2:5000/modify_book";
+        String url = "http://10.0.2.2:5000/book/modify";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 listener, errorListener) {
             @Override
@@ -344,6 +431,33 @@ public class NetUnit {
                     jsonObject.put("description", description);
                     jsonObject.put("language", language);
 
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                params.put("data", jsonObject.toString());
+                Log.d("param", params.toString());
+                return params;
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/x-www-form-urlencoded; charset=UTF-8";
+            }
+        };
+
+        // 将请求添加到请求队列
+        Volley.newRequestQueue(context).add(stringRequest);
+    }
+    public static void deleteBook(Context context, String bookId,  Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        String url = "http://10.0.2.2:5000/book/delete";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("book_id", bookId);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -391,6 +505,67 @@ public class NetUnit {
         // 将请求添加到请求队列
         Volley.newRequestQueue(context).add(stringRequest);
     }
+    public static void addFavorite(Context context,String uid,String bookId,String title,String author,String rating,String bookCover,String date,  Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        String url = "http://10.0.2.2:5000/book/favorite";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("user_id", uid);
+                    jsonObject.put("book_id", bookId);
+                    jsonObject.put("title", title);
+                    jsonObject.put("author", author);
+                    jsonObject.put("rating", rating);
+                    jsonObject.put("bookCover", bookCover);
+                    jsonObject.put("date", date);
 
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                params.put("data", jsonObject.toString());
+                Log.d("param", params.toString());
+                return params;
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/x-www-form-urlencoded; charset=UTF-8";
+            }
+        };
+
+        // 将请求添加到请求队列
+        Volley.newRequestQueue(context).add(stringRequest);
+    }
+    public static void getFavorite(Context context,String uid,  Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        String url = "http://10.0.2.2:5000/book/getfavorite";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("user_id", uid);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                params.put("data", jsonObject.toString());
+                Log.d("param", params.toString());
+                return params;
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/x-www-form-urlencoded; charset=UTF-8";
+            }
+        };
+
+        // 将请求添加到请求队列
+        Volley.newRequestQueue(context).add(stringRequest);
+    }
 
 }

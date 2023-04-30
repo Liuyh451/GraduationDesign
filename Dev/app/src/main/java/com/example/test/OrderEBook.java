@@ -29,6 +29,7 @@ public class OrderEBook extends AppCompatActivity {
     private TextView tvTitle;
     private TextView tvAuthor;
     private EditText evphone;
+    private EditText evBuyerName;
     private String selectedAddress;
     private String Uid = GlobalVariable.uid;
 
@@ -41,6 +42,7 @@ public class OrderEBook extends AppCompatActivity {
         tvTitle = findViewById(R.id.book_title);
         tvAuthor = findViewById(R.id.book_author);
         evphone = findViewById(R.id.phone_edit_text);
+        evBuyerName=findViewById(R.id.buyerName);
         Books book = new Books(getIntent().getStringExtra("title"), getIntent().getStringExtra("author"), getIntent().getStringExtra("book_cover"), getIntent().getStringExtra("bookid"));
         Glide.with(this).load(book.getCoverUrl()).into(ivCover);
         tvTitle.setText(book.getTitle());
@@ -49,6 +51,7 @@ public class OrderEBook extends AppCompatActivity {
         Button addButton = findViewById(R.id.add_button);
         Button minusButton = findViewById(R.id.minus_button);
         TextView quantityText = findViewById(R.id.quantity_text);
+        String buyerName=evBuyerName.getText().toString();
 
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,18 +95,10 @@ public class OrderEBook extends AppCompatActivity {
         //  这里获取的是空值会引起程序崩溃
         Button btnPlaceOrder = findViewById(R.id.btn_place_order);
         btnPlaceOrder.setOnClickListener(view -> {
-            Log.d("order", book.getBookId());
-            Log.d("order", book.getTitle());
-            Log.d("order", book.getAuthor());
-            Log.d("order", book.getCoverUrl());
-            Log.d("order", quantityText.getText().toString());
-            Log.d("order", selectedAddress);
-            Log.d("order", evphone.getText().toString());
-
 
             // Handle place order click
-            Toast.makeText(this, "Order placed successfully!", Toast.LENGTH_SHORT).show();
-            NetUnit.placeOrder(this, Uid, book.getBookId(), book.getTitle(), book.getAuthor(), book.getCoverUrl(), "9.9", quantityText.getText().toString(), selectedAddress, evphone.getText().toString(), new Response.Listener<String>() {
+
+            NetUnit.placeOrder(this, Uid,buyerName, book.getBookId(), book.getTitle(), book.getAuthor(), book.getCoverUrl(), "9.9", quantityText.getText().toString(), selectedAddress, evphone.getText().toString(), new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                     // 请求成功的处理
@@ -111,6 +106,7 @@ public class OrderEBook extends AppCompatActivity {
                         JSONObject jsonObject = new JSONObject(response);
 
                         String ratings = jsonObject.optString("ratings");
+                        Toast.makeText(getApplication(), "Order placed successfully!", Toast.LENGTH_SHORT).show();
 
 
                     } catch (JSONException e) {

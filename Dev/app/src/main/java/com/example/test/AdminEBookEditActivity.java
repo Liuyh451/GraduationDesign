@@ -7,9 +7,13 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -38,6 +42,7 @@ public class AdminEBookEditActivity extends AppCompatActivity {
     private EditText bookDescriptionEditText;
     private Button bookEditSaveButton;
     private Button bookEditCancelButton;
+    private Button bookEditDeleteButton;
     private String filePath;
 
 
@@ -63,6 +68,8 @@ public class AdminEBookEditActivity extends AppCompatActivity {
         bookDescriptionEditText = findViewById(R.id.novel_description);
         bookEditSaveButton = findViewById(R.id.book_edit_save_button);
         bookEditCancelButton = findViewById(R.id.book_edit_cancel_button);
+        bookEditDeleteButton = findViewById(R.id.book_edit_delete_button);
+
         if (bookid != null) {
             bookIdEditText.setText(bookid);
             bookTitleEditText.setText(title);
@@ -94,6 +101,7 @@ public class AdminEBookEditActivity extends AppCompatActivity {
         bookEditSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //TODO 加入空值判断，图书封面要特别注意
                 String newBookId = bookIdEditText.getText().toString();
                 String newBookTitle = bookTitleEditText.getText().toString();
                 String newBookAuthor = bookAuthorEditText.getText().toString();
@@ -101,7 +109,7 @@ public class AdminEBookEditActivity extends AppCompatActivity {
                 String newBookDescription = bookDescriptionEditText.getText().toString();
                 String newBookCove = filePath;
                 String newLanguage = bookLanguageEditText.getText().toString();
-                NetUnit.modifyBook(context, newBookId, newBookTitle, newBookAuthor, filePath, newBookPrice, newBookDescription, newLanguage, new Response.Listener<String>() {
+                NetUnit.modifyBook(context, newBookId, newBookTitle, newBookAuthor, newBookCove, newBookPrice, newBookDescription, newLanguage, new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         // 请求成功的处理
@@ -109,6 +117,8 @@ public class AdminEBookEditActivity extends AppCompatActivity {
                             JSONObject jsonObject = new JSONObject(response);
                             String msg = jsonObject.getString("msg");
                             Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+                            setResult(RESULT_OK);
+                            finish();
                             //requestReviews(book.getBookId());
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -122,8 +132,7 @@ public class AdminEBookEditActivity extends AppCompatActivity {
                         Log.e("Error", error.toString());
                     }
                 });
-                // 执行相应的点击操作
-                // 这里可以添加你需要执行的代码
+
             }
         });
         bookEditCancelButton.setOnClickListener(new View.OnClickListener() {
@@ -134,9 +143,39 @@ public class AdminEBookEditActivity extends AppCompatActivity {
                 // 这里可以添加你需要执行的代码
             }
         });
+        bookEditDeleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NetUnit.deleteBook(context, bookid,  new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // 请求成功的处理
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            String msg = jsonObject.getString("message");
+                            Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+                            setResult(RESULT_OK);
+                            finish();
+                            //requestReviews(book.getBookId());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // 请求失败的处理
+                        Log.e("Error", error.toString());
+                    }
+                });
+            }
+        });
 
 
     }
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

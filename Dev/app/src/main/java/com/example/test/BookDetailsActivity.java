@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -27,7 +28,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,21 +44,23 @@ public class BookDetailsActivity extends AppCompatActivity {
     private EditText etComment;
     private Button btnSubmit;
     private Button btnBuy;
+    private Button btnFavorite;
     private RecyclerView rvReviews;
     private List<Review> reviewList;
     private ReviewAdapter reviewAdapter;
     private String Uid = GlobalVariable.uid;
 
     private Books book;
-    private  float bookRating;
+    private float rating;
+    private float bookRating;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_details);
         Intent intent = getIntent();
+        String bookAverageRating = getIntent().getStringExtra("novelRating");
         Books book = new Books(getIntent().getStringExtra("novelTitle"), getIntent().getStringExtra("novelAuthor"), getIntent().getStringExtra("novelCover"), getIntent().getStringExtra("novelId"));
-        Log.d("TAG", "这里是详情页的uid" + Uid);
         Context context = this;
         // or getBaseContext();
         ivCover = findViewById(R.id.iv_book_cover);
@@ -67,21 +72,23 @@ public class BookDetailsActivity extends AppCompatActivity {
         btnSubmit = findViewById(R.id.btn_submit);
         rvReviews = findViewById(R.id.rv_reviews);
         btnBuy = findViewById(R.id.btn_buy);
+        btnFavorite = findViewById(R.id.btn_favorite);
 //
         Glide.with(this).load(book.getCoverUrl()).into(ivCover);
         tvTitle.setText(book.getTitle());
         tvAuthor.setText(book.getAuthor()); // 请替换成你自己的获取书籍作者的方法
 //        //tvScore.setText(String.format("%.1f", book.getScore())); // 请替换成你自己的获取书籍平均评分的方法
-        NetUnit.getRating(this, Uid, book.getBookId(),  new Response.Listener<String>() {
+        NetUnit.getRating(this, Uid, book.getBookId(), new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 // 请求成功的处理
                 try {
                     JSONObject jsonObject = new JSONObject(response);
                     String ratings = jsonObject.optString("ratings");
-                    bookRating=Float.parseFloat(ratings);
-                    //todo 更新评分值
-                    Log.d("NetUnit", "Ratings: " + bookRating);
+                    bookRating = Float.parseFloat(ratings);
+                    //更新评分值
+                    ratingBar.setRating(bookRating);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -94,9 +101,7 @@ public class BookDetailsActivity extends AppCompatActivity {
                 Log.e("Error", error.toString());
             }
         });
-
-        ratingBar.setRating(bookRating); // 请替换成你自己的获取用户对这本书的评分的方法
-        //todo 网络没问题，解决一下为什么显示星星
+        //加载图书的评论
         requestReviews(book.getBookId());
         reviewList = new ArrayList<>();
         reviewAdapter = new ReviewAdapter(reviewList);
@@ -113,15 +118,15 @@ public class BookDetailsActivity extends AppCompatActivity {
                 String comment = etComment.getText().toString();
                 float rating = ratingBar.getRating();
                 String ratingStr = Float.toString(rating);
-                saveRating(Uid,book.getBookId(),ratingStr);
-                NetUnit.makeComment(context, Uid, book.getBookId(), ratingStr,comment, new Response.Listener<String>() {
+                saveRating(Uid, book.getBookId(), ratingStr);
+                NetUnit.makeComment(context, Uid, book.getBookId(), ratingStr, comment, new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         // 请求成功的处理
                         try {
                             JSONObject jsonObject = new JSONObject(response);
-                            String msg=jsonObject.getString("msg");
-                            Log.d("comment",msg);
+                            String msg = jsonObject.getString("msg");
+                            Log.d("comment", msg);
                             //requestReviews(book.getBookId());
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -135,7 +140,7 @@ public class BookDetailsActivity extends AppCompatActivity {
                         Log.e("Error", error.toString());
                     }
                 });
-                Log.d("TAG","ratingBar"+rating);
+                Log.d("TAG", "ratingBar" + rating);
                 // TODO: 将评价信息传递给后台服务保存，并更新界面评价列表
             }
         });
@@ -146,9 +151,42 @@ public class BookDetailsActivity extends AppCompatActivity {
                 Intent intent = new Intent(BookDetailsActivity.this, OrderEBook.class);
                 intent.putExtra("bookid", book.getBookId());
                 intent.putExtra("book_cover", book.getCoverUrl());
-                intent.putExtra("title",book.getTitle());
-                intent.putExtra("author",book.getAuthor());
+                intent.putExtra("title", book.getTitle());
+                intent.putExtra("author", book.getAuthor());
                 startActivity(intent);
+            }
+        });
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String date = dateFormat.format(calendar.getTime());
+
+        Log.d("TAG", "Current Date: " + date);
+        btnFavorite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NetUnit.addFavorite(context, Uid, book.getBookId(), book.getTitle(), book.getAuthor(), bookAverageRating, book.getCoverUrl(), date, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // 请求成功的处理
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            String msg = jsonObject.getString("msg");
+                            Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+                            //requestReviews(book.getBookId());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // 请求失败的处理
+                        Log.e("Error", error.toString());
+                    }
+                });
+                // 处理提交评价的事件
+
             }
         });
     }

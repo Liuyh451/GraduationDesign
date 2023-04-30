@@ -41,7 +41,7 @@
                 android:id="@+id/book_price"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="¥20.00"
+                android:text="价格"
                 android:textColor="@color/gray_500"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -99,7 +99,6 @@
             android:id="@+id/address_spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:prompt="@string/prompt_address"
             android:spinnerMode="dropdown" />
 
         <TextView

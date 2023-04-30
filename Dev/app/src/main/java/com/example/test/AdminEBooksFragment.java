@@ -1,5 +1,6 @@
 package com.example.test;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -34,6 +35,7 @@ import java.util.List;
 public class AdminEBooksFragment extends Fragment {
     private BookAdapter bookAdapter;
     private List<Books> bookList;
+    public static final int REQUEST_CODE_B = 1;
 
     @Nullable
     @Override
@@ -75,6 +77,16 @@ public class AdminEBooksFragment extends Fragment {
 
 
         return view;
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE_B && resultCode == Activity.RESULT_OK) {
+            requestData();
+            // 在此进行数据的更新操作
+            // ...
+        }
     }
 
     private void navigateToEBookEdit(String ebookId, String title, String author, String bookcover) {
