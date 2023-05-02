@@ -368,6 +368,49 @@ def get_book_reviews_db(book_id):
     db.close()
     # 返回评价列表
     return json_result
+def get_user_reviews_db(user_id):
+    db = connect_mysql()
+    # 使用 with 语句保证连接自动关闭
+    with db.cursor() as cursor:
+        # 执行查询语句
+        sql = 'SELECT * FROM reviews WHERE user_id = %s'
+        cursor.execute(sql, (user_id,))
+        review_results = cursor.fetchall()
+        # 将查询结果组成一个列表，其中每个元素是一个包含用户名和评价内容的字典
+        book_id_list = [r[1] for r in review_results]
+        # 准备查询语句
+        ids = ",".join([str(id) for id in book_id_list])
+        query = f"SELECT * FROM books WHERE book_id IN ({ids})"
+
+        # 执行查询
+        cursor = db.cursor()
+        cursor.execute(query)
+
+        # 提取结果
+        rows = cursor.fetchall()
+
+        # 将结果转换为JSON格式
+        result = []
+        reviews = []
+        for row in review_results:
+            reviews.append(row[2])
+        i=0
+        for row in rows:
+            row_data = {
+                "title": row[1],
+                "authors": row[2],
+                "image_url": row[7],
+                "review":reviews[i],
+                # 添加其他需要的字段
+            }
+            result.append(row_data)
+            i += 1
+
+        json_result = json.dumps(result)
+    # 关闭数据库连接
+    db.close()
+    # 返回评价列表
+    return json_result
 
 
 def get_ratings_from_db():

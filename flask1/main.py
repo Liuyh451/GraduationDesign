@@ -109,6 +109,7 @@ def get_all_books():
     # todo 这里有个小bug，有时候前端接收不到，也可能是前端的问题
     return jsonify({'books': books})
 
+
 # 获取全部评论，管理端接口
 @app.route('/allReviews', methods=['GET'])
 def get_all_reviews():
@@ -133,6 +134,17 @@ def get_book_reviews():
     # 将包含评价信息的列表作为JSON返回值
     return jsonify({'book_id': book_id, 'reviews': reviews}), 200
 
+
+# 获取该用户的全部评论，用户端接口
+@app.route('/user/reviews', methods=['POST'])
+def get_user_reviews():
+    request_data = request.json  # 通过 request 对象获取请求数据
+    user_id = request_data.get('uid')
+    # userid=request.form.get("uid")
+    data = get_user_reviews_db(user_id)
+    return jsonify({'code': 200, "data": data})
+
+
 # 添加用户收藏，用户端接口
 @app.route('/book/favorite', methods=['POST'])
 def my_favorite():
@@ -146,14 +158,17 @@ def my_favorite():
     author = data['author']
     result, msg = add_favorite(user_id, book_id, title, author, rating, date, bookCover)
     return jsonify({'msg': msg})
+
+
 # 获取用户收藏，用户端接口
 @app.route('/book/getfavorite', methods=['POST'])
 def get_my_favorite():
     # userid = request.form.get("userid")
-    data=json.loads(request.form['data'])
+    data = json.loads(request.form['data'])
     user_id = data['user_id']
-    books=get_favorite(user_id)
+    books = get_favorite(user_id)
     return jsonify({"data": books})
+
 
 # 保存用户对书籍的评分，必要时更新模型，用户端接口
 @app.route("/rating_and_recom", methods=["POST"])
@@ -385,4 +400,5 @@ def delete_book():
 
 
 if __name__ == '__main__':
-    app.run()
+    # app.run(host='0.0.0.0', port=5000,debug=True)
+     app.run(debug=True)

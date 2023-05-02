@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardBackgroundColor="@android:color/white"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp"
+    android:id="@+id/item_layout"
+
+    android:padding="16dp"
+    android:orientation="horizontal">
+
+    <!-- Book Image -->
+    <ImageView
+        android:id="@+id/my_review_book_image"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:src="@drawable/loading"/>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <!-- Book Title -->
+        <TextView
+            android:id="@+id/my_review_book_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:text="Book Title"
+            android:maxLines="1"
+            android:ellipsize="end"/>
+
+        <!-- Book Author -->
+        <TextView
+            android:id="@+id/my_review_book_author"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text="Book Author"
+            android:maxLines="1"
+            android:ellipsize="end"/>
+
+        <!-- Book Review -->
+        <TextView
+            android:id="@+id/my_review_book_review"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text="This is a great book!"
+            android:maxLines="3"
+            android:ellipsize="end"/>
+
+        <Button
+            android:id="@+id/review_delete_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Delete"/>
+    </LinearLayout>
+</LinearLayout>
