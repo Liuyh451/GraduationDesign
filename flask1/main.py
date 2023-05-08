@@ -193,7 +193,7 @@ def rating_and_recom_fun():
     return "OK", 200
 
 
-# 获取用户对书籍的评分，用户端接口
+# 获取用户对某本书籍的评分，用户端接口
 @app.route("/bookrating", methods=["POST"])
 def get_user_to_book_rating():
     data = json.loads(request.form['data'])
@@ -208,6 +208,14 @@ def get_user_to_book_rating():
     else:
         return jsonify({"ratings": "0"})
 
+#获取用户对已评价的图书的评分
+@app.route("/user/rating", methods=["POST"])
+def get_user_all_book_ratings():
+    #userid=request.form.get("uid")
+    data = json.loads(request.form['data'])
+    userid = data['user_id']
+    result=get_user_rating_db(userid)
+    return jsonify({"ratings": result})
 
 # 获取用户的个人信息，用户端接口
 @app.route("/getUserInfo", methods=["POST"])

@@ -368,6 +368,9 @@ def get_book_reviews_db(book_id):
     db.close()
     # 返回评价列表
     return json_result
+
+
+# 获取该用户对书的评论，返回书的信息和评论
 def get_user_reviews_db(user_id):
     db = connect_mysql()
     # 使用 with 语句保证连接自动关闭
@@ -394,13 +397,13 @@ def get_user_reviews_db(user_id):
         reviews = []
         for row in review_results:
             reviews.append(row[2])
-        i=0
+        i = 0
         for row in rows:
             row_data = {
                 "title": row[1],
                 "authors": row[2],
                 "image_url": row[7],
-                "review":reviews[i],
+                "review": reviews[i],
                 # 添加其他需要的字段
             }
             result.append(row_data)
@@ -413,6 +416,7 @@ def get_user_reviews_db(user_id):
     return json_result
 
 
+# 获取全部评分
 def get_ratings_from_db():
     # 创建数据库连接
     connection = pymysql.connect(host='localhost', user='root', password='123456',
@@ -444,6 +448,48 @@ def get_ratings_from_db():
 
     # 输出结果
     return ratings_matrix
+
+
+# 获取该用户全部评分
+def get_user_rating_db(user_id):
+    conn = connect_mysql()
+    cursor = conn.cursor()
+    sql = "SELECT user_id, book_id, ratings FROM ratings WHERE user_id=%s"
+    cursor.execute(sql, user_id)
+    result = cursor.fetchall()
+    ratings = []
+    for row in result:
+        ratings.append(row[2])
+    # 将查询结果组成一个列表，其中每个元素是一个包含用户名和评价内容的字典
+    book_id_list = [r[1] for r in result]
+    # 准备查询语句
+    ids = ",".join([str(id) for id in book_id_list])
+    query = f"SELECT * FROM books WHERE book_id IN ({ids})"
+    # 执行查询
+    cursor = conn.cursor()
+    cursor.execute(query)
+
+    # 提取结果
+    rows = cursor.fetchall()
+    # 将结果转换为JSON格式
+    result = []
+    i = 0
+    for row in rows:
+        row_data = {
+            "title": row[1],
+            "authors": row[2],
+            "image_url": row[7],
+            "rating": ratings[i],
+            # 添加其他需要的字段
+        }
+        result.append(row_data)
+        i += 1
+    json_result = json.dumps(result)
+    # 关闭数据库连接
+    cursor.close()
+    conn.close()
+    # 返回评价列表
+    return json_result
 
 
 def get_recom_books_for_user(user_id):
@@ -832,8 +878,10 @@ def add_favorite(userid, bookid, title, author, rating, date, bookCover):
     except Exception as e:
         db.rollback()
         return False, str(e)
+
+
 def get_favorite(userId):
-    connection=connect_mysql()
+    connection = connect_mysql()
     # 查询用户收藏记录
     try:
         with connection.cursor() as cursor:
@@ -860,4 +908,3 @@ def get_favorite(userId):
     finally:
         connection.close()
     return json_result
-
