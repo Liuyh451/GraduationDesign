@@ -349,7 +349,22 @@ def update_user_info():
     else:
         result = {'code': 0, 'message': 'error', 'error_message': 'error'}
         return jsonify(result)
-
+@app.route('/user/uInfoModify', methods=['POST'])
+def user_info_modify():
+    data = json.loads(request.form['data'])
+    user_id = data['user_id']
+    username = data['nickName']
+    password = data['password']
+    avatar = data['avatar']
+    address = data['address']
+    phone=data['phone']
+    gender=data['gender']
+    if (user_info_modify_db(username, password, avatar, address, phone,gender,user_id)):
+        result = {'code': 1, 'message': 'success'}
+        return jsonify(result)
+    else:
+        result = {'code': 0, 'message': 'error', 'error_message': 'error'}
+        return jsonify(result)
 
 # 删除用户，管理端接口
 @app.route('/user/delete', methods=['POST'])

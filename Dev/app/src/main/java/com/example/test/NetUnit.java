@@ -413,6 +413,41 @@ public class NetUnit {
         // 将请求添加到请求队列
         Volley.newRequestQueue(context).add(stringRequest);
     }
+    public static void userInfoModify(Context context, String uid,String nickName, String phone, String password, String avatarPath, String address,String gender, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        String url = "http://10.0.2.2:5000/user/uInfoModify";
+        //todo 封装昵称
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("user_id", uid);
+                    jsonObject.put("nickName",nickName);
+                    jsonObject.put("phone", phone);
+                    jsonObject.put("password", password);
+                    jsonObject.put("avatar", avatarPath);
+                    jsonObject.put("address", address);
+                    jsonObject.put("gender", gender);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                params.put("data", jsonObject.toString());
+                Log.d("param", params.toString());
+                return params;
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/x-www-form-urlencoded; charset=UTF-8";
+            }
+        };
+
+        // 将请求添加到请求队列
+        Volley.newRequestQueue(context).add(stringRequest);
+    }
 
     public static void modifyBook(Context context, String bookId, String title, String author, String bookCover, String price, String description, String language, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         String url = "http://10.0.2.2:5000/book/modify";

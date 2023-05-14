@@ -6,6 +6,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -22,6 +24,7 @@ public class MyFavoritesActivity extends AppCompatActivity {
     private MyFavoriteAdapter novelAdapter;
     private List<Novel> novelList;
     private String uid = GlobalVariable.uid;
+    private ImageView backArrowIv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +36,13 @@ public class MyFavoritesActivity extends AppCompatActivity {
         novelAdapter = new MyFavoriteAdapter(this, novelList);
         favoriteRecyclerView.setAdapter(novelAdapter);
         favoriteRecyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
+        backArrowIv=findViewById(R.id.iv_backward);
+        backArrowIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         NetUnit.getFavorite(this, uid, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {

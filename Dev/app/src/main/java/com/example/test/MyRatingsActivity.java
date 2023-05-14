@@ -6,6 +6,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -22,6 +24,7 @@ public class MyRatingsActivity extends AppCompatActivity {
     private UserRatingAdapter userRatingAdapter;
     private List<Novel> novelList;
     private String uid=GlobalVariable.uid;
+    private ImageView backArrowIv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +35,13 @@ public class MyRatingsActivity extends AppCompatActivity {
         userRatingRecView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
         userRatingAdapter = new UserRatingAdapter(this,novelList);
         userRatingRecView.setAdapter(userRatingAdapter);
+        backArrowIv=findViewById(R.id.iv_backward);
+        backArrowIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         NetUnit.getUserRating(this, uid, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {

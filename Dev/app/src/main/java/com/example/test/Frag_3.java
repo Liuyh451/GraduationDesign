@@ -28,6 +28,12 @@ import java.io.File;
 public class Frag_3 extends Fragment {
     private String Uid = GlobalVariable.uid;
     private Context context;
+    private String avatar;
+    private String userAddress;
+    private String userGender;
+    private String userPhone;
+    private String nickName;
+    private  String passWord;
 
     @Override
     public void onAttach(Context context) {
@@ -65,7 +71,12 @@ public class Frag_3 extends Fragment {
 
                     //获取username和avatar字段
                     String username = userInfo.getString("username");
-                    String avatar = userInfo.getString("avatar");
+                    avatar = userInfo.getString("avatar");
+                    userAddress=userInfo.getString("address");
+                    nickName=userInfo.getString("nickname");
+                    userGender=userInfo.getString("gender");
+                    userPhone=userInfo.getString("phone");
+                    passWord=userInfo.getString("password");
                     Username.setText(username);
                     if (new File(avatar).exists()) {
                         // 如果本地文件存在，则使用本地文件
@@ -102,12 +113,14 @@ public class Frag_3 extends Fragment {
         LinearLayout myRatingsLayout = view.findViewById(R.id.my_ratings);
         LinearLayout myFavoritesLayout = view.findViewById(R.id.my_favorites);
         LinearLayout myReviewsLayout = view.findViewById(R.id.my_reviews);
+        LinearLayout UInfoModifyLayout = view.findViewById(R.id.user_info);
 
 // Set click listeners
         myOrdersLayout.setOnClickListener(v -> navigateToMyOrders());
         myRatingsLayout.setOnClickListener(v -> navigateToMyRatings());
         myFavoritesLayout.setOnClickListener(v -> navigateToMyFavorites());
         myReviewsLayout.setOnClickListener(v -> navigateToMyReviews());
+        UInfoModifyLayout.setOnClickListener(v->navigateToUInfoModify());
 
 
         return view;
@@ -130,6 +143,16 @@ public class Frag_3 extends Fragment {
 
     private void navigateToMyReviews() {
         Intent intent = new Intent(getActivity(), MyReviewsActivity.class);
+        startActivity(intent);
+    }
+    private void navigateToUInfoModify() {
+        Intent intent = new Intent(getActivity(), UinfoModifyActivity.class);
+        intent.putExtra("avatar",avatar);
+        intent.putExtra("phone",userPhone);
+        intent.putExtra("address",userAddress);
+        intent.putExtra("gender",userGender);
+        intent.putExtra("password",passWord);
+        intent.putExtra("nickname",nickName);
         startActivity(intent);
     }
 }

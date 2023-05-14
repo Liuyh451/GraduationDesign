@@ -6,6 +6,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -22,6 +24,7 @@ public class MyOrdersActivity extends AppCompatActivity {
     private OrderAdapter orderAdapter;
     private List<Order> orderList;
     private String uid=GlobalVariable.uid;
+    private ImageView backArrowIv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +36,13 @@ public class MyOrdersActivity extends AppCompatActivity {
         ordersRecView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
         orderAdapter = new OrderAdapter(orderList, (orderId,bookCover,title,author,buyerQuantity,buyerName,price,address,phone) -> {
             //do nothing
+        });
+        backArrowIv=findViewById(R.id.iv_backward);
+        backArrowIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
         });
         ordersRecView.setAdapter(orderAdapter);
         NetUnit.getMyOrder(this, uid, new Response.Listener<String>() {

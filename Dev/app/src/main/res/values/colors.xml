@@ -17,6 +17,9 @@
     <!-- 较深的白色（添加了一些黑色） -->
     <color name="off_white">#F2F2F2</color>
     <color name="gold">#FFD700</color>
+    <color name="gray9">#DBDFE0</color>
+    <color name="gray3">#c8969696</color>
+    <color name="dark_gray">#333333</color>
 
 
 

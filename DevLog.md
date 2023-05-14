@@ -532,6 +532,10 @@ private volatile float bookRating = 0.0f; // 将变量定义为 volatile
 
 网络被墙，会失败，会导致无法运行程序
 
+解决：给Android Studio挂代理
+
+![image-20230509195903565](C:\Users\86156\AppData\Roaming\Typora\typora-user-images\image-20230509195903565.png)
+
 gradle-wrapper.properties文件下：
 
 ```json

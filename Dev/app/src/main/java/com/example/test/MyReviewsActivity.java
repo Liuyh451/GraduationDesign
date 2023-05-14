@@ -6,6 +6,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -27,6 +29,7 @@ public class MyReviewsActivity extends AppCompatActivity {
 
     private MyReviewAdapter mAdapter;
     private String uid = GlobalVariable.uid;
+    private ImageView backArrowIv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +40,13 @@ public class MyReviewsActivity extends AppCompatActivity {
         mAdapter = new MyReviewAdapter(reviewList, this);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        backArrowIv=findViewById(R.id.iv_backward);
+        backArrowIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         requestReviews(uid);
 
     }

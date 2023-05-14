@@ -637,11 +637,18 @@ def getUserInfo_db(uid):
     cursor = conn.cursor()
 
     # 查询 uid 的 username 和 avatar
-    sql = """SELECT username, avatar FROM user WHERE id = %s"""
+    sql = """SELECT username, avatar,password,nickname,address,gender,phone FROM user WHERE id = %s"""
     cursor.execute(sql, uid)
     result = cursor.fetchone()
 
-    data = {'username': result[0], 'avatar': result[1]}
+    data = {'username': result[0],
+            'avatar': result[1],
+            'password':result[2],
+            'nickname':result[3],
+            'address':result[4],
+            'gender':result[5],
+            'phone':result[6]
+            }
     json_data = json.dumps(data)
 
     # 关闭数据库连接
@@ -755,7 +762,7 @@ def make_comment_db(user_id, book_id, comment, rating):
         return False
 
 
-# 更新用户信息
+# 更新用户信息，管理员
 def update_user_info_db(username, password, avatar, address, uid):
     try:
         # 连接数据库并开启事务
@@ -803,7 +810,32 @@ def delete_user_db(user_id):
         cursor.close()
         conn.close()
 
+#修改个人信息
+def user_info_modify_db(nickname, password, avatar, address, phone,gender,uid):
+    try:
+        # 连接数据库并开启事务
+        db = connect_mysql()
+        cursor = db.cursor()
+        cursor.execute('START TRANSACTION')
 
+        # 执行更新操作
+        sql = 'UPDATE user SET nickname=%s, password=%s, avatar=%s, address=%s,phone=%s,gender=%s WHERE id=%s'
+        cursor.execute(sql, (nickname, password, avatar, address,phone,gender, uid))
+
+        # 提交事务
+        db.commit()
+
+        # 返回成功结果
+        return True
+    except Exception as e:
+        # 发生错误时回滚事务
+        db.rollback()
+        print(str(e))
+        # 返回错误结果
+        return False
+    finally:
+        # 关闭数据库连接
+        db.close()
 def modify_book_db(book_id, book_cover, book_title, book_author, book_price, book_description, book_language):
     db = connect_mysql()
     cursor = db.cursor()
