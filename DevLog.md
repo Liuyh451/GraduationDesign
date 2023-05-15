@@ -552,6 +552,17 @@ dependencies {
 }
 ```
 
+### 1.11 购物车实现
+
+https://cloud.tencent.com/developer/article/1779909
+
+https://github.com/lilongweidev/ShoppingCart/tree/master
+
+- [ ] 从网络请求数据
+- [ ] 不需要商家，删除那个图标
+- [ ] 结算的时候，获得数据，在calculationPrice()函数中，有提示
+- [ ] 对于如果发送的是一个列表，后端如何接收
+
 ## 2.Flask后端
 
 ### 2.1注册登录模块

@@ -39,6 +39,8 @@ dependencies {
     implementation "androidx.fragment:fragment:1.2.0"
     //为了实现一个可滚动的列表来展示小说，可以使用RecyclerView
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    //RecyclerView的好搭档
+    implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.4'
     //引入gson的依赖
     implementation 'com.google.code.gson:gson:2.8.6'
     //网络请求库
@@ -47,6 +49,8 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.12.0'
     //布局添加卡片式的效果
     implementation 'androidx.cardview:cardview:1.0.0'
+    //省市区地址选择器
+    implementation 'com.github.crazyandcoder:citypicker:6.0.2'
 
 
 

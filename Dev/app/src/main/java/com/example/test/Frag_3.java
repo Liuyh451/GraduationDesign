@@ -114,13 +114,15 @@ public class Frag_3 extends Fragment {
         LinearLayout myFavoritesLayout = view.findViewById(R.id.my_favorites);
         LinearLayout myReviewsLayout = view.findViewById(R.id.my_reviews);
         LinearLayout UInfoModifyLayout = view.findViewById(R.id.user_info);
+        LinearLayout SettingLayout = view.findViewById(R.id.setting);
+
 
 // Set click listeners
         myOrdersLayout.setOnClickListener(v -> navigateToMyOrders());
         myRatingsLayout.setOnClickListener(v -> navigateToMyRatings());
         myFavoritesLayout.setOnClickListener(v -> navigateToMyFavorites());
         myReviewsLayout.setOnClickListener(v -> navigateToMyReviews());
-        UInfoModifyLayout.setOnClickListener(v->navigateToUInfoModify());
+        SettingLayout.setOnClickListener(v->navigateToCart());
 
 
         return view;
@@ -131,6 +133,10 @@ public class Frag_3 extends Fragment {
         startActivity(intent);
     }
 
+    private void navigateToCart() {
+        Intent intent = new Intent(getActivity(), CartActivity.class);
+        startActivity(intent);
+    }
     private void navigateToMyRatings() {
         Intent intent = new Intent(getActivity(), MyRatingsActivity.class);
         startActivity(intent);
