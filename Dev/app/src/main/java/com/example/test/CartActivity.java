@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -14,15 +15,24 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemChildClickListener;
 import com.example.test.bean.CarResponse;
+import com.example.test.bean.Product;
 import com.example.test.util.Constant;
 import com.example.test.util.GoodsCallback;
 import com.google.gson.Gson;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class CartActivity extends AppCompatActivity implements GoodsCallback,View.OnClickListener  {
     private double totalPrice = 0.00;//商品总价
@@ -41,7 +51,8 @@ public class CartActivity extends AppCompatActivity implements GoodsCallback,Vie
     private List<Integer> shopIdList = new ArrayList<>();//店铺列表
     private boolean isEdit = false;//是否编辑
     public static final String TAG = "MainActivity";
-
+    private String Uid=GlobalVariable.uid;
+    private String totalPriceStr;
     private RecyclerView rvStore;
     private List<CarResponse.OrderDataBean> mList = new ArrayList<>();
     private StoreAdapter storeAdapter;
@@ -72,11 +83,34 @@ public class CartActivity extends AppCompatActivity implements GoodsCallback,Vie
         tvDeleteGoods.setOnClickListener(this);
         //设置亮色状态栏模式 systemUiVisibility在Android11中弃用了，可以尝试一下。
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        NetUnit.getCartList(this, Uid, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                // 请求成功的处理
+                try {
+//                    Log.d("cart",response);
+                    CarResponse carResponse = new Gson().fromJson(response, CarResponse.class);
+                    Log.d("cart",carResponse.getOrderData().toString());
+                    mList.addAll(carResponse.getOrderData());
+                    JSONObject jsonObject = new JSONObject(response);
+                    storeAdapter.notifyDataSetChanged();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // 请求失败的处理
+                Log.e("Error", error.toString());
+            }
+        });
 
         rvStore = findViewById(R.id.rv_store);
-        CarResponse carResponse = new Gson().fromJson(Constant.CAR_JSON, CarResponse.class);
-
-        mList.addAll(carResponse.getOrderData());
+//        CarResponse carResponse = new Gson().fromJson(Constant.CAR_JSON, CarResponse.class);
+//
+//        mList.addAll(carResponse.getOrderData());
         storeAdapter = new StoreAdapter(R.layout.item_store,this,this, mList);
         rvStore.setLayoutManager(new LinearLayoutManager(this));
         //设置点击事件
@@ -163,13 +197,57 @@ public class CartActivity extends AppCompatActivity implements GoodsCallback,Vie
                     return;
                 }
                 //弹窗
-                dialog = new AlertDialog.Builder(this)
-                        .setMessage("总计:" + totalCount + "种商品，" + totalPrice + "元")
-                        .setPositiveButton("确定", (dialog, which) -> deleteGoods())
-                        .setNegativeButton("取消", (dialog, which) -> dialog.dismiss())
-                        .create();
-                dialog.show();
-                showMsg("点击了结算");
+//                dialog = new AlertDialog.Builder(this)
+//                        .setMessage("总计:" + totalCount + "种商品，" + totalPrice + "元")
+//                        .setPositiveButton("确定", (dialog, which) -> deleteGoods())
+//                        .setNegativeButton("取消", (dialog, which) -> dialog.dismiss())
+//                        .create();
+//                dialog.show();
+                List<Product> products = new ArrayList<>();
+                //循环购物车中的店铺列表
+                for (int i = 0; i < mList.size(); i++) {
+                    CarResponse.OrderDataBean orderDataBean = mList.get(i);
+                    //循环店铺中的商品列表
+                    for (int j = 0; j < orderDataBean.getCartlist().size(); j++) {
+                        CarResponse.OrderDataBean.CartlistBean cartlistBean = orderDataBean.getCartlist().get(j);
+                        //当有选中商品时计算数量和价格
+                        if (cartlistBean.isChecked()) {
+                            products.add(new Product(Uid,cartlistBean.getProductName(),cartlistBean.getDefaultPic(),String.valueOf(cartlistBean.getPrice()),cartlistBean.getCount(),String.valueOf(cartlistBean.getProductId())));
+                        }
+                    }
+                }
+                Gson gson = new Gson();
+                String productListJson = gson.toJson(products);
+                Random random = new Random();
+
+                // 生成一个随机整数
+                int orderId = random.nextInt(10000);
+                NetUnit.cartSettle(this, Uid,productListJson,orderId, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // 请求成功的处理
+                        try {
+//
+                            JSONObject jsonObject = new JSONObject(response);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // 请求失败的处理
+                        Log.e("Error", error.toString());
+                    }
+                });
+
+                Intent intent = new Intent(this, OrderEBook.class);
+
+                intent.putExtra("tag",String.valueOf(orderId));
+                intent.putExtra("price",totalPriceStr);
+                startActivity(intent);
                 break;
             case R.id.tv_delete_goods://删除
                 if (!isHaveGoods) {
@@ -187,7 +265,42 @@ public class CartActivity extends AppCompatActivity implements GoodsCallback,Vie
                         .setNegativeButton("取消", (dialog, which) -> dialog.dismiss())
                         .create();
                 dialog.show();
-                showMsg("点击了删除");
+                //循环购物车中的店铺列表
+                List<Product> productsDelete = new ArrayList<>();
+                for (int i = 0; i < mList.size(); i++) {
+                    CarResponse.OrderDataBean orderDataBean = mList.get(i);
+                    //循环店铺中的商品列表
+                    for (int j = 0; j < orderDataBean.getCartlist().size(); j++) {
+                        CarResponse.OrderDataBean.CartlistBean cartlistBean = orderDataBean.getCartlist().get(j);
+                        //当有选中商品时计算数量和价格
+                        if (cartlistBean.isChecked()) {
+                            productsDelete.add(new Product(Uid,cartlistBean.getProductName(),cartlistBean.getDefaultPic(),String.valueOf(cartlistBean.getPrice()),cartlistBean.getCount(),String.valueOf(cartlistBean.getProductId())));
+                        }
+                    }
+                }
+                Gson gsonDelete = new Gson();
+                String productsDeleteList = gsonDelete.toJson(productsDelete);
+                NetUnit.cartDelete(this, Uid,productsDeleteList, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // 请求成功的处理
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            String msg = jsonObject.getString("msg");
+                            Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // 请求失败的处理
+                        Log.e("Error", error.toString());
+                    }
+                });
                 break;
             case R.id.tv_collect_goods://收藏
                 showMsg("点击了收藏");
@@ -216,17 +329,19 @@ public class CartActivity extends AppCompatActivity implements GoodsCallback,Vie
             List<CarResponse.OrderDataBean.CartlistBean> goodsList = new ArrayList<>();
 
             List<CarResponse.OrderDataBean.CartlistBean> goods = store.getCartlist();
+
             //循环店铺中的商品列表
             for (int j = 0; j < goods.size(); j++) {
                 CarResponse.OrderDataBean.CartlistBean cartlistBean = goods.get(j);
                 //当有选中商品时添加到此列表中
                 if (cartlistBean.isChecked()) {
-                    goodsList.add(cartlistBean);
+                goodsList.add(cartlistBean);
                 }
             }
             //删除商品
             goods.removeAll(goodsList);
         }
+
         //删除店铺
         mList.removeAll(storeList);
 
@@ -324,7 +439,10 @@ public class CartActivity extends AppCompatActivity implements GoodsCallback,Vie
                 }
             }
         }
-        tvTotal.setText("￥" + totalPrice);
+        DecimalFormat df = new DecimalFormat("#.00");
+        String formattedPrice = df.format(totalPrice);
+        totalPriceStr=formattedPrice;
+        tvTotal.setText("￥" + formattedPrice);
         tvSettlement.setText(totalCount == 0 ? "结算" : "结算(" + totalCount + ")");
     }
     private void controlAllChecked() {

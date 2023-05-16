@@ -29,7 +29,6 @@ def login():
 
 
 # 用户注册，用户和管理员接口
-# todo 管理员注册时，认证密钥
 @app.route('/register', methods=['POST'])
 def register():
     username = request.form.get('username')
@@ -70,7 +69,6 @@ def get_novels():
     global cnt
     cnt += 1
     page = cnt
-    # todo 这个地方是个bug需要改的
     if (cnt == 7):
         cnt = 0
     book_id_list = [5928, 4698, 4765, 3432, 2441, 5176, 8038, 9334, 2659, 2105, 104, 7384, 5067, 2206, 6784, 8166, 1534,
@@ -208,14 +206,16 @@ def get_user_to_book_rating():
     else:
         return jsonify({"ratings": "0"})
 
-#获取用户对已评价的图书的评分
+
+# 获取用户对已评价的图书的评分
 @app.route("/user/rating", methods=["POST"])
 def get_user_all_book_ratings():
-    #userid=request.form.get("uid")
+    # userid=request.form.get("uid")
     data = json.loads(request.form['data'])
     userid = data['user_id']
-    result=get_user_rating_db(userid)
+    result = get_user_rating_db(userid)
     return jsonify({"ratings": result})
+
 
 # 获取用户的个人信息，用户端接口
 @app.route("/getUserInfo", methods=["POST"])
@@ -260,31 +260,11 @@ def get_my_order():
 @app.route('/order/create', methods=['POST'])
 def create_order():
     data = json.loads(request.form['data'])
-    user_id = data['user_id']
+    tag = data['tag']
     name = data['buyerName']
-    book_id = data['book_id']
-    title = data['title']
-    author = data['author']
-    book_cover = data['book_cover']
-    price = data['price']
-    quantity = data['quantity']
     address = data['address']
     phone = data['phone']
-    # user_id = request.form.get('userid')
-    # book_id = request.form.get('bookid')
-    # title = request.form.get('title')
-    # author = request.form.get('author')
-    # book_cover = request.form.get('book_cover')
-    # price = request.form.get('price')
-    # quantity = request.form.get('quantity')
-    # address = request.form.get('address')
-    # phone = request.form.get('phone')
-
-    # 计算总价
-    total_price = float(price) * float(quantity)
-    if (
-            place_an_order(user_id, name, book_id, title, author, book_cover, price, quantity, total_price, address,
-                           phone)):
+    if (place_an_order(tag, name, address, phone)):
         return jsonify({'msg': '订单创建成功!'})
     else:
         return jsonify({'msg': '订单创建失败'})
@@ -319,6 +299,15 @@ def delete_order():
         return jsonify({'success': False, 'msg': '订单删除失败'})
 
 
+@app.route('/order/getinfo', methods=['POST'])
+def get_order_info():
+    # userid = request.form.get("userid")
+    data = json.loads(request.form['data'])
+    tag = data['tag']
+    books = get_order_info_db(tag)
+    return jsonify({"data": books})
+
+
 # 做出评论，用户端接口
 @app.route('/makecomment', methods=['POST'])
 def create_review():
@@ -349,6 +338,8 @@ def update_user_info():
     else:
         result = {'code': 0, 'message': 'error', 'error_message': 'error'}
         return jsonify(result)
+
+
 @app.route('/user/uInfoModify', methods=['POST'])
 def user_info_modify():
     data = json.loads(request.form['data'])
@@ -357,14 +348,15 @@ def user_info_modify():
     password = data['password']
     avatar = data['avatar']
     address = data['address']
-    phone=data['phone']
-    gender=data['gender']
-    if (user_info_modify_db(username, password, avatar, address, phone,gender,user_id)):
+    phone = data['phone']
+    gender = data['gender']
+    if (user_info_modify_db(username, password, avatar, address, phone, gender, user_id)):
         result = {'code': 1, 'message': 'success'}
         return jsonify(result)
     else:
         result = {'code': 0, 'message': 'error', 'error_message': 'error'}
         return jsonify(result)
+
 
 # 删除用户，管理端接口
 @app.route('/user/delete', methods=['POST'])
@@ -422,6 +414,56 @@ def delete_book():
         return jsonify(result)
 
 
+@app.route("/cart/getInfo", methods=["POST"])
+def cart_get_info():
+    data = json.loads(request.form['data'])
+    uid = data['user_id']
+    data = get_cart_list(uid)
+    return jsonify({'code': 200, 'orderData': data})
+
+
+# 添加至购物车接口
+@app.route('/cart/add', methods=['POST'])
+def add_to_cart():
+    data = json.loads(request.form['data'])
+    uid = data['uid']
+    book_id = data['book_id']
+    book_cover = data['bookCover']
+    book_title = data['title']
+    book_author = data['author']
+    book_price = data['price']
+    count = data['count']
+    if (add_to_cart_db(book_id, book_cover, book_title, book_price, count, book_author, uid)):
+        return jsonify({'code': 200, 'msg': '添加成功，已在购物车等待！'})
+    else:
+        return jsonify({'status': 'error'})
+
+
+@app.route('/cart/settle', methods=['POST'])
+def cart_settle():
+    data = json.loads(request.form['data'])
+    tag = data['tag']
+    paycheck=data['paycheck']
+    product_list = data['products']
+    products = json.loads(product_list)
+    print(products)
+    if (settle_cart_db(tag, products,paycheck)):
+        # 返回响应
+        response = {'msg': '支付成功'}
+        return jsonify(response), 200
+
+
+@app.route('/cart/delete', methods=['POST'])
+def cart_delete():
+    data = json.loads(request.form['data'])
+    product_list = data['products']
+    products = json.loads(product_list)
+    if (delete_cart_items_by_uid_and_bookid(products)):
+        # 返回响应
+        response = {'msg': '删除成功'}
+        return jsonify(response), 200
+
+
 if __name__ == '__main__':
     # app.run(host='0.0.0.0', port=5000,debug=True)
-     app.run(debug=True)
+    app.run(debug=True)

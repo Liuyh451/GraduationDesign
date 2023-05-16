@@ -5,91 +5,12 @@
     android:orientation="vertical">
 
     <!-- 电子书的图片、作者、标题和价格 -->
-    <LinearLayout
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/novel_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
-        <ImageView
-            android:id="@+id/book_image"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_margin="10dp"
-            android:src="@drawable/default_avatar" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/book_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="电子书标题"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/book_author"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="电子书作者"
-                android:textSize="14sp" />
-
-            <TextView
-                android:id="@+id/book_price"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="¥20.00"
-                android:textColor="@color/gray_500"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <!-- 数量加减组件 -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:text="数量："
-            android:textSize="16sp" />
-
-        <!-- 使用您之前建议的加减按钮组件 -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/minus_button"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:text="-" />
-
-            <TextView
-                android:id="@+id/quantity_text"
-                android:layout_width="40dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="0"
-                android:textSize="16sp" />
-
-            <Button
-                android:id="@+id/add_button"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:text="+" />
-        </LinearLayout>
-    </LinearLayout>
 
     <!-- 地址选择和手机电话选择 -->
     <LinearLayout
@@ -97,6 +18,8 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="10dp">
+
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -120,13 +43,46 @@
             android:text="送货地址："
             android:textSize="16sp" />
 
-        <!-- 使用Spinner组件来选择地址 -->
-        <Spinner
-            android:id="@+id/address_spinner"
+        <!--地址-->
+        <LinearLayout
+            android:id="@+id/item_address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:prompt="@string/prompt_address"
-            android:spinnerMode="dropdown" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/address_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="地址"
+                android:textColor="@color/black"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/address_edt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:gravity="center_vertical"
+                android:hint="地址"
+                android:paddingLeft="15dp"
+                android:singleLine="true"
+                android:textColor="@color/dark_gray"
+                android:textSize="13sp" />
+
+            <!--点击跳转或者弹出选择框-->
+            <ImageView
+                android:id="@+id/address_right_iv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="7dp"
+
+                android:padding="8dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/arrow_forward" />
+        </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
@@ -145,6 +101,36 @@
             android:maxLines="1"
             android:textSize="16sp" />
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/tv_total_price"
+            android:text="合计:"
+            android:textColor="#000"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/tv_total"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="8dp"
+            android:layout_toLeftOf="@+id/tv_settlement"
+            android:text="￥0"
+            android:textColor="#DF3B0D"
+            android:textSize="14sp" />
+
+
+    </LinearLayout>
+
 
     <!-- 提交订单按钮 -->
 

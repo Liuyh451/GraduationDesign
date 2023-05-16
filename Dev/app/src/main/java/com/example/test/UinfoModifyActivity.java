@@ -109,8 +109,6 @@ public class UinfoModifyActivity extends AppCompatActivity {
         }
         filePath=userAvatar;
         Context context=this;
-        //todo 添加昵称和密码修改
-        // 显示头像
         if (new File(userAvatar).exists()) {
             // 如果本地文件存在，则使用本地文件
             Bitmap bitmap = BitmapFactory.decodeFile(userAvatar);

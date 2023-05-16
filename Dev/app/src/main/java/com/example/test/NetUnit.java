@@ -7,8 +7,10 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.test.bean.Product;
 import com.google.gson.Gson;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -19,6 +21,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class NetUnit {
@@ -69,9 +72,6 @@ public class NetUnit {
             String respCode = person.getString("code");
             String respMsg = person.getString("message");
             int resid = person.getInt("uid");
-            Log.d("TAG", "resmsg---" + respMsg);
-            Log.d("TAG", "rescode---" + respCode);
-            Log.d("TAG", "resid---" + resid);
             // 判断响应结果
             if (respMsg.equals("isAdmin")) {
                 int[] result = {2, resid};
@@ -82,7 +82,6 @@ public class NetUnit {
             } else {
                 //做测试的时候用，正常应为false
                 int[] result = {0, 0};
-                // TODO: 2023/4/13 记得改为false 
                 return result;
             }
         } catch (Exception e) {
@@ -226,7 +225,7 @@ public class NetUnit {
         Volley.newRequestQueue(context).add(stringRequest);
     }
 
-    public static void placeOrder(Context context, String uid,String buyerName, String bookid, String title, String author, String bookCover, String price, String quantity, String address, String phone, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+    public static void placeOrder(Context context, String tag, String buyerName, String address, String phone, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         String url = "http://10.0.2.2:5000/order/create";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 listener, errorListener) {
@@ -235,15 +234,9 @@ public class NetUnit {
                 Map<String, String> params = new HashMap<>();
                 JSONObject jsonObject = new JSONObject();
                 try {
-                    jsonObject.put("user_id", uid);
                     jsonObject.put("buyerName", buyerName);
-                    jsonObject.put("book_id", bookid);
-                    jsonObject.put("title", title);
-                    jsonObject.put("author", author);
-                    jsonObject.put("book_cover", bookCover);
-                    jsonObject.put("price", price);
-                    jsonObject.put("quantity", quantity);
                     jsonObject.put("address", address);
+                    jsonObject.put("tag", tag);
                     jsonObject.put("phone", phone);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -262,7 +255,8 @@ public class NetUnit {
         // 将请求添加到请求队列
         Volley.newRequestQueue(context).add(stringRequest);
     }
-    public static void modifyOrder(Context context, String orderId, String buyerName, String price,String quantity, String address, String phone, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+    public static void modifyOrder(Context context, String orderId, String buyerName, String price, String quantity, String address, String phone, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         String url = "http://10.0.2.2:5000/order/modify";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 listener, errorListener) {
@@ -294,7 +288,8 @@ public class NetUnit {
         // 将请求添加到请求队列
         Volley.newRequestQueue(context).add(stringRequest);
     }
-    public static void deleteOrder(Context context, String orderId,  Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+    public static void deleteOrder(Context context, String orderId, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         String url = "http://10.0.2.2:5000/order/delete";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 listener, errorListener) {
@@ -321,7 +316,8 @@ public class NetUnit {
         // 将请求添加到请求队列
         Volley.newRequestQueue(context).add(stringRequest);
     }
-    public static void getMyOrder(Context context, String userId,  Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+    public static void getMyOrder(Context context, String userId, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         String url = "http://10.0.2.2:5000/order/myOrder";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 listener, errorListener) {
@@ -413,9 +409,9 @@ public class NetUnit {
         // 将请求添加到请求队列
         Volley.newRequestQueue(context).add(stringRequest);
     }
-    public static void userInfoModify(Context context, String uid,String nickName, String phone, String password, String avatarPath, String address,String gender, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+    public static void userInfoModify(Context context, String uid, String nickName, String phone, String password, String avatarPath, String address, String gender, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         String url = "http://10.0.2.2:5000/user/uInfoModify";
-        //todo 封装昵称
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 listener, errorListener) {
             @Override
@@ -424,7 +420,7 @@ public class NetUnit {
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject.put("user_id", uid);
-                    jsonObject.put("nickName",nickName);
+                    jsonObject.put("nickName", nickName);
                     jsonObject.put("phone", phone);
                     jsonObject.put("password", password);
                     jsonObject.put("avatar", avatarPath);
@@ -483,7 +479,43 @@ public class NetUnit {
         // 将请求添加到请求队列
         Volley.newRequestQueue(context).add(stringRequest);
     }
-    public static void deleteBook(Context context, String bookId,  Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+    public static void addToCart(Context context, String bookId, String title, String author, String bookCover, String price, String count, String uid, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        String url = "http://10.0.2.2:5000/cart/add";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("book_id", bookId);
+                    jsonObject.put("bookCover", bookCover);
+                    jsonObject.put("title", title);
+                    jsonObject.put("author", author);
+                    jsonObject.put("price", price);
+                    jsonObject.put("count", count);
+                    jsonObject.put("uid", uid);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                params.put("data", jsonObject.toString());
+                Log.d("param", params.toString());
+                return params;
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/x-www-form-urlencoded; charset=UTF-8";
+            }
+        };
+
+        // 将请求添加到请求队列
+        Volley.newRequestQueue(context).add(stringRequest);
+    }
+
+    public static void deleteBook(Context context, String bookId, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         String url = "http://10.0.2.2:5000/book/delete";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 listener, errorListener) {
@@ -540,7 +572,8 @@ public class NetUnit {
         // 将请求添加到请求队列
         Volley.newRequestQueue(context).add(stringRequest);
     }
-    public static void addFavorite(Context context,String uid,String bookId,String title,String author,String rating,String bookCover,String date,  Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+    public static void addFavorite(Context context, String uid, String bookId, String title, String author, String rating, String bookCover, String date, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         String url = "http://10.0.2.2:5000/book/favorite";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 listener, errorListener) {
@@ -574,7 +607,8 @@ public class NetUnit {
         // 将请求添加到请求队列
         Volley.newRequestQueue(context).add(stringRequest);
     }
-    public static void getFavorite(Context context,String uid,  Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+    public static void getFavorite(Context context, String uid, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         String url = "http://10.0.2.2:5000/book/getfavorite";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 listener, errorListener) {
@@ -604,7 +638,7 @@ public class NetUnit {
     }
 
 
-    public static void getUserRating(Context context,String uid,  Response.Listener<String> listener, Response.ErrorListener errorListener) {
+    public static void getUserRating(Context context, String uid, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         String url = "http://10.0.2.2:5000/user/rating";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 listener, errorListener) {
@@ -614,6 +648,127 @@ public class NetUnit {
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject.put("user_id", uid);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                params.put("data", jsonObject.toString());
+                Log.d("param", params.toString());
+                return params;
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/x-www-form-urlencoded; charset=UTF-8";
+            }
+        };
+
+        // 将请求添加到请求队列
+        Volley.newRequestQueue(context).add(stringRequest);
+    }
+
+    public static void getCartList(Context context, String uid, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        String url = "http://10.0.2.2:5000/cart/getInfo";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("user_id", uid);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                params.put("data", jsonObject.toString());
+                Log.d("param", params.toString());
+                return params;
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/x-www-form-urlencoded; charset=UTF-8";
+            }
+        };
+
+        // 将请求添加到请求队列
+        Volley.newRequestQueue(context).add(stringRequest);
+    }
+
+    public static void getOrderInfo(Context context, String tag, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        String url = "http://10.0.2.2:5000/order/getinfo";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("tag", tag);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                params.put("data", jsonObject.toString());
+                Log.d("param", params.toString());
+                return params;
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/x-www-form-urlencoded; charset=UTF-8";
+            }
+        };
+
+        // 将请求添加到请求队列
+        Volley.newRequestQueue(context).add(stringRequest);
+    }
+
+    public static void cartSettle(Context context, String uid, String productList, int orderId, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        String url = "http://10.0.2.2:5000/cart/settle";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("user_id", uid);
+                    jsonObject.put("products", productList);
+                    jsonObject.put("tag", orderId);
+                    jsonObject.put("paycheck", "0");
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                params.put("data", jsonObject.toString());
+                Log.d("param", params.toString());
+                return params;
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/x-www-form-urlencoded; charset=UTF-8";
+            }
+        };
+
+        // 将请求添加到请求队列
+        Volley.newRequestQueue(context).add(stringRequest);
+    }
+
+    public static void cartDelete(Context context, String uid, String productList, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        String url = "http://10.0.2.2:5000/cart/delete";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("user_id", uid);
+                    jsonObject.put("products", productList);
+
 
                 } catch (JSONException e) {
                     e.printStackTrace();

@@ -94,6 +94,7 @@ public class Frag_1 extends Fragment {
                 intent.putExtra("novelCover", novel.getImageUrl());
                 // 这里本来是获取简介，但是为了获取评分，只好借用这个字段了
                 intent.putExtra("novelRating", novel.getDescription());
+                intent.putExtra("price", novel.getPrice());
                 startActivity(intent);
             }
         });
@@ -117,57 +118,6 @@ public class Frag_1 extends Fragment {
 
         return view;
     }
-
-    private void loadMoreNovels() {
-        //int nextPage = novelList.size() / 4 + 1; // 假设每次请求6个小说
-//        Log.d("TAG", String.valueOf(nextPage) );
-        String url = "http://10.0.2.2:5000/api/novels";
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                Request.Method.GET, url, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            String dataStr = response.getString("data");
-                            JSONArray novelsArray = new JSONArray(dataStr);
-                            for (int i = 0; i < novelsArray.length(); i++) {
-                                JSONObject novelObject = novelsArray.getJSONObject(i);
-                                String title = novelObject.getString("title");
-                                String novelId = novelObject.getString("book_id");
-                                String imageUrl = novelObject.getString("image_url");
-                                String author = novelObject.getString("authors");
-                                String description = novelObject.getString("language_code");
-
-                                Novel novel = new Novel(novelId, title, imageUrl, author, description);
-                                novelList.add(novel);
-                            }
-                            novelAdapter.notifyDataSetChanged();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                novelRecyclerView.stopScroll();
-            }
-        });
-
-// 将请求添加到请求队列
-        Volley.newRequestQueue(requireContext()).add(jsonObjectRequest);
-    }
-
-    private Response.ErrorListener onErrorResponseListener = new Response.ErrorListener() {
-        @Override
-        public void onErrorResponse(VolleyError error) {
-            // 在请求失败时停止 RecyclerView 的滚动
-            novelRecyclerView.stopScroll();
-
-            // 处理其他错误情况
-            // ...
-        }
-    };
 
 
 //    private void loadMoreNovels() { // 模拟异步请求加载更多数据
@@ -247,12 +197,12 @@ public class Frag_1 extends Fragment {
                                 JSONObject novelObject = novelsArray.getJSONObject(i);
                                 String novelId = novelObject.getString("book_id");
                                 String title = novelObject.getString("title");
-
+                                String price = novelObject.getString("price");
                                 String imageUrl = novelObject.getString("image_url");
                                 String author = novelObject.getString("authors");
                                 String rating = novelObject.getString("average_rating");
-
-                                Novel novel = new Novel(novelId, title, imageUrl, author, rating);
+                                //price借用id的字段，偷懒
+                                Novel novel = new Novel(novelId, title, imageUrl, author, rating, price);
                                 novelList.add(novel);
                             }
                             novelAdapter.notifyDataSetChanged();

@@ -8,13 +8,15 @@ public class Novel {
     private String imageUrl;
     private String author;
     private String description;
+    private String price;
 
-    public Novel(String novelId, String title, String imageUrl, String author, String description) {
+    public Novel(String novelId, String title, String imageUrl, String author, String description, String price) {
         this.novelId = novelId;
         this.title = title;
         this.imageUrl = imageUrl;
         this.author = author;
         this.description = description;
+        this.price = price;
     }
 
     public String getNovelId() {
@@ -57,5 +59,13 @@ public class Novel {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
     }
 }

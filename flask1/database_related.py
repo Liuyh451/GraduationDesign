@@ -37,6 +37,42 @@ def truncate_string(s, max_len):
         return s
 
 
+def add_book_with_price():
+    # 连接数据库
+    conn = connect_mysql()
+
+    try:
+        # 开始事务
+        conn.begin()
+
+        # 获取游标
+        cursor = conn.cursor()
+
+        # 查询表中的记录
+        cursor.execute("SELECT book_id FROM books")
+
+        # 获取查询结果
+        results = cursor.fetchall()
+
+        # 更新每条记录的price字段
+        for result in results:
+            price = round(random.uniform(10, 100), 2)
+            cursor.execute("UPDATE books SET price = %s WHERE book_id = %s", (price, result[0]))
+
+        # 提交事务
+        conn.commit()
+    except Exception as e:
+        # 出现异常时回滚事务
+        conn.rollback()
+        print(e)
+
+
+    finally:
+        # 关闭游标和连接
+        cursor.close()
+        conn.close()
+
+
 def createBooksDb():
     # 连接 MySQL 数据库
     conn = pymysql.connect(host='localhost', user='root', password='123456',
@@ -103,6 +139,7 @@ def searchBooks(book_id_list):
             "average_rating": row[5],
             "work_text_reviews_count": row[6],
             "image_url": row[7],
+            'price': row[8]
             # 添加其他需要的字段
         }
         result.append(row_data)
@@ -245,7 +282,7 @@ def get_all_Books_db():
             'title': row[1],
             'authors': row[2],
             'image_url': row[7],
-            # todo 加入 'price': row[4]
+            'price': row[8]
         }
         books_list.append(book)
     json_result = json.dumps(books_list)
@@ -290,9 +327,11 @@ def get_all_users_db():
 
 
 def get_all_orders_db():
-    query = 'SELECT * FROM orders'
     db = connect_mysql()
     cursor = db.cursor()
+    cursor.execute("DELETE FROM orders WHERE paycheck = 0")
+    db.commit()
+    query = 'SELECT * FROM orders'
     cursor.execute(query)
     result = cursor.fetchall()
     orders = []
@@ -320,6 +359,8 @@ def get_my_order_db(user_id):
     db = connect_mysql()
     try:
         cursor = db.cursor()
+        cursor.execute("DELETE FROM orders WHERE paycheck = 0")
+        db.commit()
         cursor.execute("SELECT * FROM orders WHERE userid=%s", (user_id,))
         result = cursor.fetchall()
         orders = []
@@ -643,11 +684,11 @@ def getUserInfo_db(uid):
 
     data = {'username': result[0],
             'avatar': result[1],
-            'password':result[2],
-            'nickname':result[3],
-            'address':result[4],
-            'gender':result[5],
-            'phone':result[6]
+            'password': result[2],
+            'nickname': result[3],
+            'address': result[4],
+            'gender': result[5],
+            'phone': result[6]
             }
     json_data = json.dumps(data)
 
@@ -661,7 +702,7 @@ def fuzzy_search_book(title):
     conn = connect_mysql()
     cur = conn.cursor()
     # 使用拼接字符串的方式实现模糊搜索
-    sql = "SELECT book_id, title, author, image_url FROM books WHERE title LIKE '%%" + title + "%%'"
+    sql = "SELECT book_id, title, author, rating,image_url,price FROM books WHERE title LIKE '%%" + title + "%%'"
     cur.execute(sql)
     results = cur.fetchall()
     books_list = []
@@ -670,33 +711,63 @@ def fuzzy_search_book(title):
             'book_id': row[0],
             'title': row[1],
             'authors': row[2],
-            'image_url': row[3],
-            # todo 加入 'price': row[4]
+            'average_rating': row[3],
+            'image_url': row[4],
+            'price': row[5]
+
         }
         books_list.append(book)
     json_result = json.dumps(books_list)
     return json_result
 
 
+def delete_cart_items_by_bookid(connection, book_id):
+    """删除购物车中指定书籍的记录"""
+    try:
+        with connection.cursor() as cursor:
+            # 查询购物车中是否存在该书籍
+            sql = "SELECT * FROM cart WHERE bookid=%s"
+            cursor.execute(sql, book_id)
+            result = cursor.fetchone()
+
+            if result is not None:
+                # 如果存在，则将对应的记录删除
+                sql = "DELETE FROM cart WHERE bookid=%s"
+                cursor.execute(sql, book_id)
+    except:
+        # 发生异常时回滚事务
+        connection.rollback()
+        raise
+
+
 # 下订单
-def place_an_order(user_id, buyerName, book_id, title, author, book_cover, price, quantity, total_price, address,
-                   phone):
+def place_an_order(tag, buyerName, address, phone):
     # 保存订单信息到orders表
     conn = connect_mysql()
+    paycheck="1"
     try:
         with conn.cursor() as cursor:
-            sql = "INSERT INTO orders (userid,buyername, book_id, title, author, book_cover, price, quantity, totalPrice, address, phone) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-            cursor.execute(sql,
-                           (user_id, buyerName, book_id, title, author, book_cover, price, quantity, total_price,
-                            address, phone))
+            sql = "UPDATE orders SET buyername = %s, address = %s, phone = %s,paycheck=%s WHERE tag = %s"
+            cursor.execute(sql, (buyerName, address, phone,paycheck, tag))
+            print("订单创建成功")
+            # 查询所有tag字段等于指定值的订单
+            sql = "SELECT book_id FROM orders WHERE tag=%s"
+            cursor.execute(sql, tag)
+            results = cursor.fetchall()
+            # 遍历所有的订单
+            for result in results:
+                # 删除购物车中对应书籍的记录
+                delete_cart_items_by_bookid(conn, result[0])
+                # cursor.execute(sql, result['id'])
+            print("购物车删除成功")
             conn.commit()
+        return True
     except Exception as e:
         conn.rollback()
         print(str(e))
         return False
     finally:
         conn.close()
-    return True
 
 
 # 修改订单
@@ -810,8 +881,9 @@ def delete_user_db(user_id):
         cursor.close()
         conn.close()
 
-#修改个人信息
-def user_info_modify_db(nickname, password, avatar, address, phone,gender,uid):
+
+# 修改个人信息
+def user_info_modify_db(nickname, password, avatar, address, phone, gender, uid):
     try:
         # 连接数据库并开启事务
         db = connect_mysql()
@@ -820,7 +892,7 @@ def user_info_modify_db(nickname, password, avatar, address, phone,gender,uid):
 
         # 执行更新操作
         sql = 'UPDATE user SET nickname=%s, password=%s, avatar=%s, address=%s,phone=%s,gender=%s WHERE id=%s'
-        cursor.execute(sql, (nickname, password, avatar, address,phone,gender, uid))
+        cursor.execute(sql, (nickname, password, avatar, address, phone, gender, uid))
 
         # 提交事务
         db.commit()
@@ -836,6 +908,8 @@ def user_info_modify_db(nickname, password, avatar, address, phone,gender,uid):
     finally:
         # 关闭数据库连接
         db.close()
+
+
 def modify_book_db(book_id, book_cover, book_title, book_author, book_price, book_description, book_language):
     db = connect_mysql()
     cursor = db.cursor()
@@ -912,6 +986,35 @@ def add_favorite(userid, bookid, title, author, rating, date, bookCover):
         return False, str(e)
 
 
+def get_order_info_db(tag):
+    connection = connect_mysql()
+    # 查询用户收藏记录
+    try:
+        with connection.cursor() as cursor:
+            sql = 'SELECT * FROM orders WHERE tag = %s'
+            cursor.execute(sql, tag)
+            rows = cursor.fetchall()
+            # 将结果转换为JSON格式
+            result = []
+            for row in rows:
+                row_data = {
+                    "book_id": row[0],
+                    "title": row[3],
+                    "authors": row[2],
+                    "image_url": row[1],
+                    "price": row[4],
+                    "quantity": row[6],
+                    # 添加其他需要的字段
+                }
+                result.append(row_data)
+
+            json_result = json.dumps(result)
+
+    finally:
+        connection.close()
+    return json_result
+
+
 def get_favorite(userId):
     connection = connect_mysql()
     # 查询用户收藏记录
@@ -940,3 +1043,126 @@ def get_favorite(userId):
     finally:
         connection.close()
     return json_result
+
+
+def get_cart_list(uid):
+    connection = connect_mysql()
+    try:
+        # Query the database
+        with connection.cursor() as cursor:
+            # Get the cart data from the database
+            sql = "SELECT * FROM cart WHERE uid = %s"
+            cursor.execute(sql, uid)
+            cart_data = cursor.fetchall()
+            shop_id = 1
+            shop_name = 'My Shop'
+            # Group the cart data by shop
+            shop_data = {shop_id: {'shopId': shop_id, 'shopName': shop_name, 'cartlist': []}}
+            for item in cart_data:
+                shop_data[shop_id]['cartlist'].append({
+                    'id': 1,
+                    'shopId': shop_id,
+                    'shopName': shop_name,
+                    'defaultPic': item[3],
+                    'productId': item[6],
+                    'productName': item[0],
+                    'color': item[4],
+                    'price': item[1],
+                    'count': item[2]
+                })
+
+        # Convert the shop data to JSON and return
+        return list(shop_data.values())
+
+    finally:
+        # Close the database connection
+        connection.close()
+
+
+def settle_cart_db(tag, products,paycheck):
+    connection = connect_mysql()
+    try:
+        # 将每个条目插入到数据库中
+        for item in products:
+            image = item['image']
+            name = item['name']
+            price = item['price']
+            quantity = item['quantity']
+            user_id = item['userId']
+            bookId = item['bookId']
+            print(type(price))
+            print(type(quantity))
+            total_price = eval(price) * quantity
+
+            # 插入到数据库中
+            with connection.cursor() as cursor:
+                sql = "INSERT INTO orders (book_cover, title, price, quantity, userid,book_id,totalPrice,tag,paycheck) VALUES (%s, %s, %s, %s, %s,%s,%s,%s,%s)"
+                cursor.execute(sql, (image, name, price, quantity, user_id, bookId, total_price, tag,paycheck))
+            connection.commit()
+
+    except Exception as e:
+        print("Error occurred: ", e)
+        connection.rollback()
+        return False
+
+    finally:
+        # 关闭数据库连接
+        connection.close()
+    return True
+
+
+def add_to_cart_db(book_id, book_cover, title, price, count, author, uid):
+    connection = connect_mysql()
+    try:
+        # 插入到数据库中
+        with connection.cursor() as cursor:
+            # 查询购物车中是否已经存在该书籍
+            sql = "SELECT * FROM cart WHERE bookid=%s AND uid=%s"
+            cursor.execute(sql, (book_id, uid))
+            result = cursor.fetchone()
+            if result is not None:
+                # 如果存在，则将对应bookid的count加1
+                sql = "UPDATE cart SET count=count+1 WHERE bookid=%s AND uid=%s"
+                cursor.execute(sql, (book_id, uid))
+            else:
+                # 如果不存在，则插入到数据库中
+                sql = "INSERT INTO cart (bookid, defaultPic, productName, price, count, author, uid) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+                cursor.execute(sql, (book_id, book_cover, title, price, count, author, uid))
+        connection.commit()
+        # 返回成功消息
+        return True
+
+    except Exception as e:
+        # 返回错误消息
+        return False
+
+    finally:
+        # 关闭数据库连接
+        connection.close()
+
+
+def delete_cart_items_by_uid_and_bookid(products):
+    connection = connect_mysql()
+    """删除购物车中指定用户和指定书籍的记录"""
+    try:
+        for item in products:
+            print(item)
+            user_id = item['userId']
+            book_id = item['bookId']
+            with connection.cursor() as cursor:
+                # 查询购物车中是否存在该用户和书籍
+                sql = "SELECT * FROM cart WHERE uid=%s AND bookid=%s"
+                cursor.execute(sql, (user_id, book_id))
+                result = cursor.fetchone()
+
+                if result is not None:
+                    # 如果存在，则将对应的记录删除
+                    sql = "DELETE FROM cart WHERE uid=%s AND bookid=%s"
+                    cursor.execute(sql, (user_id, book_id))
+            connection.commit()
+        return True
+    except Exception as e:
+        # 发生异常时回滚事务
+        connection.rollback()
+        print(e)
+        raise

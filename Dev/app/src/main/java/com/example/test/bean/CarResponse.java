@@ -4,6 +4,7 @@ import java.util.List;
 
 /**
  * 购物车返回数据
+ *
  * @author llw
  */
 public class CarResponse {
@@ -100,7 +101,7 @@ public class CarResponse {
             private String productName;
             private String color;
             private String size;
-            private int price;
+            private double price;
             private int count;
             private boolean isChecked;//商品是否选中
 
@@ -176,7 +177,7 @@ public class CarResponse {
                 this.size = size;
             }
 
-            public int getPrice() {
+            public double getPrice() {
                 return price;
             }
 

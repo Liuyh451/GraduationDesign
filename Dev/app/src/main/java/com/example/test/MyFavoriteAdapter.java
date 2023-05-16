@@ -66,13 +66,14 @@ public class MyFavoriteAdapter extends RecyclerView.Adapter<MyFavoriteAdapter.Vi
         TextView author;
         TextView rating;
         TextView date;
+
         public ViewHolder(View itemView) {
             super(itemView);
             image = itemView.findViewById(R.id.novel_image);
             title = itemView.findViewById(R.id.novel_title);
             author = itemView.findViewById(R.id.novel_author);
             rating = itemView.findViewById(R.id.novel_rating);
-            date=itemView.findViewById(R.id.novel_date);
+            date = itemView.findViewById(R.id.novel_date);
         }
     }
 

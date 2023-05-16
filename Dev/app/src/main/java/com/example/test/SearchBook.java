@@ -66,6 +66,9 @@ public class SearchBook extends AppCompatActivity {
                     intent.putExtra("novelTitle", novel.getTitle());
                     intent.putExtra("novelAuthor", novel.getAuthor());
                     intent.putExtra("novelCover", novel.getImageUrl());
+                    intent.putExtra("novelRating", novel.getDescription());
+                    intent.putExtra("price", novel.getPrice());
+
                     startActivity(intent);
                 }
                 //如果是管理跳转过来的，进入编辑页面
@@ -97,6 +100,7 @@ public class SearchBook extends AppCompatActivity {
                             // 将响应数据转换成 Book 对象列表
                             JSONObject jsonObject = new JSONObject(response);
                             String dataStr = jsonObject.getString("data");
+
                             JSONArray jsonArray = new JSONArray(dataStr);
 
                             for (int i = 0; i < jsonArray.length(); i++) {
@@ -105,13 +109,10 @@ public class SearchBook extends AppCompatActivity {
                                 String novelId = novelObject.getString("book_id");
                                 String imageUrl = novelObject.getString("image_url");
                                 String author = novelObject.getString("authors");
-                                String description = "111";
-
-                                Novel novel = new Novel(novelId, title, imageUrl, author, description);
-
+                                String price = novelObject.getString("price");
+                                String rating = novelObject.getString("average_rating");
+                                Novel novel = new Novel(novelId, title, imageUrl, author, rating, price);
                                 novelList.add(novel);
-
-
                             }
 
                             novelAdapter.notifyDataSetChanged();

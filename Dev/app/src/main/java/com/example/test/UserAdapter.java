@@ -77,7 +77,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         }
 
         public void bind(User user) {
-            // TODO: Load user avatar, for example using Glide
             userId = user.getUserId();
             //2023年4月26日21点14分修改为下面pwd和avatarPath两行，目的是为了把相关的值传过去
             pwd = user.getPassword();

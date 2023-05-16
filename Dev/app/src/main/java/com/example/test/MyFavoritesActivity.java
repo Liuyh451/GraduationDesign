@@ -30,13 +30,13 @@ public class MyFavoritesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_favorites);
-        favoriteRecyclerView=findViewById(R.id.novel_list_favorite);
+        favoriteRecyclerView = findViewById(R.id.novel_list_favorite);
         // 初始化RecyclerView
         novelList = new ArrayList<>();
         novelAdapter = new MyFavoriteAdapter(this, novelList);
         favoriteRecyclerView.setAdapter(novelAdapter);
         favoriteRecyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
-        backArrowIv=findViewById(R.id.iv_backward);
+        backArrowIv = findViewById(R.id.iv_backward);
         backArrowIv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -62,8 +62,8 @@ public class MyFavoritesActivity extends AppCompatActivity {
                         String imageUrl = novelObject.getString("image_url");
                         String author = novelObject.getString("authors");
                         String date = novelObject.getString("date");
-
-                        Novel novel = new Novel(rating, title, imageUrl, author, date);
+                        String price = novelObject.getString("price");
+                        Novel novel = new Novel(rating, title, imageUrl, author, date, price);
                         novelList.add(novel);
                     }
 
