@@ -141,6 +141,15 @@ def get_user_reviews():
     # userid=request.form.get("uid")
     data = get_user_reviews_db(user_id)
     return jsonify({'code': 200, "data": data})
+@app.route('/user/reviews/delete', methods=['POST'])
+def delete_user_reviews():
+    data = json.loads(request.form['data'])
+    user_id = data['user_id']
+    book_id = data['book_id']
+    if(delete_reviews_from_db(user_id,book_id)):
+        return jsonify({'code': 200, "msg": "删除成功！"})
+    else:
+        return jsonify({'code': 201, "msg": "删除失败！"})
 
 
 # 添加用户收藏，用户端接口
@@ -166,6 +175,15 @@ def get_my_favorite():
     user_id = data['user_id']
     books = get_favorite(user_id)
     return jsonify({"data": books})
+@app.route('/book/favorite/delete', methods=['POST'])
+def delete_user_favorite():
+    data = json.loads(request.form['data'])
+    user_id = data['user_id']
+    book_id = data['book_id']
+    if(delete_favorite_from_db(user_id,book_id)):
+        return jsonify({'code': 200, "msg": "删除成功！"})
+    else:
+        return jsonify({'code': 201, "msg": "删除失败！"})
 
 
 # 保存用户对书籍的评分，必要时更新模型，用户端接口

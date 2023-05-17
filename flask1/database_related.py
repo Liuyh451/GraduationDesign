@@ -441,6 +441,7 @@ def get_user_reviews_db(user_id):
         i = 0
         for row in rows:
             row_data = {
+                'book_id':row[0],
                 "title": row[1],
                 "authors": row[2],
                 "image_url": row[7],
@@ -455,6 +456,31 @@ def get_user_reviews_db(user_id):
     db.close()
     # 返回评价列表
     return json_result
+def delete_reviews_from_db(uid,bookid):
+    conn=connect_mysql()
+    try:
+        # 创建游标对象
+        with conn.cursor() as cursor:
+            # 构造 SQL 语句
+            sql = 'DELETE FROM reviews WHERE user_id=%s AND book_id=%s'
+
+            # 执行 SQL 语句
+            cursor.execute(sql, (uid, bookid))
+
+        # 提交事务
+        conn.commit()
+        print('Delete successfully!')
+        return True
+
+    except Exception as e:
+        # 发生错误时回滚事务
+        conn.rollback()
+        print('Error:', e)
+        return  False
+
+    finally:
+        # 关闭数据库连接
+        conn.close()
 
 
 # 获取全部评分
@@ -984,7 +1010,31 @@ def add_favorite(userid, bookid, title, author, rating, date, bookCover):
     except Exception as e:
         db.rollback()
         return False, str(e)
+def delete_favorite_from_db(uid,bookid):
+    conn=connect_mysql()
+    try:
+        # 创建游标对象
+        with conn.cursor() as cursor:
+            # 构造 SQL 语句
+            sql = 'DELETE FROM user_favorite WHERE userid=%s AND bookid=%s'
 
+            # 执行 SQL 语句
+            cursor.execute(sql, (uid, bookid))
+
+        # 提交事务
+        conn.commit()
+        print('Delete successfully!')
+        return True
+
+    except Exception as e:
+        # 发生错误时回滚事务
+        conn.rollback()
+        print('Error:', e)
+        return  False
+
+    finally:
+        # 关闭数据库连接
+        conn.close()
 
 def get_order_info_db(tag):
     connection = connect_mysql()

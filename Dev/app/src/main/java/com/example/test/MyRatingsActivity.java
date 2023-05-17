@@ -56,13 +56,13 @@ public class MyRatingsActivity extends AppCompatActivity {
 
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject novelObject = jsonArray.getJSONObject(i);
-                        String novelId = novelObject.getString("book_id");
+//                        String novelId = novelObject.getString("book_id");
                         String title = novelObject.getString("title");
                         String rating = novelObject.getString("rating");
                         String imageUrl = novelObject.getString("image_url");
                         String author = novelObject.getString("authors");
-                        String price=novelObject.getString("price");
-                        Novel novel = new Novel(novelId, title, imageUrl, author, rating,price);
+                        String price="1";
+                        Novel novel = new Novel(price, title, imageUrl, author, rating,price);
                         novelList.add(novel);
                     }
 

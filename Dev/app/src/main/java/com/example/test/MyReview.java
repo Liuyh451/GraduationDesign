@@ -4,21 +4,28 @@ import android.graphics.drawable.Drawable;
 
 public class MyReview {
     private String title;
+    private String book_id;
     private String author;
     private String bookCover;
 
     private String reviewContent;
 
-    public MyReview(String title, String author, String bookCover, String reviewContent) {
+    public MyReview(String title, String author, String bookCover, String reviewContent,String book_id) {
         this.title = title;
         this.author = author;
         this.bookCover = bookCover;
         this.reviewContent = reviewContent;
+        this.book_id=book_id;
     }
 
     // Getter for title property
     public String getTitle() {
         return title;
+    }
+    public String getBookId(){return  book_id;}
+
+    public void setBookId(String book_id) {
+        this.book_id = book_id;
     }
 
     // Setter for title property

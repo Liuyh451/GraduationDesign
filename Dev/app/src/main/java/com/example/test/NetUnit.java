@@ -636,6 +636,35 @@ public class NetUnit {
         // 将请求添加到请求队列
         Volley.newRequestQueue(context).add(stringRequest);
     }
+    public static void deleteFavorite(Context context, String uid, String bookId,Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        String url = "http://10.0.2.2:5000/book/favorite/delete";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("user_id", uid);
+                    jsonObject.put("book_id", bookId);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                params.put("data", jsonObject.toString());
+                Log.d("param", params.toString());
+                return params;
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/x-www-form-urlencoded; charset=UTF-8";
+            }
+        };
+
+        // 将请求添加到请求队列
+        Volley.newRequestQueue(context).add(stringRequest);
+    }
 
 
     public static void getUserRating(Context context, String uid, Response.Listener<String> listener, Response.ErrorListener errorListener) {
@@ -648,6 +677,35 @@ public class NetUnit {
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject.put("user_id", uid);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                params.put("data", jsonObject.toString());
+                Log.d("param", params.toString());
+                return params;
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/x-www-form-urlencoded; charset=UTF-8";
+            }
+        };
+
+        // 将请求添加到请求队列
+        Volley.newRequestQueue(context).add(stringRequest);
+    }
+    public static void deleteMyReview(Context context, String uid, String bookId,Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        String url = "http://10.0.2.2:5000/user/reviews/delete";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("user_id", uid);
+                    jsonObject.put("book_id", bookId);
 
                 } catch (JSONException e) {
                     e.printStackTrace();

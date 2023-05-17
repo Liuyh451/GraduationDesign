@@ -8,9 +8,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.example.test.adapter.MyFavoriteAdapterNew;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,9 +21,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyFavoritesActivity extends AppCompatActivity {
+public class MyFavoritesActivity extends AppCompatActivity implements MyFavoriteAdapterNew.FavoriteDeleteListener{
     private RecyclerView favoriteRecyclerView;
-    private MyFavoriteAdapter novelAdapter;
+    private MyFavoriteAdapterNew novelAdapter;
     private List<Novel> novelList;
     private String uid = GlobalVariable.uid;
     private ImageView backArrowIv;
@@ -33,7 +35,7 @@ public class MyFavoritesActivity extends AppCompatActivity {
         favoriteRecyclerView = findViewById(R.id.novel_list_favorite);
         // 初始化RecyclerView
         novelList = new ArrayList<>();
-        novelAdapter = new MyFavoriteAdapter(this, novelList);
+        novelAdapter = new MyFavoriteAdapterNew(this, novelList,this);
         favoriteRecyclerView.setAdapter(novelAdapter);
         favoriteRecyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
         backArrowIv = findViewById(R.id.iv_backward);
@@ -62,12 +64,36 @@ public class MyFavoritesActivity extends AppCompatActivity {
                         String imageUrl = novelObject.getString("image_url");
                         String author = novelObject.getString("authors");
                         String date = novelObject.getString("date");
-                        String price = novelObject.getString("price");
-                        Novel novel = new Novel(rating, title, imageUrl, author, date, price);
+                        String bookId = novelObject.getString("book_id");
+                        Novel novel = new Novel(bookId, title, imageUrl, author, date,rating);
                         novelList.add(novel);
                     }
 
                     novelAdapter.notifyDataSetChanged();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // 请求失败的处理
+                Log.e("Error", error.toString());
+            }
+        });
+    }
+    @Override
+    public void onFavoriteDeleted(Novel novel){
+        NetUnit.deleteFavorite(this, uid, novel.getNovelId(),new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                // 请求成功的处理
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+                    String msg = jsonObject.getString("msg");
+                    Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
