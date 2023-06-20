@@ -52,7 +52,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
     public static class OrderViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private TextView tvOrderId, tvOrderBookAuthor, tvOrderBookTitle, tvOrderBuyerName;
-        private TextView tvOrderBuyerQuantity, tvOrderBuyerAddress, tvOrderBuyerPhone;
+        private TextView tvOrderBuyerQuantity, tvOrderBuyerAddress, tvOrderBuyerPhone,tvTotalPrice;
         private ImageView tvOrderBookCover;
         private OnOrderClickListener onOrderClickListener;
         private int orderId;
@@ -64,6 +64,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         private String address;
         private String buyerName;
         private String buyerQuantity;
+        private String totalPrice;
 
         public OrderViewHolder(@NonNull View itemView, OnOrderClickListener onOrderClickListener) {
             super(itemView);
@@ -76,8 +77,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             tvOrderBuyerQuantity = itemView.findViewById(R.id.buyer_quantity);
             tvOrderBuyerAddress = itemView.findViewById(R.id.buyer_address);
             tvOrderBuyerPhone = itemView.findViewById(R.id.buyer_phone);
-            //tvOrderDetails = itemView.findViewById(R.id.tv_order_details);
-            //todo 设计用户的信息电话等
+            tvTotalPrice=itemView.findViewById(R.id.totalPrice);
             this.onOrderClickListener = onOrderClickListener;
             itemView.setOnClickListener(this);
         }
@@ -91,6 +91,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             address = order.getAddress();
             buyerName = order.getBuyerName();
             phone = order.getPhone();
+            totalPrice=String.valueOf(order.getTotalPrice());
             buyerQuantity = Integer.toString(order.getQuantity());
             //2023年4月30日00点20分修改,，目的是为了把相关的值传过去
             tvOrderId.setText("Order ID: " + order.getOrderNumber());
@@ -100,8 +101,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             tvOrderBuyerQuantity.setText("数量：" + order.getQuantity());
             tvOrderBuyerAddress.setText("地址：" + order.getAddress());
             tvOrderBuyerPhone.setText("电话：" + order.getPhone());
-            //todo 价格
-            //tvOrderDetails.setText("Order Details: " + order.getDetails());
+            tvTotalPrice.setText("总价:"+order.getTotalPrice());
             Glide.with(itemView)
                     .load(order.getBookCover())  // 指定书籍封面 URL
                     .placeholder(R.drawable.bookerror)  // 设置占位图
@@ -112,7 +112,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         @Override
         public void onClick(View view) {
             //2023年4月30日00点20分修改,，目的是为了把相关的值传过去
-            onOrderClickListener.OnOrderClick(orderId, bookCover, title, author, buyerQuantity, buyerName, price, address, phone);
+            onOrderClickListener.OnOrderClick(orderId, bookCover, title, author, buyerQuantity, buyerName, totalPrice, address, phone);
         }
     }
 }

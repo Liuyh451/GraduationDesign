@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     new Thread(new Runnable() {
                         public void run() {
+                            //String loginUrl = "http://172.24.129.12:5000/login";
                             String loginUrl = "http://10.0.2.2:5000/login";
                             int loginResult[] = NetUnit.sendLoginRequest(loginUrl, username, password);
                             Message msg = new Message();

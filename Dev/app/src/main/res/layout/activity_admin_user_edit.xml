@@ -21,26 +21,113 @@
         android:onClick="changeAvatarClicked"
         android:text="更换头像" />
 
-    <EditText
-        android:id="@+id/username_edittext"
+    <LinearLayout
+        android:id="@+id/item_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="用户名"
-        android:inputType="text" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-    <EditText
-        android:id="@+id/password_edittext"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="密码"
-        android:inputType="textPassword" />
+        <TextView
+            android:id="@+id/title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="昵称"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
 
-    <EditText
-        android:id="@+id/address_edittext"
+        <EditText
+            android:id="@+id/username_edittext"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:hint="昵称"
+            android:paddingLeft="15dp"
+            android:singleLine="true"
+            android:textColor="@color/dark_gray"
+            android:textSize="15sp" />
+        <!--点击跳转或者弹出选择框-->
+        <ImageView
+            android:id="@+id/name_right_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="7dp"
+            android:onClick="changeAvatarClicked"
+            android:padding="8dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/arrow_forward" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="地址"
-        android:inputType="textPostalAddress" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="密码"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+
+        <EditText
+            android:id="@+id/password_edittext"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:hint="密码"
+            android:paddingLeft="15dp"
+            android:singleLine="true"
+            android:textColor="@color/dark_gray"
+            android:textSize="15sp" />
+        <!--点击跳转或者弹出选择框-->
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="7dp"
+            android:onClick="changeAvatarClicked"
+            android:padding="8dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/arrow_forward" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="地址"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/address_edittext"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:hint="地址"
+            android:paddingLeft="15dp"
+            android:singleLine="true"
+            android:textColor="@color/dark_gray"
+            android:textSize="15sp" />
+        <!--点击跳转或者弹出选择框-->
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="7dp"
+            android:onClick="changeAvatarClicked"
+            android:padding="8dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/arrow_forward" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/save_changes_button"

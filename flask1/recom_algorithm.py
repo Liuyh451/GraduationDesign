@@ -20,7 +20,7 @@ def recom_fun(user_id):
     # 加载模型
     # 为用户0推荐3本书
 
-    num_recommendations = 50
+    num_recommendations = 10
     """
     @param model 训练好的模型
     @param user_id 需更新的用户ID
@@ -29,7 +29,7 @@ def recom_fun(user_id):
     @return   推荐的书
     """
 
-    def recommend_books(model, user_id, num_recommendations=50):
+    def recommend_books(model, user_id, num_recommendations):
         user_ratings = ratings[user_id]
         unrated_books = np.where(user_ratings == 0)[0]
         predicted_ratings = model(
@@ -48,8 +48,9 @@ def recom_fun(user_id):
         return recommend_books_list
 
     recommended_books = recommend_books(
-        loaded_model, user_id, num_recommendations=50)
-    print(f'Recommended books for user 0: {recommended_books}')
-    print('Recommended books_id for user 0',
+        loaded_model, user_id, num_recommendations)
+    # print(f'Recommended books for user 0: {recommended_books}')
+    print('Recommended books_id for user {}'.format(user_id+1),
           get_books_id(recommended_books, ratings_matrix))
     save_user_books(user_id + 1, get_books_id(recommended_books, ratings_matrix))
+

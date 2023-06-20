@@ -42,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 
 public class Frag_1 extends Fragment {
-    //jia
 
     private RecyclerView novelRecyclerView;
     private NovelAdapter novelAdapter;
@@ -200,7 +199,7 @@ public class Frag_1 extends Fragment {
                                 String price = novelObject.getString("price");
                                 String imageUrl = novelObject.getString("image_url");
                                 String author = novelObject.getString("authors");
-                                String rating = novelObject.getString("average_rating");
+                                String rating = novelObject.getString("rating");
                                 //price借用id的字段，偷懒
                                 Novel novel = new Novel(novelId, title, imageUrl, author, rating, price);
                                 novelList.add(novel);

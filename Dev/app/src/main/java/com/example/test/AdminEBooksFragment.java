@@ -59,7 +59,6 @@ public class AdminEBooksFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), AdminEBookEditActivity.class);
-                // TODO: 点击事件处理
                 //Toast.makeText(getActivity(), "点击按钮", Toast.LENGTH_SHORT).show();
                 startActivity(intent);
 

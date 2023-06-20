@@ -7,18 +7,28 @@ public class Product {
     private String price; // 价格
     private int quantity; // 数量
     private String bookId;
+    private String author;//作者
 
-    public Product(String userId, String name, String image, String price, int quantity, String bookId) {
+    public Product(String userId, String name, String image, String price, int quantity, String bookId,String author) {
         this.userId = userId;
         this.name = name;
         this.image = image;
         this.price = price;
         this.quantity = quantity;
         this.bookId = bookId;
+        this.author=author;
     }
 
     public String getUserId() {
         return userId;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     public String getBookId() {

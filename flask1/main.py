@@ -93,6 +93,7 @@ def get_random_highest_ratings():
     return search_top_books()
 
 
+
 # 获取全部用户，管理端接口
 @app.route('/getAllUsers', methods=['GET'])
 def get_all_users():
@@ -196,16 +197,16 @@ def rating_and_recom_fun():
     print(user_id, book_id, rating)
     # 立即返回状态码 200
     if (change_user_ratings(user_id, book_id, rating)):
-        calculation_thread = threading.Thread(target=model_train_fun)
-        calculation_thread.start()
+        print("执行训练")
+        model_train_fun()
+        # calculation_thread = threading.Thread(target=model_train_fun)
+        # calculation_thread.start()
     # 开启新线程并执行计算任务
-    else:
-
-        if (get_user_modify(user_id)):
-            user_id = int(user_id)
-
-            calculation_thread = threading.Thread(target=recom_fun(user_id - 1))
-            calculation_thread.start()
+    if (get_user_modify(user_id)):
+        print("执行推荐")
+        user_id = int(user_id)
+        calculation_thread = threading.Thread(target=recom_fun(user_id - 1))
+        calculation_thread.start()
     return "OK", 200
 
 
@@ -357,6 +358,21 @@ def update_user_info():
         result = {'code': 0, 'message': 'error', 'error_message': 'error'}
         return jsonify(result)
 
+@app.route('/user/add', methods=['POST'])
+def add_user():
+    # 从请求中获取参数
+    data = json.loads(request.form['data'])
+    username = data['username']
+    password = data['password']
+    avatar = data['avatar']
+    address = data['address']
+    if(add_user_db(avatar,username,password,address)):
+        # 返回响应
+        response = {'message': 'User added successfully'}
+        return jsonify(response), 200
+    else:
+        response = {'message': 'User added error'}
+        return jsonify(response), 201
 
 @app.route('/user/uInfoModify', methods=['POST'])
 def user_info_modify():
@@ -412,7 +428,8 @@ def modify_book():
     if (result == 1):
         return jsonify({"code": 1, "msg": "修改成功"})
     elif (result == 2):
-        # todo 加入书籍后需要进行训练
+        print("添加图书，执行训练")
+        #model_train_fun()
         return jsonify({"code": 1, "msg": "添加成功"})
     else:
         return jsonify({"code": 0, "msg": "发生错误"})
@@ -425,7 +442,8 @@ def delete_book():
     book_id = data['book_id']
     if (delete_book_db(book_id)):
         result = {'code': 1, 'message': '图书删除成功'}
-        # todo 删除书籍后需要进行训练
+        print("删除图书，执行训练")
+        #model_train_fun()
         return jsonify(result)
     else:
         result = {'code': 0, 'message': '图书删除失败', 'error_message': 'error'}
@@ -483,5 +501,5 @@ def cart_delete():
 
 
 if __name__ == '__main__':
-    # app.run(host='0.0.0.0', port=5000,debug=True)
+    #app.run(host='0.0.0.0', port=5000,debug=True)
     app.run(debug=True)

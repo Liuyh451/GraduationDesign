@@ -122,6 +122,7 @@ public class Frag_3 extends Fragment {
         myRatingsLayout.setOnClickListener(v -> navigateToMyRatings());
         myFavoritesLayout.setOnClickListener(v -> navigateToMyFavorites());
         myReviewsLayout.setOnClickListener(v -> navigateToMyReviews());
+        UInfoModifyLayout.setOnClickListener(v -> navigateToUInfoModify());
         SettingLayout.setOnClickListener(v->navigateToCart());
 
 

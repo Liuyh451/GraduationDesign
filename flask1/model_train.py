@@ -96,3 +96,4 @@ def model_train_fun():
     model = MatrixFactorization(num_users, num_items, latent_factors)
     train(model, train_data, epochs=100)
     model.save_weights('matrix_factorization_model_weights.h5')
+

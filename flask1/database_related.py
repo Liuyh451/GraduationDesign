@@ -118,7 +118,7 @@ def searchBooks(book_id_list):
     )
     # 准备查询语句
     ids = ",".join([str(id) for id in book_id_list])
-    query = f"SELECT * FROM books WHERE book_id IN ({ids})"
+    query = f"SELECT * FROM books2 WHERE book_id IN ({ids})"
 
     # 执行查询
     cursor = db.cursor()
@@ -134,9 +134,9 @@ def searchBooks(book_id_list):
             "book_id": row[0],
             "title": row[1],
             "authors": row[2],
-            "original_publication_year": row[3],
+            "year": row[3],
             "language_code": row[4],
-            "average_rating": row[5],
+            "rating": row[5],
             "work_text_reviews_count": row[6],
             "image_url": row[7],
             'price': row[8]
@@ -243,7 +243,7 @@ def login_db(username, password):
 def search_top_books():
     db = connect_mysql()
     cursor = db.cursor()
-    query = 'SELECT * FROM books ORDER BY rating DESC LIMIT 100'
+    query = 'SELECT * FROM books2 ORDER BY rating DESC LIMIT 60'
     cursor.execute(query)
     results = cursor.fetchall()
     books = random.sample(results, k=6)
@@ -256,10 +256,26 @@ def search_top_books():
             "language_code": row[4],
             "rating": row[5],
             "image_url": row[7],
+            "price":row[8]
             # 添加其他需要的字段
         }
         book_list.append(row_data)
-
+    query = 'SELECT * FROM books2 '
+    cursor.execute(query)
+    results = cursor.fetchall()
+    books = random.sample(results, k=3)
+    for row in books:
+        row_data = {
+            "book_id": row[0],
+            "title": row[1],
+            "authors": row[2],
+            "language_code": row[4],
+            "rating": row[5],
+            "image_url": row[7],
+            "price": row[8]
+            # 添加其他需要的字段
+        }
+        book_list.append(row_data)
     json_result = json.dumps(book_list)
     db.close()
     return json_result
@@ -270,7 +286,7 @@ def get_all_Books_db():
     cursor = db.cursor()
 
     # 查询随机生成的300个图书
-    query = 'SELECT * FROM books ORDER BY rating DESC LIMIT 300'
+    query = 'SELECT * FROM books2 ORDER BY rating DESC LIMIT 80'
     cursor.execute(query)
     results = cursor.fetchall()
     books = random.sample(results, k=50)
@@ -424,7 +440,7 @@ def get_user_reviews_db(user_id):
         book_id_list = [r[1] for r in review_results]
         # 准备查询语句
         ids = ",".join([str(id) for id in book_id_list])
-        query = f"SELECT * FROM books WHERE book_id IN ({ids})"
+        query = f"SELECT * FROM books2 WHERE book_id IN ({ids})"
 
         # 执行查询
         cursor = db.cursor()
@@ -490,7 +506,7 @@ def get_ratings_from_db():
                                  db='reccom_system', charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor)
 
     # 执行查询
-    sql_query = "SELECT user_id, book_id, ratings FROM ratings"
+    sql_query = "SELECT user_id, book_id, ratings FROM ratings_copy1"
     with connection.cursor() as cursor:
         cursor.execute(sql_query)
         result = cursor.fetchall()
@@ -521,7 +537,7 @@ def get_ratings_from_db():
 def get_user_rating_db(user_id):
     conn = connect_mysql()
     cursor = conn.cursor()
-    sql = "SELECT user_id, book_id, ratings FROM ratings WHERE user_id=%s"
+    sql = "SELECT user_id, book_id, ratings FROM ratings_copy1 WHERE user_id=%s"
     cursor.execute(sql, user_id)
     result = cursor.fetchall()
     ratings = []
@@ -531,7 +547,7 @@ def get_user_rating_db(user_id):
     book_id_list = [r[1] for r in result]
     # 准备查询语句
     ids = ",".join([str(id) for id in book_id_list])
-    query = f"SELECT * FROM books WHERE book_id IN ({ids})"
+    query = f"SELECT * FROM books2 WHERE book_id IN ({ids})"
     # 执行查询
     cursor = conn.cursor()
     cursor.execute(query)
@@ -619,7 +635,7 @@ def change_user_ratings(user_id, book_id, rating):
     db = connect_mysql()
     cursor = db.cursor()
     try:
-        sql = "SELECT COUNT(*) FROM `ratings` WHERE user_id = %s" % user_id
+        sql = "SELECT COUNT(*) FROM `ratings_copy1` WHERE user_id = %s" % user_id
         cursor.execute(sql)
         count = cursor.fetchone()[0]
         # 查询用户，判断用户是否存在
@@ -630,7 +646,7 @@ def change_user_ratings(user_id, book_id, rating):
             is_new_user = 0
             print("not new user")
         # 查询该用户对该书籍是否已经评分过
-        sql = f"SELECT ratings FROM ratings WHERE user_id={user_id} AND book_id={book_id}"
+        sql = f"SELECT ratings FROM ratings_copy1 WHERE user_id={user_id} AND book_id={book_id}"
         cursor.execute(sql)
         result = cursor.fetchone()
 
@@ -638,17 +654,18 @@ def change_user_ratings(user_id, book_id, rating):
         if result is not None:
             old_rating = result[0]
             new_rating = rating
-            sql = f"UPDATE ratings SET ratings={new_rating} WHERE user_id={user_id} AND book_id={book_id}"
+            sql = f"UPDATE ratings_copy1 SET ratings={new_rating} WHERE user_id={user_id} AND book_id={book_id}"
             cursor.execute(sql)
             db.commit()
             print("update rating")
 
         # 如果该用户未评分过，则插入评分值
         else:
-            sql = f"INSERT INTO ratings(user_id, book_id, ratings) VALUES ({user_id}, {book_id}, {rating})"
+            sql = f"INSERT INTO ratings_copy1(user_id, book_id, ratings) VALUES ({user_id}, {book_id}, {rating})"
             cursor.execute(sql)
             db.commit()
-            print("insert rating")
+            is_new_user = 1
+            print("insert rating,train")
         return is_new_user
     except Exception as e:
         # 如果出错，则回滚事务
@@ -674,7 +691,7 @@ def get_user_modify(user_id):
     modify = int(modify)
     print("modify", modify)
     modify += 1
-    if modify % 5 == 0:
+    if modify % 2 == 0:
         updata = 1
     else:
         updata = 0
@@ -690,7 +707,7 @@ def get_user_to_book_rating_db(user_id, book_id):
 
     # 使用游标查询数据
     with conn.cursor() as cursor:
-        sql = f"SELECT ratings FROM ratings WHERE user_id=%s AND book_id=%s"
+        sql = f"SELECT ratings FROM ratings_copy1 WHERE user_id=%s AND book_id=%s"
         cursor.execute(sql, (user_id, book_id))
         result = cursor.fetchone()
 
@@ -728,7 +745,7 @@ def fuzzy_search_book(title):
     conn = connect_mysql()
     cur = conn.cursor()
     # 使用拼接字符串的方式实现模糊搜索
-    sql = "SELECT book_id, title, author, rating,image_url,price FROM books WHERE title LIKE '%%" + title + "%%'"
+    sql = "SELECT book_id, title, author, rating,image_url,price FROM books2 WHERE title LIKE '%%" + title + "%%'"
     cur.execute(sql)
     results = cur.fetchall()
     books_list = []
@@ -886,6 +903,25 @@ def update_user_info_db(username, password, avatar, address, uid):
         # 关闭数据库连接
         db.close()
 
+def add_user_db(avatar, username, password, address):
+    conn = connect_mysql()
+    cursor = conn.cursor()
+    try:
+        # 添加用户
+        sql = "INSERT INTO user (avatar, username, password, address) VALUES (%s, %s, %s, %s)"
+        cursor.execute(sql, (avatar, username, password, address))
+        conn.commit()
+        return True
+    except:
+        # 出现异常，回滚事务
+        conn.rollback()
+        return False
+    finally:
+        # 关闭游标和连接
+        cursor.close()
+        conn.close()
+    # 将参数插入到数据库中
+
 
 # 删除用户
 def delete_user_db(user_id):
@@ -940,13 +976,13 @@ def modify_book_db(book_id, book_cover, book_title, book_author, book_price, boo
     db = connect_mysql()
     cursor = db.cursor()
     # 检查是否存在该书
-    select_query = f"SELECT * FROM books WHERE book_id='{book_id}'"
+    select_query = f"SELECT * FROM books2 WHERE book_id='{book_id}'"
     cursor.execute(select_query)
     exist_book = cursor.fetchone()
 
     if exist_book:
         # 如果存在该书，则进行更新操作
-        update_query = f"UPDATE books SET image_url='{book_cover}', title='{book_title}', author='{book_author}', price={book_price}, description='{book_description}', language='{book_language}' WHERE book_id='{book_id}'"
+        update_query = f"UPDATE books2 SET image_url='{book_cover}', title='{book_title}', author='{book_author}', price={book_price}, description='{book_description}', language='{book_language}' WHERE book_id='{book_id}'"
         try:
             cursor.execute(update_query)
             db.commit()
@@ -959,7 +995,7 @@ def modify_book_db(book_id, book_cover, book_title, book_author, book_price, boo
 
     else:
         # 如果不存在该书，则进行插入操作
-        insert_query = f"INSERT INTO books(book_id, image_url, title, author, price, description, language) VALUES ('{book_id}', '{book_cover}', '{book_title}', '{book_author}', {book_price}, '{book_description}', '{book_language}')"
+        insert_query = f"INSERT INTO books2(book_id, image_url, title, author, price, description, language) VALUES ('{book_id}', '{book_cover}', '{book_title}', '{book_author}', {book_price}, '{book_description}', '{book_language}')"
         try:
             cursor.execute(insert_query)
             db.commit()
@@ -977,7 +1013,7 @@ def delete_book_db(book_id):
     cursor = conn.cursor()
     try:
         # 删除图书
-        sql = "DELETE FROM books WHERE book_id=%s"
+        sql = "DELETE FROM books2 WHERE book_id=%s"
         cursor.execute(sql, (book_id,))
         # 提交事务
         conn.commit()
@@ -1140,14 +1176,14 @@ def settle_cart_db(tag, products,paycheck):
             quantity = item['quantity']
             user_id = item['userId']
             bookId = item['bookId']
+            author=item['author']
             print(type(price))
             print(type(quantity))
             total_price = eval(price) * quantity
-
             # 插入到数据库中
             with connection.cursor() as cursor:
-                sql = "INSERT INTO orders (book_cover, title, price, quantity, userid,book_id,totalPrice,tag,paycheck) VALUES (%s, %s, %s, %s, %s,%s,%s,%s,%s)"
-                cursor.execute(sql, (image, name, price, quantity, user_id, bookId, total_price, tag,paycheck))
+                sql = "INSERT INTO orders (book_cover,author, title, price, quantity, userid,book_id,totalPrice,tag,paycheck) VALUES (%s,%s, %s, %s, %s, %s,%s,%s,%s,%s)"
+                cursor.execute(sql, (image,author, name, price, quantity, user_id, bookId, total_price, tag,paycheck))
             connection.commit()
 
     except Exception as e:

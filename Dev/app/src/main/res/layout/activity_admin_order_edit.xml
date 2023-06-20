@@ -21,6 +21,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:background="@android:color/transparent" />
 
             <TextView
                 android:id="@+id/book_title"
@@ -29,22 +33,29 @@
                 android:text="电子书标题"
                 android:textSize="18sp"
                 android:textStyle="bold" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:background="@android:color/transparent" />
 
             <TextView
                 android:id="@+id/book_author"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="电子书作者"
-                android:textSize="14sp" />
+                android:textSize="18sp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:background="@android:color/transparent" />
 
             <TextView
                 android:id="@+id/book_price"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="价格"
-                android:textColor="@color/gray_500"
                 android:textSize="18sp"
-                android:textStyle="bold" />
+                 />
         </LinearLayout>
 
     </LinearLayout>
@@ -146,6 +157,7 @@
         android:id="@+id/delete_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="删除" />
+        android:text="删除"
+        android:textColor="@color/red_color"/>
 
 </LinearLayout>

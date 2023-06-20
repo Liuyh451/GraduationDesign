@@ -43,8 +43,6 @@ public class NetUnit {
             sb.append("&");
             sb.append("password=" + URLEncoder.encode(password, "UTF-8"));
             byte[] body = sb.toString().getBytes();
-
-
             // 创建连接
             URL url = new URL(urlStr);
             connection = (HttpURLConnection) url.openConnection();
@@ -387,6 +385,37 @@ public class NetUnit {
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject.put("user_id", uid);
+                    jsonObject.put("username", username);
+                    jsonObject.put("password", password);
+                    jsonObject.put("avatar", avatarPath);
+                    jsonObject.put("address", address);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                params.put("data", jsonObject.toString());
+                Log.d("param", params.toString());
+                return params;
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/x-www-form-urlencoded; charset=UTF-8";
+            }
+        };
+
+        // 将请求添加到请求队列
+        Volley.newRequestQueue(context).add(stringRequest);
+    }
+    public static void addUser(Context context, String username, String password, String avatarPath, String address, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        String url = "http://10.0.2.2:5000/user/add";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                JSONObject jsonObject = new JSONObject();
+                try {
                     jsonObject.put("username", username);
                     jsonObject.put("password", password);
                     jsonObject.put("avatar", avatarPath);

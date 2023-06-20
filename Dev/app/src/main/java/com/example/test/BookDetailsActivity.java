@@ -157,6 +157,7 @@ public class BookDetailsActivity extends AppCompatActivity {
                     public void onResponse(String response) {
                         // 请求成功的处理
                         try {
+                            Log.d("author",book.getAuthor());
                             JSONObject jsonObject = new JSONObject(response);
                             String msg = jsonObject.getString("msg");
                             Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();

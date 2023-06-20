@@ -51,6 +51,9 @@ dependencies {
     implementation 'androidx.cardview:cardview:1.0.0'
     //省市区地址选择器
     implementation 'com.github.crazyandcoder:citypicker:6.0.2'
+    //下拉刷新
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+
 
 
 

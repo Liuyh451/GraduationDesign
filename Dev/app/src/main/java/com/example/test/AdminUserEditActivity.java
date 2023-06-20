@@ -23,10 +23,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.bumptech.glide.Glide;
+import com.lljjcoder.Interface.OnCityItemClickListener;
+import com.lljjcoder.bean.CityBean;
+import com.lljjcoder.bean.DistrictBean;
+import com.lljjcoder.bean.ProvinceBean;
+import com.lljjcoder.style.cityjd.JDCityConfig;
+import com.lljjcoder.style.cityjd.JDCityPicker;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,9 +48,10 @@ public class AdminUserEditActivity extends AppCompatActivity {
     private ImageView avatarImageView;
     private EditText usernameEditText;
     private EditText passwordEditText;
-    private EditText addressEditText;
+    private TextView addressEditText;
     private Button saveChangesButton;
     private String filePath;
+    private String userAddress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,15 +68,7 @@ public class AdminUserEditActivity extends AppCompatActivity {
 
         // 将 userId 转换为字符串类型
         String userIdString = String.valueOf(userId);
-
-        if (username != null) {
-            Log.d("UEdit", username);
-        } else {
-            Log.d("UEdit", "用户名为空");
-        }
-        Log.d("UEdit", password);
         // Find views
-
         // 获取控件
         avatarImageView = findViewById(R.id.avatar_image);
         usernameEditText = findViewById(R.id.username_edittext);
@@ -76,26 +76,46 @@ public class AdminUserEditActivity extends AppCompatActivity {
         addressEditText = findViewById(R.id.address_edittext);
         saveChangesButton = findViewById(R.id.save_changes_button);
         filePath = avatarPath;
-        // 显示头像、用户名和密码
-        if (new File(filePath).exists()) {
-            // 如果本地文件存在，则使用本地文件
-            Bitmap bitmap = BitmapFactory.decodeFile(filePath);
-            avatarImageView.setImageBitmap(bitmap);
-        } else {
-            // 如果本地文件不存在，则使用 Glide 进行网络加载
-            Glide.with(this).load(filePath).into(avatarImageView);
+        if(userId!=0){
+            if (username != null) {
+                usernameEditText.setText(username);
+            } else {
+                Log.d("UEdit", "用户名为空");
+            }
+            if (password != null) {
+
+                passwordEditText.setText(password);
+            } else {
+                Log.d("UEdit", "密码为空");
+            }
+            // 显示头像、用户名和密码
+            if (new File(filePath).exists()) {
+                // 如果本地文件存在，则使用本地文件
+                Bitmap bitmap = BitmapFactory.decodeFile(filePath);
+                avatarImageView.setImageBitmap(bitmap);
+            } else {
+                // 如果本地文件不存在，则使用 Glide 进行网络加载
+                Glide.with(this).load(filePath).placeholder(R.drawable.ic_user).into(avatarImageView);
+            }
         }
-        usernameEditText.setText(username);
-        passwordEditText.setText(password);
+        else {
+            avatarImageView.setImageResource(R.drawable.ic_user);
+        }
+        addressEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {getAddress();
+            }
+        });
 
         // 监听按钮的点击事件
         saveChangesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String address = addressEditText.getText().toString();
+                String address = userAddress;
                 String newUsername = usernameEditText.getText().toString();
                 String newPassword = passwordEditText.getText().toString();
                 Log.d("updateUinfo", address);
+                if(userId!=0){
                 NetUnit.updateUserInfo(context, userIdString, newUsername, newPassword, filePath, address, new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -117,6 +137,32 @@ public class AdminUserEditActivity extends AppCompatActivity {
                         Log.e("Error", error.toString());
                     }
                 });
+                }
+                //添加用户
+                else {
+                    NetUnit.addUser(context,  newUsername, newPassword, filePath, address, new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            // 请求成功的处理
+                            try {
+                                JSONObject jsonObject = new JSONObject(response);
+                                String msg = jsonObject.getString("message");
+                                Log.d("updateuserinfo", msg);
+                                //requestReviews(book.getBookId());
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            // 请求失败的处理
+                            Log.e("Error", error.toString());
+                        }
+                    });
+
+                }
             }
         });
     }
@@ -131,8 +177,6 @@ public class AdminUserEditActivity extends AppCompatActivity {
         startActivityForResult(intent, REQUEST_IMAGE_PICK);
     }
 
-    // TODO: Load user data and populate EditTexts
-    // For example: int userId = getIntent().getIntExtra("user_id", 0);
     // 处理相机或图库返回的结果
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -167,6 +211,27 @@ public class AdminUserEditActivity extends AppCompatActivity {
             }
         }
     }
+    private void getAddress()   {
+        JDCityPicker cityPicker = new JDCityPicker();
+        JDCityConfig jdCityConfig = new JDCityConfig.Builder().build();
 
+        jdCityConfig.setShowType(JDCityConfig.ShowType.PRO_CITY_DIS);
+        cityPicker.init(this);
+        cityPicker.setConfig(jdCityConfig);
+        cityPicker.setOnCityItemClickListener(new OnCityItemClickListener() {
+            @Override
+            public void onSelected(ProvinceBean province, CityBean city, DistrictBean district) {
+                addressEditText.setText(province.getName() + city.getName()+ district.getName() );
+                userAddress=province.getName()+city.getName()+district.getName();
+                Log.d("UserModify",userAddress);
+            }
+
+            @Override
+            public void onCancel() {
+            }
+        });
+        cityPicker.showCityPicker();
+
+    }
 
 }

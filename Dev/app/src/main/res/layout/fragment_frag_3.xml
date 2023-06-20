@@ -160,13 +160,13 @@
         <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/settings" />
+            android:src="@drawable/cart" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="设置"
+            android:text="购物车"
             android:textColor="#333333"
             android:textSize="18sp" />
 

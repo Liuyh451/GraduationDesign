@@ -212,14 +212,14 @@ public class CartActivity extends AppCompatActivity implements GoodsCallback,Vie
                         CarResponse.OrderDataBean.CartlistBean cartlistBean = orderDataBean.getCartlist().get(j);
                         //当有选中商品时计算数量和价格
                         if (cartlistBean.isChecked()) {
-                            products.add(new Product(Uid,cartlistBean.getProductName(),cartlistBean.getDefaultPic(),String.valueOf(cartlistBean.getPrice()),cartlistBean.getCount(),String.valueOf(cartlistBean.getProductId())));
+                            products.add(new Product(Uid,cartlistBean.getProductName(),cartlistBean.getDefaultPic(),String.valueOf(cartlistBean.getPrice()),cartlistBean.getCount(),String.valueOf(cartlistBean.getProductId()),cartlistBean.getColor()));
                         }
                     }
                 }
                 Gson gson = new Gson();
                 String productListJson = gson.toJson(products);
                 Random random = new Random();
-
+                Log.d("product",productListJson);
                 // 生成一个随机整数
                 int orderId = random.nextInt(10000);
                 NetUnit.cartSettle(this, Uid,productListJson,orderId, new Response.Listener<String>() {
@@ -274,7 +274,7 @@ public class CartActivity extends AppCompatActivity implements GoodsCallback,Vie
                         CarResponse.OrderDataBean.CartlistBean cartlistBean = orderDataBean.getCartlist().get(j);
                         //当有选中商品时计算数量和价格
                         if (cartlistBean.isChecked()) {
-                            productsDelete.add(new Product(Uid,cartlistBean.getProductName(),cartlistBean.getDefaultPic(),String.valueOf(cartlistBean.getPrice()),cartlistBean.getCount(),String.valueOf(cartlistBean.getProductId())));
+                            productsDelete.add(new Product(Uid,cartlistBean.getProductName(),cartlistBean.getDefaultPic(),String.valueOf(cartlistBean.getPrice()),cartlistBean.getCount(),String.valueOf(cartlistBean.getProductId()),cartlistBean.getColor()));
                         }
                     }
                 }

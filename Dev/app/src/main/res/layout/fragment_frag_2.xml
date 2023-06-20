@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".Frag_2">
 
     <!-- 顶部搜索栏 -->
@@ -10,7 +11,8 @@
         android:id="@+id/search_field"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp">
+        android:padding="4dp"
+        android:layout_marginTop="6dp"> <!-- 设置顶部间距为8dp -->>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -31,32 +33,26 @@
 
     </RelativeLayout>
 
-
-    <!-- 书籍列表 GridView -->
-    <GridView
-        android:id="@+id/books_grid"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/search_field"
-        android:layout_centerInParent="true"
-        android:background="@color/white"
-        android:clipToPadding="false"
-        android:columnWidth="150dp"
-        android:horizontalSpacing="8dp"
-        android:numColumns="3"
-        android:padding="8dp"
-        android:stretchMode="columnWidth"
-        android:verticalSpacing="24dp" />
+        android:layout_below="@id/search_field">
+        <!-- 书籍列表 GridView -->
+        <GridView
+            android:id="@+id/books_grid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:background="@color/white"
+            android:clipToPadding="false"
+            android:columnWidth="150dp"
+            android:horizontalSpacing="8dp"
+            android:numColumns="3"
+            android:padding="4dp"
+            android:stretchMode="columnWidth"
+            android:verticalSpacing="12dp" />
 
-    <!-- 刷新按钮 -->
-    <Button
-        android:id="@+id/refresh_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="80dp"
-        android:padding="8dp"
-        android:text="换一批" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </RelativeLayout>

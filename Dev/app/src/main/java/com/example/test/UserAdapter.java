@@ -84,7 +84,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             //增加上面的那两行
             username = user.getUsername();
             tvUserId.setText("Username: " + user.getUsername());
-            tvUserPassword.setText("Password: " + user.getPassword());
+            tvUserPassword.setText(user.getPassword());
             if (new File(avatarPath).exists()) {
                 // 如果本地文件存在，则使用本地文件
                 Bitmap bitmap = BitmapFactory.decodeFile(avatarPath);

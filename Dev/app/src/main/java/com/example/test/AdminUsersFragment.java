@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -39,6 +40,20 @@ public class AdminUsersFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_admin__users, container, false);
 
         RecyclerView recyclerView = view.findViewById(R.id.rv_users);
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+
+                if (newState == RecyclerView.SCROLL_STATE_IDLE && !recyclerView.canScrollVertically(-1)) {
+                    // 滚动停止且滚动到顶部，启动新活动
+                    Intent intent = new Intent(getActivity(), AdminUserEditActivity.class);
+                    startActivity(intent);
+                }
+            }
+        });
+
+
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         userList = new ArrayList<>();
@@ -49,7 +64,7 @@ public class AdminUsersFragment extends Fragment {
         });
         recyclerView.setAdapter(userAdapter);
 
-        requestData();
+        requestUserData();
 
         return view;
     }
@@ -64,7 +79,7 @@ public class AdminUsersFragment extends Fragment {
         startActivity(intent);
     }
 
-    private void requestData() {
+    private void requestUserData() {
         String url = "http://10.0.2.2:5000/getAllUsers"; // 替换为实际的API地址
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(

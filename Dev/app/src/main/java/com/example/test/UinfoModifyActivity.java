@@ -64,8 +64,6 @@ public class UinfoModifyActivity extends AppCompatActivity {
     private String filePath;
     private String Uid = GlobalVariable.uid;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
